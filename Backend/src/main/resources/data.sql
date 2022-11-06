@@ -1,0 +1,1 @@
+INSERT INTO app_user(id_user, email, image, name, password) VALUES (1, 'email@email.com', 'image/image1.jpg', 'Charlie', 'password1!');
