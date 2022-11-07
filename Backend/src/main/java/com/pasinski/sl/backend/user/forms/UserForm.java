@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 @Getter
-public class NewUser {
+public class UserForm {
     @NotBlank(message = "Name is mandatory")
     private String name;
 
@@ -13,4 +13,6 @@ public class NewUser {
 
     @NotBlank(message = "Password is mandatory")
     private String password;
+
+    private String image;
 }

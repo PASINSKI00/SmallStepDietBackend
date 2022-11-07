@@ -1,8 +1,6 @@
 package com.pasinski.sl.backend.user;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.pasinski.sl.backend.user.forms.NewUser;
+import com.pasinski.sl.backend.user.forms.UserForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +31,9 @@ public class AppUserController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> addUser(@Valid @RequestBody NewUser newUser) {
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserForm userForm) {
         try {
-            appUserService.addUser(newUser);
+            appUserService.addUser(userForm);
         } catch (HttpClientErrorException e){
             return new ResponseEntity<>(e.getStatusCode());
         } catch (Error e){
@@ -44,4 +42,19 @@ public class AppUserController {
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PutMapping()
+    public ResponseEntity<?> updateUser(@RequestBody UserForm userForm) {
+        try {
+            appUserService.updateUser(userForm);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Error e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 }
