@@ -56,5 +56,16 @@ public class AppUserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping()
+    public ResponseEntity<?> deleteUserOwnAccount() {
+        try {
+            appUserService.deleteUserOwnAccount();
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Error e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

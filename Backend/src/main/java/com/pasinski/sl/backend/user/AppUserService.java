@@ -51,4 +51,10 @@ public class AppUserService {
         if (userForm.getImage() != null && !userForm.getImage().isBlank() && !userForm.getImage().isEmpty())
             appUser.setImage(userForm.getImage());
     }
+
+    public void deleteUserOwnAccount() {
+        appUserRepository
+                .findById(userSecurity.getUserId())
+                .ifPresent(appUser -> appUserRepository.delete(appUser));
+    }
 }
