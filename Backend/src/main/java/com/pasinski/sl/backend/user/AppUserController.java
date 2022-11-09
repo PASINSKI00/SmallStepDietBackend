@@ -1,15 +1,13 @@
 package com.pasinski.sl.backend.user;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.pasinski.sl.backend.user.forms.UserForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,9 +24,48 @@ public class AppUserController {
         } catch (HttpClientErrorException e){
             return new ResponseEntity<>(e.getStatusCode());
         } catch (Error e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>(retrievedUser, HttpStatus.OK);
+    }
+
+    @PostMapping()
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserForm userForm) {
+        try {
+            appUserService.addUser(userForm);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Error e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping()
+    public ResponseEntity<?> updateUser(@RequestBody UserForm userForm) {
+        try {
+            appUserService.updateUser(userForm);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Error e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<?> deleteUserOwnAccount() {
+        try {
+            appUserService.deleteUserOwnAccount();
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Error e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
