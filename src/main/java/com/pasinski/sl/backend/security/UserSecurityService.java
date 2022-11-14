@@ -2,9 +2,11 @@ package com.pasinski.sl.backend.security;
 
 import com.pasinski.sl.backend.user.AppUserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @AllArgsConstructor
-public class UserSecurity {
+public class UserSecurityService {
 
     private AppUserRepository appUserRepository;
 
@@ -17,7 +19,7 @@ public class UserSecurity {
         return true;
     }
 
-    public Long getUserId() {
+    public Long getLoggedUserId() {
         //TODO: implement
         return 1L;
     }
