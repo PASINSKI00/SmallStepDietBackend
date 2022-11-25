@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.meal;
 
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
+import com.pasinski.sl.backend.user.AppUser;
 import lombok.Getter;
 import lombok.Setter;
 import javax.persistence.*;
@@ -29,4 +30,8 @@ public class Meal {
 
     @ManyToMany
     private List<Category> categories;
+
+    @ManyToOne
+    private AppUser author;
+
 }

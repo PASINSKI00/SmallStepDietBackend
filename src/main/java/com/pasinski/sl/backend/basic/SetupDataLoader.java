@@ -140,6 +140,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredients.add(ingredientRepository.findByName("Rice"));
         meal.setCategories(categories);
         meal.setIngredients(ingredients);
+        meal.setAuthor(appUserRepository.findById(1L).get());
         mealRepository.save(meal);
     }
 
