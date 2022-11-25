@@ -6,6 +6,8 @@ import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
+import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.user.AppUserRepository;
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,8 @@ public class MealService {
     private final MealRepository mealRepository;
     private final CategoryRepository categoryRepository;
     private final IngredientRepository ingredientRepository;
+    private final AppUserRepository appUserRepository;
+    private final UserSecurityService userSecurityService;
 
     public List<MealResponseBody> getMeals() {
         List<Meal> meals = mealRepository.findAll();
@@ -43,18 +47,23 @@ public class MealService {
         Meal meal = new Meal();
 
         meal.setName(mealForm.getName());
-//        meal.setRecipe(mealForm.getRecipe());
+        meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
+        meal.getMealExtention().setRecipe(mealForm.getRecipe());
+        meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
 
-        mealForm.getIngredientsIds().forEach(id -> {
-            Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-            meal.getIngredients().add(ingredient);
-        });
+        if(mealForm.getCategoriesIds() != null)
+            meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
 
-        mealForm.getCategoriesIds().forEach(id -> {
-            Category category = categoryRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-            meal.getCategories().add(category);
-        });
+        if(mealForm.getImage() != null)
+            meal.setImage(mealForm.getImage());
 
+        calculateRatiosOfMacroElements(meal);
+
+        meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
         mealRepository.save(meal);
+    }
+
+    private void calculateRatiosOfMacroElements(Meal meal) {
+        //TODO
     }
 }

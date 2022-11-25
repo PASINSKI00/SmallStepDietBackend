@@ -5,7 +5,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 public class MealForm {
@@ -16,11 +16,11 @@ public class MealForm {
     private String recipe;
 
     @NotEmpty(message = "Ingredients are mandatory")
-    private Set<Long> ingredientsIds;
+    private List<Long> ingredientsIds;
 
     @NotNull(message = "Time to prepare is mandatory")
     private Integer timeToPrepare;
 
     private String image;
-    private Set<Long> categoriesIds;
+    private List<Long> categoriesIds;
 }

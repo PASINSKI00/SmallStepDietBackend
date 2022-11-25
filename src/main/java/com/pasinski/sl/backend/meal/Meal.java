@@ -5,8 +5,11 @@ import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.user.AppUser;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Setter
@@ -19,17 +22,19 @@ public class Meal {
 
     @NotNull
     private String name;
+
     @NotNull
-    private String image;
+    @ColumnDefault("'/assets/images/Hot_meal_header.png'")
+    private String image = "/assets/images/Hot_meal_header.png";
 
     @OneToOne(cascade = CascadeType.ALL)
-    MealExtention mealExtention;
+    MealExtention mealExtention = new MealExtention();
 
     @ManyToMany
-    private List<Ingredient> ingredients;
+    private List<Ingredient> ingredients = new ArrayList<>();
 
     @ManyToMany
-    private List<Category> categories;
+    private List<Category> categories = new ArrayList<>();
 
     @ManyToOne
     private AppUser author;
