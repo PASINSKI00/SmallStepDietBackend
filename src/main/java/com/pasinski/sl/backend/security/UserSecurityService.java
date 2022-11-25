@@ -1,7 +1,9 @@
 package com.pasinski.sl.backend.security;
 
+import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,13 +16,8 @@ public class UserSecurityService {
         return appUserRepository.findByEmail(email).isPresent();
     }
 
-    public boolean isUserLoggedIn() {
-        //TODO: implement
-        return true;
-    }
-
     public Long getLoggedUserId() {
-        //TODO: implement
-        return 1L;
+        AppUser appUser= (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return appUser.getIdUser();
     }
 }
