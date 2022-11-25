@@ -95,6 +95,14 @@ public class MealService {
 
         mealRepository.save(meal);
     }
+    public void deleteMeal(MealForm mealForm) {
+        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
+
+        if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        mealRepository.delete(meal);
+    }
 
     private void calculateRatiosOfMacroElements(Meal meal) {
         //TODO
@@ -103,4 +111,5 @@ public class MealService {
     private void assignCategoriesAutomatically(Meal meal) {
         //TODO
     }
+
 }

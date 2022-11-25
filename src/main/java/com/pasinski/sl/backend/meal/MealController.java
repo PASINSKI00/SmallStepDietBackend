@@ -58,4 +58,18 @@ public class MealController {
 
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping()
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteMeal(@RequestBody MealForm mealForm) {
+        try {
+            mealService.deleteMeal(mealForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().build();
+    }
 }
