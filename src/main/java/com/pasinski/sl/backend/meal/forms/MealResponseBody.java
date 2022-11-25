@@ -1,7 +1,5 @@
 package com.pasinski.sl.backend.meal.forms;
 
-import com.pasinski.sl.backend.meal.category.Category;
-import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
