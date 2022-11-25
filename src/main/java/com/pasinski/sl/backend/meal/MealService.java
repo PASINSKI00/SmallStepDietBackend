@@ -4,6 +4,7 @@ import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
+import com.pasinski.sl.backend.meal.forms.MealResponseBodyExtended;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
@@ -104,6 +105,12 @@ public class MealService {
         mealRepository.delete(meal);
     }
 
+    public MealResponseBodyExtended extendMeal(MealForm mealForm) {
+        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        return new MealResponseBodyExtended(meal, meal.getMealExtention());
+    }
+
     private void calculateRatiosOfMacroElements(Meal meal) {
         //TODO
     }
@@ -111,5 +118,4 @@ public class MealService {
     private void assignCategoriesAutomatically(Meal meal) {
         //TODO
     }
-
 }

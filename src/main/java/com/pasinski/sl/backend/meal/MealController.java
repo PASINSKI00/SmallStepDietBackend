@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.meal;
 
 import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
+import com.pasinski.sl.backend.meal.forms.MealResponseBodyExtended;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,4 +73,20 @@ public class MealController {
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/extend")
+    public ResponseEntity<?> extendMeal(@RequestBody MealForm mealForm) {
+        MealResponseBodyExtended mealResponseBodyExtended;
+
+        try {
+            mealResponseBodyExtended = mealService.extendMeal(mealForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok(mealResponseBodyExtended);
+    }
+
 }

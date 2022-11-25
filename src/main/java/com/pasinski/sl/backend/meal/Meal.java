@@ -27,16 +27,15 @@ public class Meal {
     @ColumnDefault("'/assets/images/Hot_meal_header.png'")
     private String image = "/assets/images/Hot_meal_header.png";
 
-    @OneToOne(cascade = CascadeType.ALL)
-    MealExtention mealExtention = new MealExtention();
-
     @ManyToMany
     private List<Ingredient> ingredients = new ArrayList<>();
 
     @ManyToMany
     private List<Category> categories = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    MealExtention mealExtention = new MealExtention();
+
     @ManyToOne
     private AppUser author;
-
 }

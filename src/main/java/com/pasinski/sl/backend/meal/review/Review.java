@@ -18,5 +18,5 @@ public class Review {
     private int rating;
 
     @ManyToOne
-    private AppUser appUser;
+    private AppUser author;
 }

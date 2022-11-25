@@ -7,6 +7,8 @@ import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
+import com.pasinski.sl.backend.meal.review.Review;
+import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
@@ -40,6 +42,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final MealRepository mealRepository;
     private final IngredientRepository ingredientRepository;
     private final CategoryRepository categoryRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
     @Transactional
@@ -96,6 +99,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         user.setPassword(passwordEncoder.encode("Password1!"));
         user.setEmail("email@email.com");
         user.setRoles(Arrays.asList(adminRole));
+        user.setImage("users/iamge");
         appUserRepository.save(user);
     }
 
@@ -141,6 +145,15 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         meal.setCategories(categories);
         meal.setIngredients(ingredients);
         meal.setAuthor(appUserRepository.findById(1L).get());
+
+        Review review = new Review();
+        review.setAuthor(appUserRepository.findById(1L).get());
+        review.setRating(5);
+        review.setContent("This is a comment");
+        reviewRepository.save(review);
+
+
+        meal.getMealExtention().getReviews().add(review);
         mealRepository.save(meal);
     }
 
