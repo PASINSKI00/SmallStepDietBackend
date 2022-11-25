@@ -1,0 +1,115 @@
+package com.pasinski.sl.backend.meal;
+
+import com.pasinski.sl.backend.meal.category.Category;
+import com.pasinski.sl.backend.meal.category.CategoryRepository;
+import com.pasinski.sl.backend.meal.forms.MealForm;
+import com.pasinski.sl.backend.meal.forms.MealResponseBody;
+import com.pasinski.sl.backend.meal.ingredient.Ingredient;
+import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
+import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.user.AppUserRepository;
+import lombok.AllArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Service
+@AllArgsConstructor
+public class MealService {
+    private final MealRepository mealRepository;
+    private final CategoryRepository categoryRepository;
+    private final IngredientRepository ingredientRepository;
+    private final AppUserRepository appUserRepository;
+    private final UserSecurityService userSecurityService;
+
+    public List<MealResponseBody> getMeals() {
+        List<Meal> meals = mealRepository.findAll();
+        List<MealResponseBody> mealResponseBodies = new ArrayList<>();
+
+        meals.forEach(meal -> {
+            mealResponseBodies.add(new MealResponseBody(
+                    meal.getIdMeal(),
+                    meal.getName(),
+                    meal.getImage(),
+                    meal.getIngredients().stream().map(Ingredient::getName).toList(),
+                    meal.getCategories().stream().map(Category::getName).toList()
+        ));
+        });
+
+        return mealResponseBodies;
+    }
+
+    public void addMeal(MealForm mealForm) {
+        Meal meal = new Meal();
+
+        meal.setName(mealForm.getName());
+        meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
+        meal.getMealExtention().setRecipe(mealForm.getRecipe());
+        meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
+
+        if(mealForm.getCategoriesIds() != null)
+            meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
+
+        if(mealForm.getImage() != null)
+            meal.setImage(mealForm.getImage());
+
+        calculateRatiosOfMacroElements(meal);
+        assignCategoriesAutomatically(meal);
+
+        meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
+        mealRepository.save(meal);
+    }
+
+    public void updateMeal(MealForm mealForm) {
+        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        if(mealForm.getName() != null)
+            meal.setName(mealForm.getName());
+
+        if(mealForm.getIngredientsIds() != null) {
+            meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
+            calculateRatiosOfMacroElements(meal);
+        }
+
+        if(mealForm.getRecipe() != null)
+            meal.getMealExtention().setRecipe(mealForm.getRecipe());
+
+        if(mealForm.getTimeToPrepare() != null)
+            meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
+
+        if(mealForm.getCategoriesIds() != null) {
+            meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
+            assignCategoriesAutomatically(meal);
+        }
+
+        if(mealForm.getImage() != null)
+            meal.setImage(mealForm.getImage());
+
+        mealRepository.save(meal);
+    }
+    public void deleteMeal(MealForm mealForm) {
+        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
+
+        if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        mealRepository.delete(meal);
+    }
+
+    private void calculateRatiosOfMacroElements(Meal meal) {
+        //TODO
+    }
+
+    private void assignCategoriesAutomatically(Meal meal) {
+        //TODO
+    }
+
+}

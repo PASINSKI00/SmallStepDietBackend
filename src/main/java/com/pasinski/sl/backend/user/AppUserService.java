@@ -1,17 +1,24 @@
 package com.pasinski.sl.backend.user;
 
-import com.pasinski.sl.backend.security.UserSecurity;
+import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.forms.UserForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 @AllArgsConstructor
-public class AppUserService {
+public class AppUserService implements UserDetailsService {
     private AppUserRepository appUserRepository;
-    private UserSecurity userSecurity;
+    private UserSecurityService userSecurityService;
+    private PasswordEncoder passwordEncoder;
+
     public AppUser getUser(Long idUser) {
         AppUser appUser;
         appUser = appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
@@ -22,16 +29,17 @@ public class AppUserService {
     }
 
     public void addUser(UserForm userForm) {
-        if(userSecurity.isEmailTaken(userForm.getEmail()))
+        if(userSecurityService.isEmailTaken(userForm.getEmail()))
             throw new HttpClientErrorException(HttpStatus.CONFLICT);
 
         AppUser appUser = new AppUser(userForm.getName(), userForm.getEmail(), userForm.getPassword());
+        appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
 
         appUserRepository.save(appUser);
     }
 
     public void updateUser(UserForm userForm) {
-        AppUser appUser = appUserRepository.findById(userSecurity.getUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        AppUser appUser = appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         applyChanges(appUser, userForm);
 
@@ -54,7 +62,12 @@ public class AppUserService {
 
     public void deleteUserOwnAccount() {
         appUserRepository
-                .findById(userSecurity.getUserId())
+                .findById(userSecurityService.getLoggedUserId())
                 .ifPresent(appUser -> appUserRepository.delete(appUser));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return this.appUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", email)));
     }
 }
