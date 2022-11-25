@@ -16,6 +16,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -58,12 +59,48 @@ public class MealService {
             meal.setImage(mealForm.getImage());
 
         calculateRatiosOfMacroElements(meal);
+        assignCategoriesAutomatically(meal);
 
         meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
         mealRepository.save(meal);
     }
 
+    public void updateMeal(MealForm mealForm) {
+        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        if(mealForm.getName() != null)
+            meal.setName(mealForm.getName());
+
+        if(mealForm.getIngredientsIds() != null) {
+            meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
+            calculateRatiosOfMacroElements(meal);
+        }
+
+        if(mealForm.getRecipe() != null)
+            meal.getMealExtention().setRecipe(mealForm.getRecipe());
+
+        if(mealForm.getTimeToPrepare() != null)
+            meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
+
+        if(mealForm.getCategoriesIds() != null) {
+            meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
+            assignCategoriesAutomatically(meal);
+        }
+
+        if(mealForm.getImage() != null)
+            meal.setImage(mealForm.getImage());
+
+        mealRepository.save(meal);
+    }
+
     private void calculateRatiosOfMacroElements(Meal meal) {
+        //TODO
+    }
+
+    private void assignCategoriesAutomatically(Meal meal) {
         //TODO
     }
 }

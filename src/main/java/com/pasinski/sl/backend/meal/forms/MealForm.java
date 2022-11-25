@@ -21,6 +21,7 @@ public class MealForm {
     @NotNull(message = "Time to prepare is mandatory")
     private Integer timeToPrepare;
 
+    private Long idMeal;
     private String image;
     private List<Long> categoriesIds;
 }

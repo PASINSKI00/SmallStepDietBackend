@@ -44,4 +44,18 @@ public class MealController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping()
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateMeal(@RequestBody MealForm mealForm) {
+        try {
+            mealService.updateMeal(mealForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().build();
+    }
 }
