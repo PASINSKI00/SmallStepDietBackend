@@ -24,10 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -158,7 +155,10 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredients.add(ingredientRepository.findByName("Chicken"));
         ingredients.add(ingredientRepository.findByName("Rice"));
         meal.setCategories(categories);
-        meal.setIngredients(ingredients);
+        HashMap<Ingredient, Integer> ingredientWeightHashMap = new HashMap<>();
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), 100);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), 200);
+        meal.setIngredients(ingredientWeightHashMap);
         meal.setAuthor(appUserRepository.findById(1L).get());
 
         Review review = new Review();

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,7 +38,7 @@ public class MealService {
                     meal.getIdMeal(),
                     meal.getName(),
                     meal.getImage(),
-                    meal.getIngredients().stream().map(Ingredient::getName).toList(),
+                    meal.getIngredients().keySet().stream().map(Ingredient::getName).toList(),
                     meal.getCategories().stream().map(Category::getName).toList()
         ));
         });
@@ -48,8 +49,15 @@ public class MealService {
     public void addMeal(MealForm mealForm) {
         Meal meal = new Meal();
 
+        HashMap<Ingredient, Integer> ingredients = new HashMap<>();
+        mealForm.getIngredients().forEach((id, amount) -> {
+            Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+            ingredients.put(ingredient, amount);
+        });
+
         meal.setName(mealForm.getName());
-        meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
+        meal.setIngredients(ingredients);
+
         meal.getMealExtention().setRecipe(mealForm.getRecipe());
         meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
 
@@ -75,8 +83,13 @@ public class MealService {
         if(mealForm.getName() != null)
             meal.setName(mealForm.getName());
 
-        if(mealForm.getIngredientsIds() != null) {
-            meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
+        if(mealForm.getIngredients() != null) {
+            HashMap<Ingredient, Integer> ingredients = new HashMap<>();
+            mealForm.getIngredients().forEach((id, amount) -> {
+                Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+                ingredients.put(ingredient, amount);
+            });
+            meal.setIngredients(ingredients);
             calculateRatiosOfMacroElements(meal);
         }
 

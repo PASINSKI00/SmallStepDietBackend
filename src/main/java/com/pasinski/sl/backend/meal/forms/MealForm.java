@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class MealForm {
@@ -15,8 +16,8 @@ public class MealForm {
     @NotBlank(message = "Recipe is mandatory")
     private String recipe;
 
-    @NotEmpty(message = "Ingredients are mandatory")
-    private List<Long> ingredientsIds;
+    @NotNull(message = "Ingredients are mandatory")
+    private Map<Long, Integer> ingredients;
 
     @NotNull(message = "Time to prepare is mandatory")
     private Integer timeToPrepare;
