@@ -46,7 +46,7 @@ public class MealService {
         return mealResponseBodies;
     }
 
-    public void addMeal(MealForm mealForm) {
+    public Long addMeal(MealForm mealForm) {
         Meal meal = new Meal();
 
         HashMap<Ingredient, Integer> ingredients = new HashMap<>();
@@ -72,6 +72,8 @@ public class MealService {
 
         meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
         mealRepository.save(meal);
+
+        return meal.getIdMeal();
     }
 
     public void updateMeal(MealForm mealForm) {
@@ -109,8 +111,8 @@ public class MealService {
 
         mealRepository.save(meal);
     }
-    public void deleteMeal(MealForm mealForm) {
-        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
+    public void deleteMeal(Long idMeal) {
+        Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
 
         if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
