@@ -25,4 +25,8 @@ public class IngredientService {
 
         ingredientRepository.save(ingredient);
     }
+
+    public List<Ingredient> getIngredientsByNames(List<String> names) {
+        return ingredientRepository.findAllByNameIn(names);
+    }
 }

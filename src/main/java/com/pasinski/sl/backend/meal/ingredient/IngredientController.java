@@ -45,4 +45,20 @@ public class IngredientController {
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @GetMapping("/all/byName")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getIngredientsByNames(@RequestBody List<String> names) {
+        List<Ingredient> ingredients;
+
+        try {
+            ingredients = ingredientService.getIngredientsByNames(names);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(ingredients);
+    }
 }
