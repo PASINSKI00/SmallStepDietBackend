@@ -11,7 +11,7 @@ import java.util.List;
 public class IngredientService {
     private final IngredientRepository ingredientRepository;
     public List<Ingredient> getAllIngredients() {
-        return ingredientRepository.findAll();
+        return ingredientRepository.getAllIdsAndNames();
     }
 
     public void addIngredient(IngredientForm ingredientForm) {
