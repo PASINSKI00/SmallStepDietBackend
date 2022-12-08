@@ -1,6 +1,6 @@
 package com.pasinski.sl.backend.meal;
 
-import com.pasinski.sl.backend.meal.ingredient.IngredientSpecifics.IngredientSpecifics;
+import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.user.AppUser;
@@ -32,7 +32,7 @@ public class Meal {
 
     @OneToMany
     @MapKeyJoinColumn(name = "id_ingredient")
-    private Map<Ingredient, IngredientSpecifics> ingredients;
+    private Map<Ingredient, MealIngredientSpecifics> ingredients;
 
     @ManyToMany
     private List<Category> categories = new ArrayList<>();

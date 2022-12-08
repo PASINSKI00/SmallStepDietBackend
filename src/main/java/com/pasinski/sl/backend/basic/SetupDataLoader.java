@@ -3,12 +3,12 @@ package com.pasinski.sl.backend.basic;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealExtention;
 import com.pasinski.sl.backend.meal.MealRepository;
-import com.pasinski.sl.backend.meal.ingredient.IngredientSpecifics.IngredientSpecificsRepository;
+import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecificsRepository;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
-import com.pasinski.sl.backend.meal.ingredient.IngredientSpecifics.IngredientSpecifics;
+import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import com.pasinski.sl.backend.user.AppUser;
@@ -40,7 +40,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final IngredientRepository ingredientRepository;
     private final CategoryRepository categoryRepository;
     private final ReviewRepository reviewRepository;
-    private final IngredientSpecificsRepository ingredientSpecificsRepository;
+    private final MealIngredientSpecificsRepository mealIngredientSpecificsRepository;
 
     @Override
     @Transactional
@@ -156,17 +156,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredients.add(ingredientRepository.findByName("Chicken"));
         ingredients.add(ingredientRepository.findByName("Rice"));
         meal.setCategories(categories);
-        HashMap<Ingredient, IngredientSpecifics> ingredientWeightHashMap = new HashMap<>();
+        HashMap<Ingredient, MealIngredientSpecifics> ingredientWeightHashMap = new HashMap<>();
 
-        IngredientSpecifics ingredientSpecifics = new IngredientSpecifics();
-        ingredientSpecifics.setWeight(100);
-        ingredientSpecificsRepository.save(ingredientSpecifics);
-        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), ingredientSpecifics);
+        MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
+        mealIngredientSpecifics.setWeight(100);
+        mealIngredientSpecificsRepository.save(mealIngredientSpecifics);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), mealIngredientSpecifics);
 
-        IngredientSpecifics ingredientSpecifics2 = new IngredientSpecifics();
-        ingredientSpecifics2.setWeight(200);
-        ingredientSpecificsRepository.save(ingredientSpecifics2);
-        ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), ingredientSpecifics2);
+        MealIngredientSpecifics mealIngredientSpecifics2 = new MealIngredientSpecifics();
+        mealIngredientSpecifics2.setWeight(200);
+        mealIngredientSpecificsRepository.save(mealIngredientSpecifics2);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), mealIngredientSpecifics2);
 
         meal.setIngredients(ingredientWeightHashMap);
         meal.setAuthor(appUserRepository.findById(1L).get());

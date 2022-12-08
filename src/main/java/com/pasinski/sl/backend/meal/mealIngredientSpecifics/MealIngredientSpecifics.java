@@ -1,4 +1,4 @@
-package com.pasinski.sl.backend.meal.ingredient.IngredientSpecifics;
+package com.pasinski.sl.backend.meal.mealIngredientSpecifics;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,10 +8,10 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-public class IngredientSpecifics {
+public class MealIngredientSpecifics {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_ingredient_specifics", nullable = false)
+    @Column(name = "id_meal_ingredient_specifics", nullable = false)
     private Long idMealSpecifics;
     private Integer weight;
     private Integer initialRatioInMeal;
