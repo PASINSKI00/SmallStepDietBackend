@@ -160,11 +160,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
         mealIngredientSpecifics.setWeight(100);
+        mealIngredientSpecifics.setInitialRatioInMeal(50);
         mealIngredientSpecificsRepository.save(mealIngredientSpecifics);
         ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), mealIngredientSpecifics);
 
         MealIngredientSpecifics mealIngredientSpecifics2 = new MealIngredientSpecifics();
         mealIngredientSpecifics2.setWeight(200);
+        mealIngredientSpecifics2.setInitialRatioInMeal(50);
         mealIngredientSpecificsRepository.save(mealIngredientSpecifics2);
         ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), mealIngredientSpecifics2);
 
