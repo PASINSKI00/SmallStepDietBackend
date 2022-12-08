@@ -3,10 +3,12 @@ package com.pasinski.sl.backend.basic;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealExtention;
 import com.pasinski.sl.backend.meal.MealRepository;
+import com.pasinski.sl.backend.meal.ingredient.IngredientSpecifics.IngredientSpecificsRepository;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
+import com.pasinski.sl.backend.meal.ingredient.IngredientSpecifics.IngredientSpecifics;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import com.pasinski.sl.backend.user.AppUser;
@@ -15,7 +17,6 @@ import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.PrivilegeRepository;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.accessManagment.RoleRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -23,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Array;
 import java.util.*;
 
 @Component
@@ -40,6 +40,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final IngredientRepository ingredientRepository;
     private final CategoryRepository categoryRepository;
     private final ReviewRepository reviewRepository;
+    private final IngredientSpecificsRepository ingredientSpecificsRepository;
 
     @Override
     @Transactional
@@ -155,9 +156,18 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredients.add(ingredientRepository.findByName("Chicken"));
         ingredients.add(ingredientRepository.findByName("Rice"));
         meal.setCategories(categories);
-        HashMap<Ingredient, Integer> ingredientWeightHashMap = new HashMap<>();
-        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), 100);
-        ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), 200);
+        HashMap<Ingredient, IngredientSpecifics> ingredientWeightHashMap = new HashMap<>();
+
+        IngredientSpecifics ingredientSpecifics = new IngredientSpecifics();
+        ingredientSpecifics.setWeight(100);
+        ingredientSpecificsRepository.save(ingredientSpecifics);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), ingredientSpecifics);
+
+        IngredientSpecifics ingredientSpecifics2 = new IngredientSpecifics();
+        ingredientSpecifics2.setWeight(200);
+        ingredientSpecificsRepository.save(ingredientSpecifics2);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), ingredientSpecifics2);
+
         meal.setIngredients(ingredientWeightHashMap);
         meal.setAuthor(appUserRepository.findById(1L).get());
 

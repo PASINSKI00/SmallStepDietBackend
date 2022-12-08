@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.meal;
 
+import com.pasinski.sl.backend.meal.ingredient.IngredientSpecifics.IngredientSpecifics;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.forms.MealForm;
@@ -48,11 +49,13 @@ public class MealService {
 
     public Long addMeal(MealForm mealForm) {
         Meal meal = new Meal();
+        IngredientSpecifics ingredientSpecifics = new IngredientSpecifics();
 
-        HashMap<Ingredient, Integer> ingredients = new HashMap<>();
+        HashMap<Ingredient, IngredientSpecifics> ingredients = new HashMap<>();
         mealForm.getIngredients().forEach((id, amount) -> {
             Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-            ingredients.put(ingredient, amount);
+            ingredientSpecifics.setWeight(amount);
+            ingredients.put(ingredient, ingredientSpecifics);
         });
 
         meal.setName(mealForm.getName());
@@ -86,10 +89,12 @@ public class MealService {
             meal.setName(mealForm.getName());
 
         if(mealForm.getIngredients() != null) {
-            HashMap<Ingredient, Integer> ingredients = new HashMap<>();
+            HashMap<Ingredient, IngredientSpecifics> ingredients = new HashMap<>();
             mealForm.getIngredients().forEach((id, amount) -> {
                 Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-                ingredients.put(ingredient, amount);
+                IngredientSpecifics ingredientSpecifics = new IngredientSpecifics();
+                ingredientSpecifics.setWeight(amount);
+                ingredients.put(ingredient, ingredientSpecifics);
             });
             meal.setIngredients(ingredients);
             calculateRatiosOfMacroElements(meal);
