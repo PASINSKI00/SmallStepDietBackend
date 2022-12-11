@@ -20,4 +20,8 @@ public class UserSecurityService {
         AppUser appUser= (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return appUser.getIdUser();
     }
+
+    public AppUser getLoggedUser() {
+        return (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 }

@@ -54,7 +54,7 @@ public class MealService {
         HashMap<Ingredient, MealIngredientSpecifics> ingredients = new HashMap<>();
         mealForm.getIngredients().forEach((id, amount) -> {
             Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-            mealIngredientSpecifics.setWeight(amount);
+            mealIngredientSpecifics.setInitialWeight(amount);
             ingredients.put(ingredient, mealIngredientSpecifics);
         });
 
@@ -93,7 +93,7 @@ public class MealService {
             mealForm.getIngredients().forEach((id, amount) -> {
                 Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
                 MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
-                mealIngredientSpecifics.setWeight(amount);
+                mealIngredientSpecifics.setInitialWeight(amount);
                 ingredients.put(ingredient, mealIngredientSpecifics);
             });
             meal.setIngredients(ingredients);

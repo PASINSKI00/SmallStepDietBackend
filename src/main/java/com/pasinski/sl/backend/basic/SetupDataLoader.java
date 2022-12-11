@@ -104,18 +104,18 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private void addIngredients(){
         Ingredient ingredient = new Ingredient();
         ingredient.setName("Chicken");
-        ingredient.setCalories(100);
-        ingredient.setProtein(10);
-        ingredient.setCarbs(10);
-        ingredient.setFats(2);
+        ingredient.setCaloriesPer100g(100);
+        ingredient.setProteinPer100g(10);
+        ingredient.setCarbsPer100g(10);
+        ingredient.setFatsPer100g(2);
         ingredientRepository.save(ingredient);
 
         Ingredient ingredient2 = new Ingredient();
         ingredient2.setName("Rice");
-        ingredient2.setCalories(200);
-        ingredient2.setProtein(10);
-        ingredient2.setCarbs(10);
-        ingredient2.setFats(13);
+        ingredient2.setCaloriesPer100g(200);
+        ingredient2.setProteinPer100g(10);
+        ingredient2.setCarbsPer100g(10);
+        ingredient2.setFatsPer100g(13);
         ingredientRepository.save(ingredient2);
     }
 
@@ -159,13 +159,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         HashMap<Ingredient, MealIngredientSpecifics> ingredientWeightHashMap = new HashMap<>();
 
         MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
-        mealIngredientSpecifics.setWeight(100);
+        mealIngredientSpecifics.setInitialWeight(100);
         mealIngredientSpecifics.setInitialRatioInMeal(50);
         mealIngredientSpecificsRepository.save(mealIngredientSpecifics);
         ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), mealIngredientSpecifics);
 
         MealIngredientSpecifics mealIngredientSpecifics2 = new MealIngredientSpecifics();
-        mealIngredientSpecifics2.setWeight(200);
+        mealIngredientSpecifics2.setInitialWeight(200);
         mealIngredientSpecifics2.setInitialRatioInMeal(50);
         mealIngredientSpecificsRepository.save(mealIngredientSpecifics2);
         ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), mealIngredientSpecifics2);

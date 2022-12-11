@@ -20,13 +20,13 @@ public class Ingredient {
     @NotNull
     private String name;
     @NotNull
-    private Integer calories;
+    private Integer caloriesPer100g;
     @NotNull
-    private Integer protein;
+    private Integer proteinPer100g;
     @NotNull
-    private Integer fats;
+    private Integer fatsPer100g;
     @NotNull
-    private Integer carbs;
+    private Integer carbsPer100g;
 
     public Ingredient(Long idIngredient, String name) {
         this.idIngredient = idIngredient;

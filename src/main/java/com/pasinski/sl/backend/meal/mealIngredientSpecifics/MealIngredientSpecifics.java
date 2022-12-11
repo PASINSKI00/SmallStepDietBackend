@@ -13,6 +13,6 @@ public class MealIngredientSpecifics {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_meal_ingredient_specifics", nullable = false)
     private Long idMealSpecifics;
-    private Integer weight;
+    private Integer initialWeight;
     private Integer initialRatioInMeal;
 }

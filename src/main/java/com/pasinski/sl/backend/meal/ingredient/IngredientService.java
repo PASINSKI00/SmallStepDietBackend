@@ -23,10 +23,10 @@ public class IngredientService {
         Ingredient ingredient = new Ingredient();
 
         ingredient.setName(ingredientForm.getName());
-        ingredient.setCalories(ingredientForm.getCalories());
-        ingredient.setProtein(ingredientForm.getProtein());
-        ingredient.setCarbs(ingredientForm.getCarbs());
-        ingredient.setFats(ingredientForm.getFats());
+        ingredient.setCaloriesPer100g(ingredientForm.getCalories());
+        ingredient.setProteinPer100g(ingredientForm.getProtein());
+        ingredient.setCarbsPer100g(ingredientForm.getCarbs());
+        ingredient.setFatsPer100g(ingredientForm.getFats());
 
         ingredientRepository.save(ingredient);
     }
@@ -38,11 +38,11 @@ public class IngredientService {
             ingredientsWithMealSpecifics.add(new IngredientWithMealSpecifics(
                     ingredient.getIdIngredient(),
                     ingredient.getName(),
-                    ingredient.getCalories(),
-                    ingredient.getProtein(),
-                    ingredient.getCarbs(),
-                    ingredient.getFats(),
-                    mealIngredientSpecifics.getWeight(),
+                    ingredient.getCaloriesPer100g(),
+                    ingredient.getProteinPer100g(),
+                    ingredient.getCarbsPer100g(),
+                    ingredient.getFatsPer100g(),
+                    mealIngredientSpecifics.getInitialWeight(),
                     mealIngredientSpecifics.getInitialRatioInMeal()
             ));
         });
