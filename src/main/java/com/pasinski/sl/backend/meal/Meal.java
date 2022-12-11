@@ -6,6 +6,7 @@ import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.user.AppUser;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
@@ -32,6 +33,7 @@ public class Meal {
 
     @OneToMany
     @MapKeyJoinColumn(name = "id_ingredient")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Map<Ingredient, MealIngredientSpecifics> ingredients;
 
     @ManyToMany
