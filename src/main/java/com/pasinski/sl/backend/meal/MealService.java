@@ -49,10 +49,10 @@ public class MealService {
 
     public Long addMeal(MealForm mealForm) {
         Meal meal = new Meal();
-        MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
 
         HashMap<Ingredient, MealIngredientSpecifics> ingredients = new HashMap<>();
         mealForm.getIngredients().forEach((id, amount) -> {
+            MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
             Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
             mealIngredientSpecifics.setInitialWeight(amount);
             ingredients.put(ingredient, mealIngredientSpecifics);
