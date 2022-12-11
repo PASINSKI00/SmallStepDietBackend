@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.diet.FinalIngredient.FinalIngredient;
 import com.pasinski.sl.backend.diet.FinalIngredient.FinalIngredientRepository;
+import com.pasinski.sl.backend.diet.PDFGenerator.PDFGeneratorService;
 import com.pasinski.sl.backend.diet.finalDay.FinalDay;
 import com.pasinski.sl.backend.diet.finalDay.FinalDayRepository;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +31,7 @@ public class DietService {
     private final FinalMealRepository finalMealRepository;
     private final FinalIngredientRepository finalIngredientRepository;
     private final UserSecurityService userSecurityService;
+    private final PDFGeneratorService pdfGeneratorService;
 
     public Diet getDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
@@ -113,6 +116,15 @@ public class DietService {
 
         this.dietRepository.save(diet);
         return diet.getIdDiet();
+    }
+
+    public String generateDietPDF(Long idDiet) throws FileNotFoundException {
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        return this.pdfGeneratorService.generateDietPDF(diet);
     }
 
     private List<Integer> calculatePercentagesOfMealsForDay(int size) {

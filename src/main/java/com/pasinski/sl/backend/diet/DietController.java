@@ -7,6 +7,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.io.FileNotFoundException;
+
 @RestController
 @RequestMapping("/api/diet")
 @AllArgsConstructor
@@ -53,4 +55,19 @@ public class DietController {
         return null;
     }
 
+    @GetMapping("/pdf")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> generateDietPDF(@RequestParam Long idDiet) {
+        String fileName;
+        try {
+            fileName = this.dietService.generateDietPDF(idDiet);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(fileName, HttpStatus.OK);
+    }
 }
