@@ -40,7 +40,7 @@ public class ImageController {
 
     @PostMapping("/meal")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> addMealImage(@RequestParam MultipartFile image, @RequestParam Long idMeal) throws IOException {
+    public ResponseEntity<?> addMealImage(@RequestBody String image, @RequestParam Long idMeal) throws IOException {
         try {
             imageService.addMealImage(image, idMeal);
         } catch (HttpClientErrorException e) {
