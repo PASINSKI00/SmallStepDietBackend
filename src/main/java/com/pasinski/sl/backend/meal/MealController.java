@@ -40,8 +40,6 @@ public class MealController {
             idMeal = mealService.addMeal(mealForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<Long>(idMeal, HttpStatus.CREATED);
@@ -54,8 +52,6 @@ public class MealController {
             mealService.updateMeal(mealForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok().build();
@@ -68,8 +64,6 @@ public class MealController {
             mealService.deleteMeal(idMeal);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok().build();
@@ -83,8 +77,6 @@ public class MealController {
             mealResponseBodyExtended = mealService.extendMeal(mealForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(mealResponseBodyExtended);

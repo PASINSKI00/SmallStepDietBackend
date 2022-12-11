@@ -26,8 +26,6 @@ public class IngredientController {
             ingredients = ingredientService.getAllIngredients();
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok(ingredients);
@@ -40,8 +38,6 @@ public class IngredientController {
             ingredientService.addIngredient(ingredientForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
         }
 
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -56,8 +52,6 @@ public class IngredientController {
             ingredients = ingredientService.getIngredientsForMeal(idMeal);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok(ingredients);
