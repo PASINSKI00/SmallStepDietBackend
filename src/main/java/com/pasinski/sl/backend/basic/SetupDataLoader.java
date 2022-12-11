@@ -103,19 +103,19 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private void addIngredients(){
         Ingredient ingredient = new Ingredient();
-        ingredient.setName("Chicken");
-        ingredient.setCaloriesPer100g(100);
-        ingredient.setProteinPer100g(10);
-        ingredient.setCarbsPer100g(10);
-        ingredient.setFatsPer100g(2);
+        ingredient.setName("Chicken breast");
+        ingredient.setCaloriesPer100g(164);
+        ingredient.setProteinPer100g(31);
+        ingredient.setCarbsPer100g(0);
+        ingredient.setFatsPer100g(4);
         ingredientRepository.save(ingredient);
 
         Ingredient ingredient2 = new Ingredient();
-        ingredient2.setName("Rice");
-        ingredient2.setCaloriesPer100g(200);
-        ingredient2.setProteinPer100g(10);
-        ingredient2.setCarbsPer100g(10);
-        ingredient2.setFatsPer100g(13);
+        ingredient2.setName("White rice");
+        ingredient2.setCaloriesPer100g(130);
+        ingredient2.setProteinPer100g(3);
+        ingredient2.setCarbsPer100g(28);
+        ingredient2.setFatsPer100g(0);
         ingredientRepository.save(ingredient2);
     }
 
@@ -153,8 +153,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         List<Category> categories = new ArrayList<>();
         categories.add(categoryRepository.findByName("Fast"));
         List<Ingredient> ingredients = new ArrayList<>();
-        ingredients.add(ingredientRepository.findByName("Chicken"));
-        ingredients.add(ingredientRepository.findByName("Rice"));
+        ingredients.add(ingredientRepository.findByName("Chicken breast"));
+        ingredients.add(ingredientRepository.findByName("White rice"));
         meal.setCategories(categories);
         HashMap<Ingredient, MealIngredientSpecifics> ingredientWeightHashMap = new HashMap<>();
 
@@ -162,13 +162,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         mealIngredientSpecifics.setInitialWeight(100);
         mealIngredientSpecifics.setInitialRatioInMeal(50);
         mealIngredientSpecificsRepository.save(mealIngredientSpecifics);
-        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken"), mealIngredientSpecifics);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken breast"), mealIngredientSpecifics);
 
         MealIngredientSpecifics mealIngredientSpecifics2 = new MealIngredientSpecifics();
         mealIngredientSpecifics2.setInitialWeight(200);
         mealIngredientSpecifics2.setInitialRatioInMeal(50);
         mealIngredientSpecificsRepository.save(mealIngredientSpecifics2);
-        ingredientWeightHashMap.put(ingredientRepository.findByName("Rice"), mealIngredientSpecifics2);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("White rice"), mealIngredientSpecifics2);
 
         meal.setIngredients(ingredientWeightHashMap);
         meal.setAuthor(appUserRepository.findById(1L).get());

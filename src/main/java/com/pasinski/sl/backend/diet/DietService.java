@@ -102,6 +102,10 @@ public class DietService {
         });
 
         //TODO: Set values of finalDay
+        finalDays.forEach(finalDay -> {
+            setFinalDayValues(finalDay);
+        });
+
 
         Diet diet = new Diet();
         diet.setAppUser(this.userSecurityService.getLoggedUser());
@@ -138,12 +142,11 @@ public class DietService {
     }
 
     private Integer getInitialCaloriesOfMeal(Meal meal) {
-        AtomicReference<Integer> calories = new AtomicReference<>(0);
-        meal.getIngredients().forEach((ingredient, specifics) -> {
-            calories.updateAndGet(v -> v + ingredient.getCaloriesPer100g() * specifics.getInitialWeight());
-        });
+        final Integer[] calories = {0};
 
-        return calories.get();
+        meal.getIngredients().forEach((key, value) -> calories[0] += key.getCaloriesPer100g() * value.getInitialWeight() / 100);
+
+        return calories[0];
     }
 
     private List<FinalIngredient> getFinalIngredientsOfMeal(Meal meal) {
@@ -164,12 +167,12 @@ public class DietService {
 
     private void setFinalIngredientsValues(List<FinalIngredient> finalIngredients, Float ingredientWeightMultiplier) {
         finalIngredients.forEach(finalIngredient -> {
-            finalIngredient.setWeight((int) (finalIngredient.getInitialWeight() * ingredientWeightMultiplier));
-            finalIngredient.setProtein((int) ((int) finalIngredient.getWeight() + finalIngredient.getIngredient().getProteinPer100g() * ingredientWeightMultiplier / 100));
-            finalIngredient.setFats((int) ((int) finalIngredient.getWeight() + finalIngredient.getIngredient().getFatsPer100g() * ingredientWeightMultiplier / 100));
-            finalIngredient.setCarbs((int) ((int) finalIngredient.getWeight() + finalIngredient.getIngredient().getCarbsPer100g() * ingredientWeightMultiplier / 100));
-            finalIngredient.setCalories(finalIngredient.getProtein() * 4 + finalIngredient.getFats() * 9 + finalIngredient.getCarbs() * 4);
-//            this.finalIngredientRepository.save(finalIngredient);
+            // TODO verify if this is correct
+            finalIngredient.setWeight((int)     (finalIngredient.getInitialWeight() * ingredientWeightMultiplier));
+            finalIngredient.setProtein((int)    (finalIngredient.getIngredient().getProteinPer100g() * finalIngredient.getWeight() / 100));
+            finalIngredient.setFats((int)       (finalIngredient.getIngredient().getFatsPer100g() * finalIngredient.getWeight() / 100));
+            finalIngredient.setCarbs((int)      (finalIngredient.getIngredient().getCarbsPer100g() * finalIngredient.getWeight() / 100));
+            finalIngredient.setCalories((int)   (finalIngredient.getIngredient().getCaloriesPer100g() * finalIngredient.getWeight() / 100));
         });
     }
 
@@ -178,5 +181,12 @@ public class DietService {
         finalMeal.setFats(finalMeal.getFinalIngredients().stream().mapToInt(FinalIngredient::getFats).sum());
         finalMeal.setCarbs(finalMeal.getFinalIngredients().stream().mapToInt(FinalIngredient::getCarbs).sum());
         finalMeal.setCalories(finalMeal.getFinalIngredients().stream().mapToInt(FinalIngredient::getCalories).sum());
+    }
+
+    private void setFinalDayValues(FinalDay finalDay) {
+        finalDay.setProtein(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getProtein).sum());
+        finalDay.setFats(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getFats).sum());
+        finalDay.setCarbs(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getCarbs).sum());
+        finalDay.setCalories(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getCalories).sum());
     }
 }
