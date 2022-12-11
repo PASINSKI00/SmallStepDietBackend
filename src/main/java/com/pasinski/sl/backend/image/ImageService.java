@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,8 +29,12 @@ public class ImageService {
         return new InputStreamResource(new FileInputStream(file));
     }
 
-    public void addMealImage(MultipartFile image, Long idMeal) {
+    public void addMealImage(String base64Image, Long idMeal) {
         String fileName = UUID.randomUUID().toString() + ".jpg";
+        String base64ImageWithoutHeader = base64Image.split(",")[1];
+
+        byte[] fileContent = Base64Utils.decodeFromString(base64ImageWithoutHeader);
+        MultipartFile image = new Base64EncodedMultipartFile(fileContent, fileName);
 
         Path storageDirectory = Paths.get(System.getenv("MEALIMAGESPATH"));
         Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
@@ -54,43 +59,4 @@ public class ImageService {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
     }
-
-//    public ResponseEntity uploadToLocalFileSystem(MultipartFile file) {
-//        /* we will extract the file name (with extension) from the given file to store it in our local machine for now
-//        and later in virtual machine when we'll deploy the project
-//         */
-//        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-//
-//        /* The Path in which we will store our image . we could change it later
-//        based on the OS of the virtual machine in which we will deploy the project.
-//        In my case i'm using windows 10 .
-//         */
-//        Path storageDirectory = Paths.get(storageDirectoryPath);
-//        /*
-//         * we'll do just a simple verification to check if the folder in which we will store our images exists or not
-//         * */
-//        if(!Files.exists(storageDirectory)){ // if the folder does not exist
-//            try {
-//                Files.createDirectories(storageDirectory); // we create the directory in the given storage directory path
-//            }catch (Exception e){
-//                e.printStackTrace();// print the exception
-//            }
-//        }
-//
-//        Path destination = Paths.get(storageDirectory.toString() + "\\" + fileName);
-//
-//        try {
-//            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);// we are Copying all bytes from an input stream to a file
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        // the response will be the download URL of the image
-//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-//                .path("api/images/getImage/")
-//                .path(fileName)
-//                .toUriString();
-//        // return the download image url as a response entity
-//        return ResponseEntity.ok(fileDownloadUri);
-//    }
 }
