@@ -47,7 +47,7 @@ public class ImageService {
 
         try {
             mealRepository.findById(idMeal).ifPresent(meal -> {
-                meal.setImage(fileName);
+                meal.setImageName(fileName);
                 mealRepository.save(meal);
             });
         } catch (Exception e) {

@@ -29,7 +29,7 @@ public class Meal {
 
     @NotNull
     @ColumnDefault("'/assets/images/Hot_meal_header.png'")
-    private String image = "/assets/images/Hot_meal_header.png";
+    private String imageName = "/assets/images/Hot_meal_header.png";
 
     @OneToMany
     @MapKeyJoinColumn(name = "id_ingredient")

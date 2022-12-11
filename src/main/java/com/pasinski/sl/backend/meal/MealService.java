@@ -38,7 +38,7 @@ public class MealService {
             mealResponseBodies.add(new MealResponseBody(
                     meal.getIdMeal(),
                     meal.getName(),
-                    meal.getImage(),
+                    meal.getImageName(),
                     meal.getIngredients().keySet().stream().map(Ingredient::getName).toList(),
                     meal.getCategories().stream().map(Category::getName).toList()
         ));
@@ -68,7 +68,7 @@ public class MealService {
             meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
 
         if(mealForm.getImage() != null)
-            meal.setImage(mealForm.getImage());
+            meal.setImageName(mealForm.getImage());
 
         calculateRatiosOfMacroElements(meal);
         assignCategoriesAutomatically(meal);
@@ -112,7 +112,7 @@ public class MealService {
         }
 
         if(mealForm.getImage() != null)
-            meal.setImage(mealForm.getImage());
+            meal.setImageName(mealForm.getImage());
 
         mealRepository.save(meal);
     }

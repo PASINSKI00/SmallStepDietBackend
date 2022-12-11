@@ -143,7 +143,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private void addMeal(String name){
         Meal meal = new Meal();
         meal.setName(name);
-        meal.setImage("/assets/images/Hot_meal_header.png");
+        meal.setImageName("/assets/images/Hot_meal_header.png");
         meal.setMealExtention(new MealExtention());
         meal.getMealExtention().setRecipe("Cook the chicken. Boil the rice. Voila!");
         meal.getMealExtention().setTimeToPrepare(20);
