@@ -7,6 +7,10 @@ import com.pasinski.sl.backend.diet.finalDay.FinalDay;
 import com.pasinski.sl.backend.diet.finalDay.FinalDayRepository;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMealRepository;
+import com.pasinski.sl.backend.diet.forms.DietResponseForm;
+import com.pasinski.sl.backend.diet.forms.FinalDayResponseForm;
+import com.pasinski.sl.backend.diet.forms.FinalIngredientResponseForm;
+import com.pasinski.sl.backend.diet.forms.FinalMealResponseForm;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
@@ -33,21 +37,49 @@ public class DietService {
     private final UserSecurityService userSecurityService;
     private final PDFGeneratorService pdfGeneratorService;
 
-    public Diet getDiet(Long idDiet) {
+    public DietResponseForm getDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        DietResponseForm dietResponseForm = new DietResponseForm();
 
         if(!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        diet.setAppUser(null);
+        dietResponseForm.setIdDiet(diet.getIdDiet());
+        dietResponseForm.setFinalDays(new ArrayList<>());
+
         diet.getFinalDays().forEach(finalDay -> {
+            FinalDayResponseForm finalDayResponseForm = new FinalDayResponseForm();
+            finalDayResponseForm.setIdFinalDay(finalDay.getIdFinalDay());
+            finalDayResponseForm.setFinalMeals(new ArrayList<>());
+            finalDayResponseForm.setCalories(finalDay.getCalories());
+            finalDayResponseForm.setCarbs(finalDay.getCarbs());
+            finalDayResponseForm.setProtein(finalDay.getProtein());
+            finalDayResponseForm.setFats(finalDay.getFats());
+
             finalDay.getFinalMeals().forEach(finalMeal -> {
-                finalMeal.setMeal(null);
-                finalMeal.getFinalIngredients().forEach(finalIngredient -> finalIngredient.setIngredient(null));
+                FinalMealResponseForm finalMealResponseForm = new FinalMealResponseForm();
+                finalMealResponseForm.setIdFinalMeal(finalMeal.getIdFinalMeal());
+                finalMealResponseForm.setName(finalMeal.getMeal().getName());
+                finalMealResponseForm.setFinalIngredients(new ArrayList<>());
+                finalMealResponseForm.setCalories(finalMeal.getCalories());
+                finalMealResponseForm.setProtein(finalMeal.getProtein());
+                finalMealResponseForm.setFats(finalMeal.getFats());
+                finalMealResponseForm.setCarbs(finalMeal.getCarbs());
+                finalMealResponseForm.setPercentOfDay(finalMeal.getPercentOfDay());
+
+                finalMeal.getFinalIngredients().forEach(finalIngredient -> {
+                    FinalIngredientResponseForm finalIngredientResponseForm = new FinalIngredientResponseForm();
+                    finalIngredientResponseForm.setIdFinalIngredient(finalIngredient.getIdFinalIngredient());
+                    finalIngredientResponseForm.setName(finalIngredient.getIngredient().getName());
+                    finalIngredientResponseForm.setWeight(finalIngredient.getWeight());
+                    finalMealResponseForm.getFinalIngredients().add(finalIngredientResponseForm);
+                });
+                finalDayResponseForm.getFinalMeals().add(finalMealResponseForm);
             });
+            dietResponseForm.getFinalDays().add(finalDayResponseForm);
         });
 
-       return diet;
+       return dietResponseForm;
     }
 
     public Long addDiet(Long[][] days) {

@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.diet;
 
+import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +19,14 @@ public class DietController {
     @GetMapping()
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getDiet(@RequestParam Long idDiet) {
-        Diet diet;
+        DietResponseForm dietResponseForm;
         try {
-            diet = this.dietService.getDiet(idDiet);
+            dietResponseForm = this.dietService.getDiet(idDiet);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
-        return new ResponseEntity<>(diet, HttpStatus.OK);
+        return new ResponseEntity<>(dietResponseForm, HttpStatus.OK);
     }
 
     @PostMapping()
