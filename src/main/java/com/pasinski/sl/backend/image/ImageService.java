@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -31,10 +32,13 @@ public class ImageService {
 
     public void addMealImage(String base64Image, Long idMeal) {
         String fileName = UUID.randomUUID().toString() + ".jpg";
+        String base64header = base64Image.split(",")[0];
         String base64ImageWithoutHeader = base64Image.split(",")[1];
 
         byte[] fileContent = Base64Utils.decodeFromString(base64ImageWithoutHeader);
         MultipartFile image = new Base64EncodedMultipartFile(fileContent, fileName);
+
+        validateImage(base64header);
 
         Path storageDirectory = Paths.get(System.getenv("MEALIMAGESPATH"));
         Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
@@ -58,5 +62,10 @@ public class ImageService {
             }
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private void validateImage(String header) {
+        if (!Objects.equals(header, "data:image/jpeg;base64"))
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
     }
 }
