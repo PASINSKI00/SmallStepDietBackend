@@ -70,7 +70,7 @@ public class MealService {
         if(mealForm.getImage() != null)
             meal.setImageName(mealForm.getImage());
 
-        calculateRatiosOfMacroElements(meal);
+        calculateProteinRatioOfAMeal(meal);
         assignCategoriesAutomatically(meal);
 
         meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
@@ -97,7 +97,7 @@ public class MealService {
                 ingredients.put(ingredient, mealIngredientSpecifics);
             });
             meal.setIngredients(ingredients);
-            calculateRatiosOfMacroElements(meal);
+            calculateProteinRatioOfAMeal(meal);
         }
 
         if(mealForm.getRecipe() != null)
@@ -131,7 +131,7 @@ public class MealService {
         return new MealResponseBodyExtended(meal, meal.getMealExtention());
     }
 
-    private void calculateRatiosOfMacroElements(Meal meal) {
+    private void calculateProteinRatioOfAMeal(Meal meal) {
         //TODO
     }
 
