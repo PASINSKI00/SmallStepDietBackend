@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.meal;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
@@ -28,8 +29,7 @@ public class Meal {
     private String name;
 
     @NotNull
-    @ColumnDefault("'/assets/images/Hot_meal_header.png'")
-    private String imageName = "/assets/images/Hot_meal_header.png";
+    private String imageName = ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
 
     @OneToMany
     @MapKeyJoinColumn(name = "id_ingredient")

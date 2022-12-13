@@ -21,8 +21,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ImageService {
     private MealRepository mealRepository;
-    public InputStreamResource getMealImage(String name) throws FileNotFoundException {
-        File file = new File(System.getenv("MEALIMAGESPATH") + name);
+    public InputStreamResource getMealImage(Long idMeal) throws FileNotFoundException {
+        String name = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)).getImageName();
+        File file = new File(System.getenv("MEALIMAGESPATH") + FileSystems.getDefault().getSeparator() + name);
 
         if (!file.exists())
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);

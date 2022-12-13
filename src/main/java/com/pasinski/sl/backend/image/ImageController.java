@@ -25,10 +25,10 @@ public class ImageController {
             value = "/meal",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
-    public ResponseEntity<InputStreamResource> getMealImage(@RequestParam @Valid String name) throws IOException {
+    public ResponseEntity<InputStreamResource> getMealImage(@RequestParam @Valid Long idMeal) throws IOException {
         InputStreamResource inputStreamResource;
         try {
-            inputStreamResource = imageService.getMealImage(name);
+            inputStreamResource = imageService.getMealImage(idMeal);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }

@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.meal;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
@@ -38,7 +39,7 @@ public class MealService {
             mealResponseBodies.add(new MealResponseBody(
                     meal.getIdMeal(),
                     meal.getName(),
-                    meal.getImageName(),
+                    ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
                     meal.getIngredients().keySet().stream().map(Ingredient::getName).toList(),
                     meal.getCategories().stream().map(Category::getName).toList()
         ));
@@ -67,8 +68,8 @@ public class MealService {
         if(mealForm.getCategoriesIds() != null)
             meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
 
-        if(mealForm.getImage() != null)
-            meal.setImageName(mealForm.getImage());
+        if(mealForm.getImageName() != null)
+            meal.setImageName(mealForm.getImageName());
 
         calculateProteinRatioOfAMeal(meal);
         assignCategoriesAutomatically(meal);
@@ -111,8 +112,8 @@ public class MealService {
             assignCategoriesAutomatically(meal);
         }
 
-        if(mealForm.getImage() != null)
-            meal.setImageName(mealForm.getImage());
+        if(mealForm.getImageName() != null)
+            meal.setImageName(mealForm.getImageName());
 
         mealRepository.save(meal);
     }

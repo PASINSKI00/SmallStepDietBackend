@@ -22,6 +22,6 @@ public class MealForm {
     private Integer timeToPrepare;
 
     private Long idMeal;
-    private String image;
+    private String imageName;
     private List<Long> categoriesIds;
 }
