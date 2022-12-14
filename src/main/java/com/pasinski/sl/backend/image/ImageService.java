@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.image;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.MealRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -23,7 +24,7 @@ public class ImageService {
     private MealRepository mealRepository;
     public InputStreamResource getMealImage(Long idMeal) throws FileNotFoundException {
         String name = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)).getImageName();
-        File file = new File(System.getenv("MEALIMAGESPATH") + FileSystems.getDefault().getSeparator() + name);
+        File file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
 
         if (!file.exists())
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
@@ -41,7 +42,7 @@ public class ImageService {
 
         validateImage(base64header);
 
-        Path storageDirectory = Paths.get(System.getenv("MEALIMAGESPATH"));
+        Path storageDirectory = Paths.get(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY);
         Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
 
         try {

@@ -3,6 +3,7 @@ package com.pasinski.sl.backend.diet.PDFGenerator;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.TextField;
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.Diet;
 import com.pasinski.sl.backend.diet.DietRepository;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.nio.file.FileSystems;
 import java.util.UUID;
 
 @Service
@@ -21,7 +23,7 @@ public class PDFGeneratorService {
     public String generateDietPDF(Diet diet) throws FileNotFoundException {
         Document document = new Document();
         String fileName = UUID.randomUUID() + ".pdf";
-        PdfWriter.getInstance(document, new FileOutputStream(System.getenv("PDFSPATH") + "\\" + fileName));
+        PdfWriter.getInstance(document, new FileOutputStream(ApplicationConstants.PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName));
 
         Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 20, Font.BOLD);
         Font fontDayAndMeal = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
@@ -66,34 +68,6 @@ public class PDFGeneratorService {
             });
         });
 
-        document.close();
-
-        return fileName;
-    }
-
-    public String generatePDF() throws FileNotFoundException {
-        Document document = new Document(PageSize.A4);
-        String fileName = UUID.randomUUID() + ".pdf";
-        PdfWriter.getInstance(document, new FileOutputStream(System.getenv("PDFSPATH") + "\\" + fileName));
-
-        Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 20, Font.BOLD);
-        Font fontDayAndMeal = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
-        Font fontContent = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL);
-
-        Paragraph title = new Paragraph("This is your Diet!", fontTitle);
-        title.setAlignment(Element.ALIGN_CENTER);
-
-        Paragraph day = new Paragraph("Day 1", fontDayAndMeal);
-        day.setAlignment(Element.ALIGN_CENTER);
-
-        Paragraph meal = new Paragraph("Meal1", fontDayAndMeal);
-        Paragraph content = new Paragraph("this is content", fontContent);
-
-        document.open();
-        document.add(title);
-        document.add(day);
-        document.add(meal);
-        document.add(content);
         document.close();
 
         return fileName;
