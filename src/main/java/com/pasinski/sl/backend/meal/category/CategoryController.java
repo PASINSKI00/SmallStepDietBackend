@@ -24,8 +24,6 @@ public class CategoryController {
             categories = categoryService.getAllCategories();
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok(categories);
@@ -37,8 +35,6 @@ public class CategoryController {
             categoryService.addCategory(categoryForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
         }
 
         return new ResponseEntity<>(HttpStatus.CREATED);

@@ -1,5 +1,7 @@
 package com.pasinski.sl.backend.meal;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
+import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.forms.MealForm;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,8 +39,8 @@ public class MealService {
             mealResponseBodies.add(new MealResponseBody(
                     meal.getIdMeal(),
                     meal.getName(),
-                    meal.getImage(),
-                    meal.getIngredients().stream().map(Ingredient::getName).toList(),
+                    ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
+                    meal.getIngredients().keySet().stream().map(Ingredient::getName).toList(),
                     meal.getCategories().stream().map(Category::getName).toList()
         ));
         });
@@ -45,25 +48,36 @@ public class MealService {
         return mealResponseBodies;
     }
 
-    public void addMeal(MealForm mealForm) {
+    public Long addMeal(MealForm mealForm) {
         Meal meal = new Meal();
 
+        HashMap<Ingredient, MealIngredientSpecifics> ingredients = new HashMap<>();
+        mealForm.getIngredients().forEach((id, amount) -> {
+            MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
+            Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+            mealIngredientSpecifics.setInitialWeight(amount);
+            ingredients.put(ingredient, mealIngredientSpecifics);
+        });
+
         meal.setName(mealForm.getName());
-        meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
+        meal.setIngredients(ingredients);
+
         meal.getMealExtention().setRecipe(mealForm.getRecipe());
         meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
 
         if(mealForm.getCategoriesIds() != null)
             meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
 
-        if(mealForm.getImage() != null)
-            meal.setImage(mealForm.getImage());
+        if(mealForm.getImageName() != null)
+            meal.setImageName(mealForm.getImageName());
 
-        calculateRatiosOfMacroElements(meal);
+        calculateProteinRatioOfAMeal(meal);
         assignCategoriesAutomatically(meal);
 
         meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
         mealRepository.save(meal);
+
+        return meal.getIdMeal();
     }
 
     public void updateMeal(MealForm mealForm) {
@@ -75,9 +89,16 @@ public class MealService {
         if(mealForm.getName() != null)
             meal.setName(mealForm.getName());
 
-        if(mealForm.getIngredientsIds() != null) {
-            meal.setIngredients(ingredientRepository.findAllById(mealForm.getIngredientsIds()));
-            calculateRatiosOfMacroElements(meal);
+        if(mealForm.getIngredients() != null) {
+            HashMap<Ingredient, MealIngredientSpecifics> ingredients = new HashMap<>();
+            mealForm.getIngredients().forEach((id, amount) -> {
+                Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+                MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
+                mealIngredientSpecifics.setInitialWeight(amount);
+                ingredients.put(ingredient, mealIngredientSpecifics);
+            });
+            meal.setIngredients(ingredients);
+            calculateProteinRatioOfAMeal(meal);
         }
 
         if(mealForm.getRecipe() != null)
@@ -91,13 +112,13 @@ public class MealService {
             assignCategoriesAutomatically(meal);
         }
 
-        if(mealForm.getImage() != null)
-            meal.setImage(mealForm.getImage());
+        if(mealForm.getImageName() != null)
+            meal.setImageName(mealForm.getImageName());
 
         mealRepository.save(meal);
     }
-    public void deleteMeal(MealForm mealForm) {
-        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
+    public void deleteMeal(Long idMeal) {
+        Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
 
         if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
@@ -111,7 +132,7 @@ public class MealService {
         return new MealResponseBodyExtended(meal, meal.getMealExtention());
     }
 
-    private void calculateRatiosOfMacroElements(Meal meal) {
+    private void calculateProteinRatioOfAMeal(Meal meal) {
         //TODO
     }
 

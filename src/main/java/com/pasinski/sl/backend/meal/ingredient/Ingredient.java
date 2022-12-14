@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.meal.ingredient;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class Ingredient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,11 +20,16 @@ public class Ingredient {
     @NotNull
     private String name;
     @NotNull
-    private Integer calories;
+    private Integer caloriesPer100g;
     @NotNull
-    private Integer protein;
+    private Integer proteinPer100g;
     @NotNull
-    private Integer fats;
+    private Integer fatsPer100g;
     @NotNull
-    private Integer carbs;
+    private Integer carbsPer100g;
+
+    public Ingredient(Long idIngredient, String name) {
+        this.idIngredient = idIngredient;
+        this.name = name;
+    }
 }

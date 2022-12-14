@@ -3,10 +3,12 @@ package com.pasinski.sl.backend.basic;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealExtention;
 import com.pasinski.sl.backend.meal.MealRepository;
+import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecificsRepository;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
+import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import com.pasinski.sl.backend.user.AppUser;
@@ -15,7 +17,6 @@ import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.PrivilegeRepository;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.accessManagment.RoleRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -23,11 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -43,6 +40,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final IngredientRepository ingredientRepository;
     private final CategoryRepository categoryRepository;
     private final ReviewRepository reviewRepository;
+    private final MealIngredientSpecificsRepository mealIngredientSpecificsRepository;
 
     @Override
     @Transactional
@@ -105,19 +103,19 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private void addIngredients(){
         Ingredient ingredient = new Ingredient();
-        ingredient.setName("Chicken");
-        ingredient.setCalories(100);
-        ingredient.setProtein(10);
-        ingredient.setCarbs(10);
-        ingredient.setFats(2);
+        ingredient.setName("Chicken breast");
+        ingredient.setCaloriesPer100g(164);
+        ingredient.setProteinPer100g(31);
+        ingredient.setCarbsPer100g(0);
+        ingredient.setFatsPer100g(4);
         ingredientRepository.save(ingredient);
 
         Ingredient ingredient2 = new Ingredient();
-        ingredient2.setName("Rice");
-        ingredient2.setCalories(200);
-        ingredient2.setProtein(10);
-        ingredient2.setCarbs(10);
-        ingredient2.setFats(13);
+        ingredient2.setName("White rice");
+        ingredient2.setCaloriesPer100g(130);
+        ingredient2.setProteinPer100g(3);
+        ingredient2.setCarbsPer100g(28);
+        ingredient2.setFatsPer100g(0);
         ingredientRepository.save(ingredient2);
     }
 
@@ -145,7 +143,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private void addMeal(String name){
         Meal meal = new Meal();
         meal.setName(name);
-        meal.setImage("/assets/images/Hot_meal_header.png");
         meal.setMealExtention(new MealExtention());
         meal.getMealExtention().setRecipe("Cook the chicken. Boil the rice. Voila!");
         meal.getMealExtention().setTimeToPrepare(20);
@@ -155,10 +152,24 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         List<Category> categories = new ArrayList<>();
         categories.add(categoryRepository.findByName("Fast"));
         List<Ingredient> ingredients = new ArrayList<>();
-        ingredients.add(ingredientRepository.findByName("Chicken"));
-        ingredients.add(ingredientRepository.findByName("Rice"));
+        ingredients.add(ingredientRepository.findByName("Chicken breast"));
+        ingredients.add(ingredientRepository.findByName("White rice"));
         meal.setCategories(categories);
-        meal.setIngredients(ingredients);
+        HashMap<Ingredient, MealIngredientSpecifics> ingredientWeightHashMap = new HashMap<>();
+
+        MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
+        mealIngredientSpecifics.setInitialWeight(100);
+        mealIngredientSpecifics.setInitialRatioInMeal(50);
+        mealIngredientSpecificsRepository.save(mealIngredientSpecifics);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("Chicken breast"), mealIngredientSpecifics);
+
+        MealIngredientSpecifics mealIngredientSpecifics2 = new MealIngredientSpecifics();
+        mealIngredientSpecifics2.setInitialWeight(200);
+        mealIngredientSpecifics2.setInitialRatioInMeal(50);
+        mealIngredientSpecificsRepository.save(mealIngredientSpecifics2);
+        ingredientWeightHashMap.put(ingredientRepository.findByName("White rice"), mealIngredientSpecifics2);
+
+        meal.setIngredients(ingredientWeightHashMap);
         meal.setAuthor(appUserRepository.findById(1L).get());
 
         Review review = new Review();

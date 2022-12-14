@@ -35,15 +35,14 @@ public class MealController {
     @PostMapping()
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> addMeal(@Valid @RequestBody MealForm mealForm) {
+        Long idMeal;
         try {
-            mealService.addMeal(mealForm);
+            idMeal = mealService.addMeal(mealForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<Long>(idMeal, HttpStatus.CREATED);
     }
 
     @PutMapping()
@@ -53,8 +52,6 @@ public class MealController {
             mealService.updateMeal(mealForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok().build();
@@ -62,13 +59,11 @@ public class MealController {
 
     @DeleteMapping()
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteMeal(@RequestBody MealForm mealForm) {
+    public ResponseEntity<?> deleteMeal(@RequestParam Long idMeal) {
         try {
-            mealService.deleteMeal(mealForm);
+            mealService.deleteMeal(idMeal);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok().build();
@@ -82,8 +77,6 @@ public class MealController {
             mealResponseBodyExtended = mealService.extendMeal(mealForm);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok(mealResponseBodyExtended);

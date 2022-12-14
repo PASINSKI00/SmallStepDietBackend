@@ -11,6 +11,6 @@ public class MealResponseBody {
     private Long idMeal;
     private String name;
     private String image;
-    private List<String> ingredientNames;
+    private List<String> ingredientsNames;
     private List<String> categoriesNames;
 }
