@@ -7,10 +7,7 @@ import com.pasinski.sl.backend.diet.finalDay.FinalDay;
 import com.pasinski.sl.backend.diet.finalDay.FinalDayRepository;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMealRepository;
-import com.pasinski.sl.backend.diet.forms.DietResponseForm;
-import com.pasinski.sl.backend.diet.forms.FinalDayResponseForm;
-import com.pasinski.sl.backend.diet.forms.FinalIngredientResponseForm;
-import com.pasinski.sl.backend.diet.forms.FinalMealResponseForm;
+import com.pasinski.sl.backend.diet.forms.*;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
@@ -157,6 +154,37 @@ public class DietService {
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
         return this.pdfGeneratorService.generateDietPDF(diet);
+    }
+
+    public List<Grocery> getGroceries(Long idDiet) {
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        List<Grocery> groceries = new ArrayList<>();
+        diet.getFinalDays().forEach(finalDay -> {
+            finalDay.getFinalMeals().forEach(finalMeal -> {
+                finalMeal.getFinalIngredients().forEach(finalIngredient -> {
+                    Grocery grocery = new Grocery();
+                    grocery.setName(finalIngredient.getIngredient().getName());
+                    grocery.setWeight(finalIngredient.getWeight());
+                    groceries.add(grocery);
+                });
+            });
+        });
+
+        List<Grocery> groceriesSummed = new ArrayList<>();
+        groceries.forEach(grocery -> {
+            if(groceriesSummed.stream().anyMatch(grocery1 -> Objects.equals(grocery1.getName(), grocery.getName()))) {
+                groceriesSummed.stream().filter(grocery1 -> Objects.equals(grocery1.getName(), grocery.getName())).forEach(grocery1 -> {
+                    grocery1.setWeight(grocery1.getWeight() + grocery.getWeight());
+                });
+            } else {
+                groceriesSummed.add(grocery);
+            }
+        });
+
+        return groceriesSummed;
     }
 
     private List<Integer> calculatePercentagesOfMealsForDay(int size) {
