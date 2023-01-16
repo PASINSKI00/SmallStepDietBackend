@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.diet;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.FinalIngredient.FinalIngredient;
 import com.pasinski.sl.backend.diet.FinalIngredient.FinalIngredientRepository;
 import com.pasinski.sl.backend.diet.PDFGenerator.PDFGeneratorService;
@@ -11,12 +12,17 @@ import com.pasinski.sl.backend.diet.forms.*;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.user.AppUser;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -226,6 +232,15 @@ public class DietService {
         return this.pdfGeneratorService.generateDietPDF(diet);
     }
 
+    public InputStreamResource getDietPdf(String fileName) throws FileNotFoundException {
+        File file = new File(ApplicationConstants.PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName);
+
+        if (!file.exists())
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+
+        return new InputStreamResource(new FileInputStream(file));
+    }
+
     public List<Grocery> getGroceries(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
         if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
@@ -255,6 +270,59 @@ public class DietService {
         });
 
         return groceriesSummed;
+    }
+
+    public String generateGroceriesPDF(Long idDiet) throws FileNotFoundException {
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        List<Grocery> groceries = getGroceries(idDiet);
+
+        if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        return this.pdfGeneratorService.generateGroceriesPDF(groceries);
+    }
+
+    public InputStreamResource getGroceriesPdf(String fileName) throws FileNotFoundException {
+        File file = new File(ApplicationConstants.PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName);
+
+        if (!file.exists())
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+
+        return new InputStreamResource(new FileInputStream(file));
+    }
+
+    public List<DietResponseForm> getMyDiets() {
+        AppUser appUser = userSecurityService.getLoggedUser();
+        List<Diet> diets = dietRepository.findAllByAppUser(appUser);
+
+        List<DietResponseForm> dietResponseForms = new ArrayList<>();
+        diets.forEach(diet -> {
+            DietResponseForm dietResponseForm = new DietResponseForm();
+
+            dietResponseForm.setIdDiet(diet.getIdDiet());
+            dietResponseForm.setFinalDays(new ArrayList<>());
+
+            diet.getFinalDays().forEach(finalDay -> {
+                FinalDayResponseForm finalDayResponseForm = new FinalDayResponseForm();
+                finalDayResponseForm.setFinalMeals(new ArrayList<>());
+
+                finalDay.getFinalMeals().forEach(finalMeal -> {
+                    FinalMealResponseForm finalMealResponseForm = new FinalMealResponseForm();
+                    finalMealResponseForm.setName(finalMeal.getMeal().getName());
+                    finalMealResponseForm.setImageUrl(ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + finalMeal.getMeal().getIdMeal());
+
+                    finalDayResponseForm.getFinalMeals().add(finalMealResponseForm);
+                });
+                dietResponseForm.getFinalDays().add(finalDayResponseForm);
+                dietResponseForm.setDietFileUrl(ApplicationConstants.DEFAULT_DIET_PDF_URL_WITH_PARAMETER + diet.getIdDiet());
+                //TODO
+                dietResponseForm.setShoppingListFileUrl(ApplicationConstants.DEFAULT_GROCERIES_PDF_URL_WITH_PARAMETER + diet.getIdDiet());
+            });
+
+            dietResponseForms.add(dietResponseForm);
+        });
+
+        return dietResponseForms;
     }
 
     private List<Integer> calculatePercentagesOfMealsForDay(int size) {

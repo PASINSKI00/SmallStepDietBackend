@@ -3,7 +3,9 @@ package com.pasinski.sl.backend.diet;
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -67,8 +69,11 @@ public class DietController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> generateDietPDF(@RequestParam Long idDiet) {
         String fileName;
+        InputStreamResource inputStreamResource;
+
         try {
             fileName = this.dietService.generateDietPDF(idDiet);
+            inputStreamResource = dietService.getDietPdf(fileName);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         } catch (FileNotFoundException e) {
@@ -76,7 +81,9 @@ public class DietController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(fileName, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(inputStreamResource);
     }
 
     @GetMapping("/groceries")
@@ -90,5 +97,39 @@ public class DietController {
         }
 
         return new ResponseEntity<>(groceries, HttpStatus.OK);
+    }
+
+    @GetMapping("/groceries/pdf")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> generateGroceriesPDF(@RequestParam Long idDiet) {
+        String fileName;
+        InputStreamResource inputStreamResource;
+
+        try {
+            fileName = this.dietService.generateGroceriesPDF(idDiet);
+            inputStreamResource = dietService.getGroceriesPdf(fileName);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(inputStreamResource);
+    }
+
+    @GetMapping("/mine")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMyDiets() {
+        List<DietResponseForm> diets;
+        try {
+            diets = this.dietService.getMyDiets();
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(diets, HttpStatus.OK);
     }
 }
