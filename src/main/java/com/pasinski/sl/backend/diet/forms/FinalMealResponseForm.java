@@ -17,4 +17,6 @@ public class FinalMealResponseForm {
     private Integer fats;
     private Integer carbs;
     private Integer percentOfDay;
+
+    private String imageUrl;
 }
