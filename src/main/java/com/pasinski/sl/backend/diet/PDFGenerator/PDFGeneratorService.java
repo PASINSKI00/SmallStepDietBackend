@@ -6,6 +6,7 @@ import com.lowagie.text.pdf.TextField;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.Diet;
 import com.pasinski.sl.backend.diet.DietRepository;
+import com.pasinski.sl.backend.diet.forms.Grocery;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.FileSystems;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,7 +24,7 @@ public class PDFGeneratorService {
 
     public String generateDietPDF(Diet diet) throws FileNotFoundException {
         Document document = new Document();
-        String fileName = UUID.randomUUID() + ".pdf";
+        String fileName = "Diet_" + UUID.randomUUID() + ".pdf";
         PdfWriter.getInstance(document, new FileOutputStream(ApplicationConstants.PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName));
 
         Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 20, Font.BOLD);
@@ -66,6 +68,30 @@ public class PDFGeneratorService {
                 Paragraph mealRecipe = new Paragraph(meal.getMeal().getMealExtention().getRecipe(), fontContent);
                 document.add(mealRecipe);
             });
+        });
+
+        document.close();
+
+        return fileName;
+    }
+
+    public String generateGroceriesPDF(List<Grocery> groceries) throws FileNotFoundException {
+        Document document = new Document();
+        String fileName = "Groceries_" + UUID.randomUUID() + ".pdf";
+        PdfWriter.getInstance(document, new FileOutputStream(ApplicationConstants.PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName));
+
+        Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 20, Font.BOLD);
+        Font fontContentBold = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL);
+
+        document.open();
+
+        Paragraph title = new Paragraph("This is your shopping list!", fontTitle);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+
+        groceries.forEach(grocery -> {
+            Paragraph groceryTitle = new Paragraph(grocery.getName() + " " + grocery.getWeight() + " g", fontContentBold);
+            document.add(groceryTitle);
         });
 
         document.close();
