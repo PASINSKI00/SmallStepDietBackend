@@ -11,4 +11,6 @@ import java.util.List;
 public class DietResponseForm {
     private Long idDiet;
     private List<FinalDayResponseForm> finalDays;
+    private String dietFileUrl;
+    private String shoppingListFileUrl;
 }
