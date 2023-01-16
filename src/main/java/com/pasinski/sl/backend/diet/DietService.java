@@ -134,9 +134,7 @@ public class DietService {
         });
 
         //TODO: Set values of finalDay
-        finalDays.forEach(finalDay -> {
-            setFinalDayValues(finalDay);
-        });
+        finalDays.forEach(this::setFinalDayValues);
 
 
         Diet diet = new Diet();
@@ -145,6 +143,78 @@ public class DietService {
 
         this.dietRepository.save(diet);
         return diet.getIdDiet();
+    }
+
+    public void updateDiet(Long idDiet, Long[][] days) {
+        List<List<Long>> daysForm = new ArrayList<>();
+        Arrays.stream(days).forEach(day -> daysForm.add(Arrays.asList(day)));
+
+        List<List<Meal>> daysMeal = new ArrayList<>();
+
+//        Get Meals from database
+        daysForm.forEach(day -> {
+            daysMeal.add(new ArrayList<>());
+            day.forEach(idMeal -> {
+                Meal meal = this.mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+                daysMeal.get(daysMeal.size() - 1).add(meal);
+            });
+        });
+
+        //Delete old finalMeals
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        diet.getFinalDays().forEach(finalDay -> {
+            finalDay.getFinalMeals().forEach(finalMeal -> {
+                this.finalIngredientRepository.deleteAll(finalMeal.getFinalIngredients());
+                this.finalMealRepository.delete(finalMeal);
+            });
+            this.finalDayRepository.delete(finalDay);
+        });
+
+//        Create FinalMeals inside FinalDays
+        List<FinalDay> finalDays = new ArrayList<>();
+        daysMeal.forEach(day -> {
+            finalDays.add(new FinalDay());
+            finalDays.get(finalDays.size() - 1).setFinalMeals(new ArrayList<>());
+            this.finalDayRepository.save(finalDays.get(finalDays.size() - 1));
+            day.forEach(meal -> {
+                FinalMeal finalMeal = new FinalMeal();
+                finalMeal.setMeal(meal);
+                this.finalMealRepository.save(finalMeal);
+                finalDays.get(finalDays.size() - 1).getFinalMeals().add(finalMeal);
+            });
+        });
+
+//        TODO: Get caloriesGoal from user
+        Integer calories = 3000;
+
+//        create final meals for each day
+        finalDays.forEach(finalDay -> {
+            List<Integer> percentsOfMeals = calculatePercentagesOfMealsForDay(finalDay.getFinalMeals().size());
+            List<Integer> caloriesGoals = calculateCaloriesGoalsForDay(calories, percentsOfMeals);
+            finalDay.getFinalMeals().forEach(finalMeal -> {
+                finalMeal.setPercentOfDay(percentsOfMeals.get(finalDay.getFinalMeals().indexOf(finalMeal)));
+                finalMeal.setCaloriesGoal(caloriesGoals.get(finalDay.getFinalMeals().indexOf(finalMeal)));
+                finalMeal.setInitialCalories(getInitialCaloriesOfMeal(finalMeal.getMeal()));
+                finalMeal.setIngredientWeightMultiplier(setIngredientsWeightMultiplier(finalMeal.getInitialCalories(), finalMeal.getCaloriesGoal(), finalMeal.getMeal()));
+                finalMeal.setFinalIngredients(getFinalIngredientsOfMeal(finalMeal.getMeal()));
+            });
+        });
+
+        finalDays.forEach(finalDay -> {
+            finalDay.getFinalMeals().forEach(finalMeal -> {
+                setFinalIngredientsValues(finalMeal.getFinalIngredients(), finalMeal.getIngredientWeightMultiplier());
+                setFinalMealValues(finalMeal);
+                this.finalIngredientRepository.saveAll(finalMeal.getFinalIngredients());
+                this.finalMealRepository.save(finalMeal);
+            });
+        });
+
+        //TODO: Set values of finalDay
+        finalDays.forEach(this::setFinalDayValues);
+
+        diet.setFinalDays(finalDays);
+
+        this.dietRepository.save(diet);
     }
 
     public String generateDietPDF(Long idDiet) throws FileNotFoundException {

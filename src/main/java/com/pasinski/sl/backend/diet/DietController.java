@@ -46,9 +46,14 @@ public class DietController {
 
     @PutMapping()
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> updateDiet(){
-        //TODO
-        return null;
+    public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody Long[][] days){
+        try {
+            this.dietService.updateDiet(idDiet, days);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping
