@@ -1,9 +1,11 @@
 package com.pasinski.sl.backend.user;
 
 import com.pasinski.sl.backend.user.forms.UserForm;
+import com.pasinski.sl.backend.user.forms.UserResponseForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -16,11 +18,25 @@ public class AppUserController {
     private AppUserService appUserService;
 
     @GetMapping()
-    public ResponseEntity<?> getUser(@RequestBody AppUser appUser) {
-        AppUser retrievedUser;
+    public ResponseEntity<?> getUser(@RequestParam Long idUser) {
+        UserResponseForm retrievedUser;
         try {
-            retrievedUser = appUserService.getUser(appUser.getIdUser());
-            System.out.println(appUser.getIdUser());
+            retrievedUser = appUserService.getUser(idUser);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Error e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(retrievedUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getMe() {
+        UserResponseForm retrievedUser;
+        try {
+            retrievedUser = appUserService.getMe();
         } catch (HttpClientErrorException e){
             return new ResponseEntity<>(e.getStatusCode());
         } catch (Error e){

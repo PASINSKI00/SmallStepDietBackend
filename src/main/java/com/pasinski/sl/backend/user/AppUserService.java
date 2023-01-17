@@ -1,7 +1,9 @@
 package com.pasinski.sl.backend.user;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.forms.UserForm;
+import com.pasinski.sl.backend.user.forms.UserResponseForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,13 +21,19 @@ public class AppUserService implements UserDetailsService {
     private UserSecurityService userSecurityService;
     private PasswordEncoder passwordEncoder;
 
-    public AppUser getUser(Long idUser) {
+    public UserResponseForm getUser(Long idUser) {
         AppUser appUser;
         appUser = appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        appUser.setIdUser(null);
-        appUser.setPassword(null);
-        return appUser;
+        UserResponseForm userResponseForm = new UserResponseForm();
+        userResponseForm.setName(appUser.getName());
+        userResponseForm.setImageUrl(ApplicationConstants.DEFAULT_USER_IMAGE_URL_WITH_PARAMETER + appUser.getIdUser());
+
+        return userResponseForm;
+    }
+
+    public UserResponseForm getMe() {
+        return getUser(userSecurityService.getLoggedUserId());
     }
 
     public void addUser(UserForm userForm) {
