@@ -14,7 +14,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_review", nullable = false)
     private Long idReview;
-    private String content;
+    private String comment;
     private int rating;
 
     @ManyToOne

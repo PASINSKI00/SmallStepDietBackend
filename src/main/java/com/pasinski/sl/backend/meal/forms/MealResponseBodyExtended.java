@@ -32,6 +32,6 @@ public class MealResponseBodyExtended {
                         review.getAuthor().getImage(),
                         review.getAuthor().getName(),
                         review.getRating(),
-                        review.getContent())).collect(Collectors.toList());
+                        review.getComment())).collect(Collectors.toList());
     }
 }

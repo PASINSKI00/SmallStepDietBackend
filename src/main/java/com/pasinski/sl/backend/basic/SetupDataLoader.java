@@ -174,7 +174,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Review review = new Review();
         review.setAuthor(appUserRepository.findById(1L).get());
         review.setRating(5);
-        review.setContent("This is a comment");
+        review.setComment("This is a comment");
         reviewRepository.save(review);
 
 
