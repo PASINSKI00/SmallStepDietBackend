@@ -3,6 +3,7 @@ package com.pasinski.sl.backend.meal;
 import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.forms.MealResponseBodyExtended;
+import com.pasinski.sl.backend.meal.forms.ReviewForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,18 @@ public class MealController {
         }
 
         return new ResponseEntity<Long>(idMeal, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/review")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> addReview(@RequestBody ReviewForm reviewForm) {
+        try {
+            mealService.addReview(reviewForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping()

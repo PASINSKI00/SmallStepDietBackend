@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.meal;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
+import com.pasinski.sl.backend.meal.forms.ReviewForm;
 import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
@@ -9,6 +10,8 @@ import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.forms.MealResponseBodyExtended;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
+import com.pasinski.sl.backend.meal.review.Review;
+import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUserRepository;
 import lombok.AllArgsConstructor;
@@ -29,6 +32,7 @@ public class MealService {
     private final CategoryRepository categoryRepository;
     private final IngredientRepository ingredientRepository;
     private final AppUserRepository appUserRepository;
+    private final ReviewRepository reviewRepository;
     private final UserSecurityService userSecurityService;
 
     public List<MealResponseBody> getMeals() {
@@ -78,6 +82,20 @@ public class MealService {
         mealRepository.save(meal);
 
         return meal.getIdMeal();
+    }
+
+
+    public void addReview(ReviewForm reviewForm) {
+        Meal meal = mealRepository.findById(reviewForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        Review review = new Review();
+        review.setRating(reviewForm.getRating());
+        review.setComment(reviewForm.getComment());
+        review.setAuthor(this.userSecurityService.getLoggedUser());
+        this.reviewRepository.save(review);
+
+        meal.getMealExtention().getReviews().add(review);
+
+        mealRepository.save(meal);
     }
 
     public void updateMeal(MealForm mealForm) {
