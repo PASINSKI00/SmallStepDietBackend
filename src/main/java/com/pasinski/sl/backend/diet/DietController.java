@@ -2,6 +2,8 @@ package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
+import com.pasinski.sl.backend.meal.Meal;
+import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -131,5 +133,31 @@ public class DietController {
         }
 
         return new ResponseEntity<>(diets, HttpStatus.OK);
+    }
+
+    @GetMapping("/mine/meals/unreviewed")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getUnreviewedMealsUsedByUser() {
+        List<MealResponseBody> meals;
+        try {
+            meals = this.dietService.getUnreviewedMealsUsedByUser();
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(meals, HttpStatus.OK);
+    }
+
+    @GetMapping("/mine/meals/reviewed")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getAlreadyReviewedMealsUsedByUser() {
+        List<MealResponseBody> meals;
+        try {
+            meals = this.dietService.getAlreadyReviewedMealsUsedByUser();
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(meals, HttpStatus.OK);
     }
 }

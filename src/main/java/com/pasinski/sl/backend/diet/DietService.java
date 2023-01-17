@@ -11,8 +11,12 @@ import com.pasinski.sl.backend.diet.finalMeal.FinalMealRepository;
 import com.pasinski.sl.backend.diet.forms.*;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
+import com.pasinski.sl.backend.meal.forms.MealResponseBody;
+import com.pasinski.sl.backend.meal.ingredient.Ingredient;
+import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
+import com.pasinski.sl.backend.meal.category.Category;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -23,10 +27,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.file.FileSystems;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -314,7 +316,6 @@ public class DietService {
                 });
                 dietResponseForm.getFinalDays().add(finalDayResponseForm);
                 dietResponseForm.setDietFileUrl(ApplicationConstants.DEFAULT_DIET_PDF_URL_WITH_PARAMETER + diet.getIdDiet());
-                //TODO
                 dietResponseForm.setShoppingListFileUrl(ApplicationConstants.DEFAULT_GROCERIES_PDF_URL_WITH_PARAMETER + diet.getIdDiet());
             });
 
@@ -322,6 +323,61 @@ public class DietService {
         });
 
         return dietResponseForms;
+    }
+
+    public List<MealResponseBody> getUnreviewedMealsUsedByUser() {
+        AppUser appUser = userSecurityService.getLoggedUser();
+        List<Diet> diets = dietRepository.findAllByAppUser(appUser);
+
+        Set<Meal> meals = new HashSet<>();
+        diets.forEach(diet -> {
+            diet.getFinalDays().forEach(finalDay -> {
+                finalDay.getFinalMeals().forEach(finalMeal -> {
+                    if(finalMeal.getMeal().getMealExtention().getReviews().stream().map(Review::getAuthor).noneMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId())))
+                        meals.add(finalMeal.getMeal());
+                });
+            });
+        });
+
+        List<MealResponseBody> mealResponseBodies = new ArrayList<>();
+        meals.forEach(meal -> {
+            MealResponseBody mealResponseBody = new MealResponseBody(meal.getIdMeal(),
+                    meal.getName(),
+                    ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
+                    meal.getIngredients().keySet().stream().map(Ingredient::getName).collect(Collectors.toList()),
+                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()));
+            mealResponseBodies.add(mealResponseBody);
+        });
+
+        return mealResponseBodies;
+    }
+
+
+    public List<MealResponseBody> getAlreadyReviewedMealsUsedByUser() {
+        AppUser appUser = userSecurityService.getLoggedUser();
+        List<Diet> diets = dietRepository.findAllByAppUser(appUser);
+
+        Set<Meal> meals = new HashSet<>();
+        diets.forEach(diet -> {
+            diet.getFinalDays().forEach(finalDay -> {
+                finalDay.getFinalMeals().forEach(finalMeal -> {
+                    if(finalMeal.getMeal().getMealExtention().getReviews().stream().map(Review::getAuthor).noneMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId())))
+                        meals.add(finalMeal.getMeal());
+                });
+            });
+        });
+
+        List<MealResponseBody> mealResponseBodies = new ArrayList<>();
+        meals.forEach(meal -> {
+            MealResponseBody mealResponseBody = new MealResponseBody(meal.getIdMeal(),
+                    meal.getName(),
+                    ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
+                    meal.getIngredients().keySet().stream().map(Ingredient::getName).collect(Collectors.toList()),
+                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()));
+            mealResponseBodies.add(mealResponseBody);
+        });
+
+        return mealResponseBodies;
     }
 
     private List<Integer> calculatePercentagesOfMealsForDay(int size) {
