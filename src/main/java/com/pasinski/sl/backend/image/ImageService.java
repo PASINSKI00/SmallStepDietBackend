@@ -2,6 +2,9 @@ package com.pasinski.sl.backend.image;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.MealRepository;
+import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.user.AppUser;
+import com.pasinski.sl.backend.user.AppUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ImageService {
     private MealRepository mealRepository;
+    private AppUserRepository appUserRepository;
+    private UserSecurityService userSecurityService;
+
     public InputStreamResource getMealImage(Long idMeal) throws FileNotFoundException {
         String name = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)).getImageName();
         File file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
@@ -33,7 +39,7 @@ public class ImageService {
     }
 
     public void addMealImage(String base64Image, Long idMeal) {
-        String fileName = UUID.randomUUID().toString() + ".jpg";
+        String fileName = "meal_" + UUID.randomUUID().toString() + ".jpg";
         String base64header = base64Image.split(",")[0];
         String base64ImageWithoutHeader = base64Image.split(",")[1];
 
@@ -55,6 +61,51 @@ public class ImageService {
             mealRepository.findById(idMeal).ifPresent(meal -> {
                 meal.setImageName(fileName);
                 mealRepository.save(meal);
+            });
+        } catch (Exception e) {
+            try {
+                Files.delete(destination);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public InputStreamResource getUserImage(Long idUser) throws FileNotFoundException {
+        AppUser appUser = this.appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        String fileName = appUser.getImage();
+        File file = new File(ApplicationConstants.PATH_TO_USER_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName);
+
+        if (!file.exists())
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+
+        return new InputStreamResource(new FileInputStream(file));
+    }
+
+    public void addMyImage(String base64Image) {
+        String fileName = "user_" + UUID.randomUUID().toString() + ".jpg";
+        String base64header = base64Image.split(",")[0];
+        String base64ImageWithoutHeader = base64Image.split(",")[1];
+
+        byte[] fileContent = Base64Utils.decodeFromString(base64ImageWithoutHeader);
+        MultipartFile image = new Base64EncodedMultipartFile(fileContent, fileName);
+
+        validateImage(base64header);
+
+        Path storageDirectory = Paths.get(ApplicationConstants.PATH_TO_USER_IMAGES_DIRECTORY);
+        Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
+
+        try {
+            Files.copy(image.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            appUserRepository.findById(this.userSecurityService.getLoggedUser().getIdUser()).ifPresent(appUser -> {
+                appUser.setImage(fileName);
+                appUserRepository.save(appUser);
             });
         } catch (Exception e) {
             try {
