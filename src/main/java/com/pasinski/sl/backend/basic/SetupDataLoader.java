@@ -97,7 +97,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         user.setPassword(passwordEncoder.encode("Password1!"));
         user.setEmail("email@email.com");
         user.setRoles(Arrays.asList(adminRole));
-        user.setImage("users/iamge");
         appUserRepository.save(user);
     }
 
