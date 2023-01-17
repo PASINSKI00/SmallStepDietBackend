@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_review", nullable = false)
     private Long idReview;
     private String comment;
