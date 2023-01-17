@@ -171,14 +171,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         meal.setIngredients(ingredientWeightHashMap);
         meal.setAuthor(appUserRepository.findById(1L).get());
 
-        Review review = new Review();
-        review.setAuthor(appUserRepository.findById(1L).get());
-        review.setRating(5);
-        review.setComment("This is a comment");
-        reviewRepository.save(review);
-
-
-        meal.getMealExtention().getReviews().add(review);
         mealRepository.save(meal);
     }
 
