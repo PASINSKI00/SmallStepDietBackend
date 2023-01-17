@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.user;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class AppUser implements UserDetails {
     private String name;
     private String email;
     private String password;
-    private String image;
+    private String image = ApplicationConstants.DEFAULT_USER_IMAGE_NAME;
 
     @ManyToMany
     @JoinTable(
