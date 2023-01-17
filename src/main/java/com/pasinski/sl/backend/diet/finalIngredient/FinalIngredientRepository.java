@@ -1,4 +1,4 @@
-package com.pasinski.sl.backend.diet.FinalIngredient;
+package com.pasinski.sl.backend.diet.finalIngredient;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

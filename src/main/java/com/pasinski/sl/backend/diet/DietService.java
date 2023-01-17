@@ -1,8 +1,8 @@
 package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
-import com.pasinski.sl.backend.diet.FinalIngredient.FinalIngredient;
-import com.pasinski.sl.backend.diet.FinalIngredient.FinalIngredientRepository;
+import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredient;
+import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredientRepository;
 import com.pasinski.sl.backend.diet.PDFGenerator.PDFGeneratorService;
 import com.pasinski.sl.backend.diet.finalDay.FinalDay;
 import com.pasinski.sl.backend.diet.finalDay.FinalDayRepository;
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @AllArgsConstructor

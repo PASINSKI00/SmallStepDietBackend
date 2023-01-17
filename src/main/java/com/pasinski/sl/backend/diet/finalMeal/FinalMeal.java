@@ -1,6 +1,6 @@
 package com.pasinski.sl.backend.diet.finalMeal;
 
-import com.pasinski.sl.backend.diet.FinalIngredient.FinalIngredient;
+import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredient;
 import com.pasinski.sl.backend.meal.Meal;
 import lombok.Getter;
 import lombok.Setter;
