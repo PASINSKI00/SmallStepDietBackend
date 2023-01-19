@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.user;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.user.accessManagment.Role;
+import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +35,9 @@ public class AppUser implements UserDetails {
             inverseJoinColumns = @JoinColumn(
                     name = "id_role"))
     private Collection<Role> roles;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private BodyInfo bodyInfo;
 
     public AppUser(String name, String email, String password) {
         this.name = name;
