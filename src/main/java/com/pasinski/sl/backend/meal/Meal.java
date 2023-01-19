@@ -42,6 +42,6 @@ public class Meal {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     MealExtention mealExtention = new MealExtention();
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     private AppUser author;
 }

@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.user;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
+import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.forms.UserForm;
 import com.pasinski.sl.backend.user.forms.UserResponseForm;
@@ -18,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 @AllArgsConstructor
 public class AppUserService implements UserDetailsService {
     private AppUserRepository appUserRepository;
+    private MealRepository mealRepository;
     private UserSecurityService userSecurityService;
     private PasswordEncoder passwordEncoder;
 
@@ -69,9 +71,14 @@ public class AppUserService implements UserDetailsService {
     }
 
     public void deleteUserOwnAccount() {
-        appUserRepository
-                .findById(userSecurityService.getLoggedUserId())
-                .ifPresent(appUser -> appUserRepository.delete(appUser));
+        AppUser appUser = userSecurityService.getLoggedUser();
+
+        mealRepository.findAllByAuthor(appUser).forEach(meal -> {
+                meal.setAuthor(null);
+                mealRepository.save(meal);
+        });
+
+        appUserRepository.delete(appUser);
     }
 
     @Override

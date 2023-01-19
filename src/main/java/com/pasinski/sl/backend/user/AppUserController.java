@@ -60,6 +60,7 @@ public class AppUserController {
     }
 
     @PutMapping()
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateUser(@RequestBody UserForm userForm) {
         try {
             appUserService.updateUser(userForm);
@@ -73,6 +74,7 @@ public class AppUserController {
     }
 
     @DeleteMapping()
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteUserOwnAccount() {
         try {
             appUserService.deleteUserOwnAccount();
