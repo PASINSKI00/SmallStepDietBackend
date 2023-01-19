@@ -26,7 +26,7 @@ public class AppUser implements UserDetails {
     private String password;
     private String image = ApplicationConstants.DEFAULT_USER_IMAGE_NAME;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(
