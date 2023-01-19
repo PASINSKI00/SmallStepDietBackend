@@ -39,7 +39,7 @@ public class Meal {
     @ManyToMany
     private List<Category> categories = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     MealExtention mealExtention = new MealExtention();
 
     @ManyToOne
