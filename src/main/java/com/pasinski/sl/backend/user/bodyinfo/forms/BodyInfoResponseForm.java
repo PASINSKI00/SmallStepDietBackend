@@ -11,4 +11,8 @@ public class BodyInfoResponseForm {
     private Integer weight;
     private Integer age;
     private Float pal;
+    private Integer additionalCalories;
+    private Integer TDEE;
+    private Integer BEE;
+    private Integer caloriesGoal;
 }
