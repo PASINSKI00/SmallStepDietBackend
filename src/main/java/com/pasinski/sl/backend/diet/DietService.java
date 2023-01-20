@@ -115,8 +115,7 @@ public class DietService {
             });
         });
 
-//        TODO: Get caloriesGoal from user
-        Integer calories = 3000;
+        Integer calories = userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal();
 
 //        create final meals for each day
         finalDays.forEach(finalDay -> {
@@ -140,7 +139,6 @@ public class DietService {
             });
         });
 
-        //TODO: Set values of finalDay
         finalDays.forEach(this::setFinalDayValues);
 
 
@@ -191,8 +189,7 @@ public class DietService {
             });
         });
 
-//        TODO: Get caloriesGoal from user
-        Integer calories = 3000;
+        Integer calories = userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal();
 
 //        create final meals for each day
         finalDays.forEach(finalDay -> {
@@ -216,7 +213,6 @@ public class DietService {
             });
         });
 
-        //TODO: Set values of finalDay
         finalDays.forEach(this::setFinalDayValues);
 
         diet.setFinalDays(finalDays);
@@ -432,7 +428,6 @@ public class DietService {
 
     private void setFinalIngredientsValues(List<FinalIngredient> finalIngredients, Float ingredientWeightMultiplier) {
         finalIngredients.forEach(finalIngredient -> {
-            // TODO verify if this is correct
             finalIngredient.setWeight((int)     (finalIngredient.getInitialWeight() * ingredientWeightMultiplier));
             finalIngredient.setProtein((int)    (finalIngredient.getIngredient().getProteinPer100g() * finalIngredient.getWeight() / 100));
             finalIngredient.setFats((int)       (finalIngredient.getIngredient().getFatsPer100g() * finalIngredient.getWeight() / 100));
