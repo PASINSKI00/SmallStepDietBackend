@@ -45,7 +45,10 @@ public class MealService {
                     meal.getName(),
                     ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
                     meal.getIngredients().keySet().stream().map(Ingredient::getName).toList(),
-                    meal.getCategories().stream().map(Category::getName).toList()
+                    meal.getCategories().stream().map(Category::getName).toList(),
+                    meal.getAvgRating(),
+                    meal.getMealExtention().getProteinRatio(),
+                    meal.getTimesUsed()
         ));
         });
 
@@ -94,6 +97,7 @@ public class MealService {
         this.reviewRepository.save(review);
 
         meal.getMealExtention().getReviews().add(review);
+        meal.setAvgRating((float) (meal.getMealExtention().getReviews().stream().map(Review::getRating).reduce(0, Integer::sum) / meal.getMealExtention().getReviews().size()));
 
         mealRepository.save(meal);
     }

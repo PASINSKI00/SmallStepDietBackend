@@ -13,4 +13,7 @@ public class MealResponseBody {
     private String image;
     private List<String> ingredientsNames;
     private List<String> categoriesNames;
+    private Float avgRating;
+    private Integer proteinRatio;
+    private Integer timesUsed;
 }

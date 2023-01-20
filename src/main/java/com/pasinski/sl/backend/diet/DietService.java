@@ -110,6 +110,7 @@ public class DietService {
             day.forEach(meal -> {
                 FinalMeal finalMeal = new FinalMeal();
                 finalMeal.setMeal(meal);
+                meal.setTimesUsed(meal.getTimesUsed() + 1);
                 this.finalMealRepository.save(finalMeal);
                 finalDays.get(finalDays.size() - 1).getFinalMeals().add(finalMeal);
             });
@@ -184,6 +185,7 @@ public class DietService {
             day.forEach(meal -> {
                 FinalMeal finalMeal = new FinalMeal();
                 finalMeal.setMeal(meal);
+                meal.setTimesUsed(meal.getTimesUsed() + 1);
                 this.finalMealRepository.save(finalMeal);
                 finalDays.get(finalDays.size() - 1).getFinalMeals().add(finalMeal);
             });
@@ -341,7 +343,12 @@ public class DietService {
                     meal.getName(),
                     ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
                     meal.getIngredients().keySet().stream().map(Ingredient::getName).collect(Collectors.toList()),
-                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()));
+                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()),
+                    meal.getAvgRating(),
+                    meal.getMealExtention().getProteinRatio(),
+                    meal.getTimesUsed()
+            );
+
             mealResponseBodies.add(mealResponseBody);
         });
 
@@ -369,7 +376,10 @@ public class DietService {
                     meal.getName(),
                     ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
                     meal.getIngredients().keySet().stream().map(Ingredient::getName).collect(Collectors.toList()),
-                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()));
+                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()),
+                    meal.getAvgRating(),
+                    meal.getMealExtention().getProteinRatio(),
+                    meal.getTimesUsed());
             mealResponseBodies.add(mealResponseBody);
         });
 
