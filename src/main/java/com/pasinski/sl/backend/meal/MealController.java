@@ -83,11 +83,11 @@ public class MealController {
     }
 
     @GetMapping("/extend")
-    public ResponseEntity<?> extendMeal(@RequestBody MealForm mealForm) {
+    public ResponseEntity<?> extendMeal(@RequestParam Long idMeal) {
         MealResponseBodyExtended mealResponseBodyExtended;
 
         try {
-            mealResponseBodyExtended = mealService.extendMeal(mealForm);
+            mealResponseBodyExtended = mealService.extendMeal(idMeal);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }

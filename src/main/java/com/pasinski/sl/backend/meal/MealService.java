@@ -144,8 +144,8 @@ public class MealService {
         mealRepository.delete(meal);
     }
 
-    public MealResponseBodyExtended extendMeal(MealForm mealForm) {
-        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    public MealResponseBodyExtended extendMeal(Long idMeal) {
+        Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         return new MealResponseBodyExtended(meal, meal.getMealExtention());
     }
