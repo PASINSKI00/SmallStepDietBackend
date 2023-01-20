@@ -386,6 +386,15 @@ public class DietService {
         return mealResponseBodies;
     }
 
+    public void deleteDiet(Long idDiet) {
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
+
+        if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        this.dietRepository.delete(diet);
+    }
+
     private List<Integer> calculatePercentagesOfMealsForDay(int size) {
         List<Integer> percents = new ArrayList<>();
         for(int i = 0; i < size; i++) {

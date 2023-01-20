@@ -156,8 +156,13 @@ public class DietController {
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteDiet(){
-        //TODO
-        return null;
+    public ResponseEntity<?> deleteDiet(@RequestParam Long idDiet){
+        try {
+            this.dietService.deleteDiet(idDiet);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
