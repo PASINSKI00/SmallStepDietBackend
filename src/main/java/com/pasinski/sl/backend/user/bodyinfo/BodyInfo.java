@@ -40,6 +40,14 @@ public class BodyInfo {
     private Float pal;
 
     @NotNull
+    @Column(nullable = false)
+    private Integer additionalCalories;
+
+    private Integer TDEE;
+    private Integer BEE;
+    private Integer CaloriesGoal;
+
+    @NotNull
     @OneToOne(mappedBy = "bodyInfo", optional = false)
     private AppUser appUser;
 }
