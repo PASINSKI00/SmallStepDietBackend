@@ -119,8 +119,26 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     private void addCategories(){
+        addCategory("Breakfast");
+        addCategory("Lunch");
+        addCategory("Dinner");
+        addCategory("Snack");
+        addCategory("Dessert");
+        addCategory("Shake");
+        addCategory("Fast food");
+        addCategory("Soup");
+        addCategory("Salad");
+        addCategory("Bread");
+        addCategory("Pasta");
+        addCategory("Pizza");
+        addCategory("Sandwich");
+        addCategory("Sauce");
+        addCategory("Drink");
+    }
+
+    private void addCategory(String name){
         Category category = new Category();
-        category.setName("Fast");
+        category.setName(name);
         categoryRepository.save(category);
     }
 
