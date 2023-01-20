@@ -116,6 +116,9 @@ public class DietService {
             });
         });
 
+        if(userSecurityService.getLoggedUser().getBodyInfo() == null)
+            throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
+
         Integer calories = userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal();
 
 //        create final meals for each day
@@ -190,6 +193,9 @@ public class DietService {
                 finalDays.get(finalDays.size() - 1).getFinalMeals().add(finalMeal);
             });
         });
+
+        if(userSecurityService.getLoggedUser().getBodyInfo() == null)
+            throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
 
         Integer calories = userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal();
 
