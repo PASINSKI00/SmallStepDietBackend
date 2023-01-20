@@ -31,6 +31,14 @@ public class Meal {
     @NotNull
     private String imageName = ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
 
+    @NotNull
+    @ColumnDefault("0")
+    private Float avgRating = 0F;
+
+    @NotNull
+    @ColumnDefault("0")
+    private Integer timesUsed = 0;
+
     @OneToMany
     @MapKeyJoinColumn(name = "id_ingredient")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
