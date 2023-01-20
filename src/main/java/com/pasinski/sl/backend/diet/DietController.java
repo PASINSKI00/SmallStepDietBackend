@@ -35,38 +35,6 @@ public class DietController {
         return new ResponseEntity<>(dietResponseForm, HttpStatus.OK);
     }
 
-    @PostMapping()
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> addDiet(@RequestBody Long[][] days) {
-        Long id;
-        try {
-            id = this.dietService.addDiet(days);
-        } catch (HttpClientErrorException e){
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
-    }
-
-    @PutMapping()
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody Long[][] days){
-        try {
-            this.dietService.updateDiet(idDiet, days);
-        } catch (HttpClientErrorException e){
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @DeleteMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteDiet(){
-        //TODO
-        return null;
-    }
-
     @GetMapping("/pdf")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> generateDietPDF(@RequestParam Long idDiet) {
@@ -159,5 +127,37 @@ public class DietController {
         }
 
         return new ResponseEntity<>(meals, HttpStatus.OK);
+    }
+
+    @PostMapping()
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> addDiet(@RequestBody Long[][] days) {
+        Long id;
+        try {
+            id = this.dietService.addDiet(days);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
+    }
+
+    @PutMapping()
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody Long[][] days){
+        try {
+            this.dietService.updateDiet(idDiet, days);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteDiet(){
+        //TODO
+        return null;
     }
 }
