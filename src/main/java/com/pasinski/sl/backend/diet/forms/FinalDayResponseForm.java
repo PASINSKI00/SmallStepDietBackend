@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.diet.forms;
 
 import com.pasinski.sl.backend.diet.finalDay.FinalDay;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class FinalDayResponseForm {
     private Long idFinalDay;
     private List<FinalMealResponseForm> finalMeals;

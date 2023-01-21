@@ -1,12 +1,16 @@
 package com.pasinski.sl.backend.diet.finalDay;
 
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
+import com.pasinski.sl.backend.diet.forms.FinalDayResponseForm;
 import com.pasinski.sl.backend.meal.Meal;
+import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -65,5 +69,34 @@ public class FinalDay {
             caloriesGoals.set(caloriesGoals.size() - 1, caloriesGoals.get(caloriesGoals.size() - 1) + (caloriesGoal - caloriesGoals.stream().mapToInt(Integer::intValue).sum()));
 
         return caloriesGoals;
+    }
+
+    public void modifyFinalDay(FinalDayResponseForm finalDayResponseForm, IngredientRepository ingredientRepository, Integer caloriesGoal) {
+        if (finalDayResponseForm.getFinalMeals().get(0).getPercentOfDay() != null) {
+            List<Integer> percents = new ArrayList<>();
+            finalDayResponseForm.getFinalMeals().forEach(finalMealResponseForm1 -> {
+                percents.add(finalMealResponseForm1.getPercentOfDay());
+            });
+
+            if (percents.stream().mapToInt(Integer::intValue).sum() != 100)
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Sum of percents of meals must be equal 100");
+
+            List<Integer> caloriesGoals = calculateCaloriesGoalsForFinalMeals(caloriesGoal, percents);
+
+            for (int i = 0; i < finalMeals.size(); i++)
+                finalMeals.get(i).modifyPercentOfDay(percents.get(i), caloriesGoals.get(i));
+        }
+
+        finalDayResponseForm.getFinalMeals().forEach(finalMealResponseForm -> {
+            if(finalMealResponseForm.getFinalIngredients() != null)
+                finalMeals.stream()
+                        .filter(finalMeal -> finalMeal.getIdFinalMeal().equals(finalMealResponseForm.getIdFinalMeal())).findFirst()
+                        .get().modifyFinalMeal(finalMealResponseForm, ingredientRepository);
+
+            this.calories = finalMeals.stream().mapToInt(FinalMeal::getCalories).sum();
+            this.protein = finalMeals.stream().mapToInt(FinalMeal::getProtein).sum();
+            this.fats = finalMeals.stream().mapToInt(FinalMeal::getFats).sum();
+            this.carbs = finalMeals.stream().mapToInt(FinalMeal::getCarbs).sum();
+        });
     }
 }

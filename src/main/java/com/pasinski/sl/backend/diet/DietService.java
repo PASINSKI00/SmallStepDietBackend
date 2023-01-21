@@ -7,6 +7,7 @@ import com.pasinski.sl.backend.diet.forms.*;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
+import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
@@ -30,6 +31,7 @@ public class DietService {
     private final MealRepository mealRepository;
     private final UserSecurityService userSecurityService;
     private final PDFGeneratorService pdfGeneratorService;
+    private final IngredientRepository ingredientRepository;
 
     public DietResponseForm getDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
@@ -143,38 +145,15 @@ public class DietService {
         this.dietRepository.delete(diet);
     }
 
-    private List<Integer> calculatePercentagesOfMealsForDay(int size) {
-        List<Integer> percents = new ArrayList<>();
-        for(int i = 0; i < size; i++) {
-            percents.add(100 / size);
-        }
+    public void modifyFinalDiet(DietResponseForm dietResponseForm) {
+        Diet diet = this.dietRepository.findById(dietResponseForm.getIdDiet()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        if(percents.stream().mapToInt(Integer::intValue).sum() != 100) {
-            percents.set(percents.size() - 1, percents.get(percents.size() - 1) + (100 - percents.stream().mapToInt(Integer::intValue).sum()));
-        }
+        if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        return percents;
-    }
+        diet.modifyDiet(dietResponseForm, ingredientRepository);
 
-    private List<Integer> calculateCaloriesGoalsForDay(Integer calories, List<Integer> percentsOfMeals) {
-        List<Integer> caloriesGoals = new ArrayList<>();
-        percentsOfMeals.forEach(percent -> {
-            caloriesGoals.add((calories * percent) / 100);
-        });
-
-        if(caloriesGoals.stream().mapToInt(Integer::intValue).sum() != calories) {
-            caloriesGoals.set(caloriesGoals.size() - 1, caloriesGoals.get(caloriesGoals.size() - 1) + (calories - caloriesGoals.stream().mapToInt(Integer::intValue).sum()));
-        }
-
-        return caloriesGoals;
-    }
-
-    private Integer getInitialCaloriesOfMeal(Meal meal) {
-        final Integer[] calories = {0};
-
-        meal.getIngredients().forEach((key, value) -> calories[0] += key.getCaloriesPer100g() * value.getInitialWeight() / 100);
-
-        return calories[0];
+        this.dietRepository.save(diet);
     }
 
     private List<List<Meal>> getListOfListsOfMeals(List<List<Long>> daysForm){
@@ -188,43 +167,5 @@ public class DietService {
         });
 
         return days;
-    }
-
-    private void modifyPercentagesOfMealsForDay(DietResponseForm dietResponseForm, Diet diet) {
-//        Verify that the sum of percentages is 100
-        dietResponseForm.getFinalDays().forEach(finalDay -> {
-            if(finalDay.getFinalMeals().stream().map(FinalMealResponseForm::getPercentOfDay).reduce(0, Integer::sum) != 100)
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        });
-
-        return finalIngredients;
-    }
-
-    private Float setIngredientsWeightMultiplier(Integer initialCalories, Integer caloriesGoal, Meal meal) {
-        return (float) caloriesGoal / initialCalories;
-    }
-
-    private void setFinalIngredientsValues(List<FinalIngredient> finalIngredients, Float ingredientWeightMultiplier) {
-        finalIngredients.forEach(finalIngredient -> {
-            finalIngredient.setWeight((int)     (finalIngredient.getInitialWeight() * ingredientWeightMultiplier));
-            finalIngredient.setProtein((int)    (finalIngredient.getIngredient().getProteinPer100g() * finalIngredient.getWeight() / 100));
-            finalIngredient.setFats((int)       (finalIngredient.getIngredient().getFatsPer100g() * finalIngredient.getWeight() / 100));
-            finalIngredient.setCarbs((int)      (finalIngredient.getIngredient().getCarbsPer100g() * finalIngredient.getWeight() / 100));
-            finalIngredient.setCalories((int)   (finalIngredient.getIngredient().getCaloriesPer100g() * finalIngredient.getWeight() / 100));
-        });
-    }
-
-    private void setFinalMealValues(FinalMeal finalMeal) {
-        finalMeal.setProtein(finalMeal.getFinalIngredients().stream().mapToInt(FinalIngredient::getProtein).sum());
-        finalMeal.setFats(finalMeal.getFinalIngredients().stream().mapToInt(FinalIngredient::getFats).sum());
-        finalMeal.setCarbs(finalMeal.getFinalIngredients().stream().mapToInt(FinalIngredient::getCarbs).sum());
-        finalMeal.setCalories(finalMeal.getFinalIngredients().stream().mapToInt(FinalIngredient::getCalories).sum());
-    }
-
-    private void setFinalDayValues(FinalDay finalDay) {
-        finalDay.setProtein(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getProtein).sum());
-        finalDay.setFats(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getFats).sum());
-        finalDay.setCarbs(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getCarbs).sum());
-        finalDay.setCalories(finalDay.getFinalMeals().stream().mapToInt(FinalMeal::getCalories).sum());
     }
 }

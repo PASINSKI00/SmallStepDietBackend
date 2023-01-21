@@ -2,8 +2,10 @@ package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.diet.finalDay.FinalDay;
 import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredient;
+import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import com.pasinski.sl.backend.meal.Meal;
+import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.user.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,7 @@ import org.hibernate.annotations.Cascade;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,8 +45,17 @@ public class Diet {
     }
 
     public void updateDiet(List<List<Meal>> days) {
-        this.finalDays = new ArrayList<>();
+        this.finalDays.removeAll(this.finalDays);
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
+    }
+
+    public void modifyDiet(DietResponseForm dietResponseForm, IngredientRepository ingredientRepository){
+        dietResponseForm.getFinalDays().forEach(finalDayResponseForm -> {
+            finalDays.forEach(finalDay -> {
+                if(Objects.equals(finalDayResponseForm.getIdFinalDay(), finalDay.getIdFinalDay()))
+                    finalDay.modifyFinalDay(finalDayResponseForm, ingredientRepository, appUser.getBodyInfo().getCaloriesGoal());
+            });
+        });
     }
 
     public Set<Grocery> getGroceries(){
