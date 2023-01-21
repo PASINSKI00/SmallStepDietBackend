@@ -1,22 +1,15 @@
 package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
-import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredient;
-import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredientRepository;
 import com.pasinski.sl.backend.diet.PDFGenerator.PDFGeneratorService;
-import com.pasinski.sl.backend.diet.finalDay.FinalDay;
-import com.pasinski.sl.backend.diet.finalDay.FinalDayRepository;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
-import com.pasinski.sl.backend.diet.finalMeal.FinalMealRepository;
 import com.pasinski.sl.backend.diet.forms.*;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
-import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
-import com.pasinski.sl.backend.meal.category.Category;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -35,195 +28,32 @@ import java.util.stream.Collectors;
 public class DietService {
     private final DietRepository dietRepository;
     private final MealRepository mealRepository;
-    private final FinalDayRepository finalDayRepository;
-    private final FinalMealRepository finalMealRepository;
-    private final FinalIngredientRepository finalIngredientRepository;
     private final UserSecurityService userSecurityService;
     private final PDFGeneratorService pdfGeneratorService;
 
     public DietResponseForm getDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        DietResponseForm dietResponseForm = new DietResponseForm();
 
         if(!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        dietResponseForm.setIdDiet(diet.getIdDiet());
-        dietResponseForm.setFinalDays(new ArrayList<>());
-
-        diet.getFinalDays().forEach(finalDay -> {
-            FinalDayResponseForm finalDayResponseForm = new FinalDayResponseForm();
-            finalDayResponseForm.setIdFinalDay(finalDay.getIdFinalDay());
-            finalDayResponseForm.setFinalMeals(new ArrayList<>());
-            finalDayResponseForm.setCalories(finalDay.getCalories());
-            finalDayResponseForm.setCarbs(finalDay.getCarbs());
-            finalDayResponseForm.setProtein(finalDay.getProtein());
-            finalDayResponseForm.setFats(finalDay.getFats());
-
-            finalDay.getFinalMeals().forEach(finalMeal -> {
-                FinalMealResponseForm finalMealResponseForm = new FinalMealResponseForm();
-                finalMealResponseForm.setIdFinalMeal(finalMeal.getIdFinalMeal());
-                finalMealResponseForm.setName(finalMeal.getMeal().getName());
-                finalMealResponseForm.setFinalIngredients(new ArrayList<>());
-                finalMealResponseForm.setCalories(finalMeal.getCalories());
-                finalMealResponseForm.setProtein(finalMeal.getProtein());
-                finalMealResponseForm.setFats(finalMeal.getFats());
-                finalMealResponseForm.setCarbs(finalMeal.getCarbs());
-                finalMealResponseForm.setPercentOfDay(finalMeal.getPercentOfDay());
-
-                finalMeal.getFinalIngredients().forEach(finalIngredient -> {
-                    FinalIngredientResponseForm finalIngredientResponseForm = new FinalIngredientResponseForm();
-                    finalIngredientResponseForm.setIdFinalIngredient(finalIngredient.getIdFinalIngredient());
-                    finalIngredientResponseForm.setName(finalIngredient.getIngredient().getName());
-                    finalIngredientResponseForm.setWeight(finalIngredient.getWeight());
-                    finalMealResponseForm.getFinalIngredients().add(finalIngredientResponseForm);
-                });
-                finalDayResponseForm.getFinalMeals().add(finalMealResponseForm);
-            });
-            dietResponseForm.getFinalDays().add(finalDayResponseForm);
-        });
-
-       return dietResponseForm;
+       return new DietResponseForm(diet);
     }
 
-    public Long addDiet(Long[][] days) {
-        List<List<Long>> daysForm = new ArrayList<>();
-        Arrays.stream(days).forEach(day -> daysForm.add(Arrays.asList(day)));
+    public Long addDiet(List<List<Long>> daysForm) {
+        if(userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal() == null)
+            throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY, "You have to set your body info first");
 
-        List<List<Meal>> daysMeal = new ArrayList<>();
-
-//        Get Meals from database
-        daysForm.forEach(day -> {
-            daysMeal.add(new ArrayList<>());
-            day.forEach(idMeal -> {
-                Meal meal = this.mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-                daysMeal.get(daysMeal.size() - 1).add(meal);
-            });
-        });
-
-//        Create FinalMeals inside FinalDays
-        List<FinalDay> finalDays = new ArrayList<>();
-        daysMeal.forEach(day -> {
-            finalDays.add(new FinalDay());
-            finalDays.get(finalDays.size() - 1).setFinalMeals(new ArrayList<>());
-            this.finalDayRepository.save(finalDays.get(finalDays.size() - 1));
-            day.forEach(meal -> {
-                FinalMeal finalMeal = new FinalMeal();
-                finalMeal.setMeal(meal);
-                meal.setTimesUsed(meal.getTimesUsed() + 1);
-                this.finalMealRepository.save(finalMeal);
-                finalDays.get(finalDays.size() - 1).getFinalMeals().add(finalMeal);
-            });
-        });
-
-        if(userSecurityService.getLoggedUser().getBodyInfo() == null)
-            throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
-
-        Integer calories = userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal();
-
-//        create final meals for each day
-        finalDays.forEach(finalDay -> {
-            List<Integer> percentsOfMeals = calculatePercentagesOfMealsForDay(finalDay.getFinalMeals().size());
-            List<Integer> caloriesGoals = calculateCaloriesGoalsForDay(calories, percentsOfMeals);
-            finalDay.getFinalMeals().forEach(finalMeal -> {
-                finalMeal.setPercentOfDay(percentsOfMeals.get(finalDay.getFinalMeals().indexOf(finalMeal)));
-                finalMeal.setCaloriesGoal(caloriesGoals.get(finalDay.getFinalMeals().indexOf(finalMeal)));
-                finalMeal.setInitialCalories(getInitialCaloriesOfMeal(finalMeal.getMeal()));
-                finalMeal.setIngredientWeightMultiplier(setIngredientsWeightMultiplier(finalMeal.getInitialCalories(), finalMeal.getCaloriesGoal(), finalMeal.getMeal()));
-                finalMeal.setFinalIngredients(getFinalIngredientsOfMeal(finalMeal.getMeal()));
-            });
-        });
-
-        finalDays.forEach(finalDay -> {
-            finalDay.getFinalMeals().forEach(finalMeal -> {
-                setFinalIngredientsValues(finalMeal.getFinalIngredients(), finalMeal.getIngredientWeightMultiplier());
-                setFinalMealValues(finalMeal);
-                this.finalIngredientRepository.saveAll(finalMeal.getFinalIngredients());
-                this.finalMealRepository.save(finalMeal);
-            });
-        });
-
-        finalDays.forEach(this::setFinalDayValues);
-
-
-        Diet diet = new Diet();
-        diet.setAppUser(this.userSecurityService.getLoggedUser());
-        diet.setFinalDays(finalDays);
-
-        this.dietRepository.save(diet);
-        return diet.getIdDiet();
+        return this.dietRepository.save(new Diet(getListOfListsOfMeals(daysForm), userSecurityService.getLoggedUser())).getIdDiet();
     }
 
-    public void updateDiet(Long idDiet, Long[][] days) {
-        List<List<Long>> daysForm = new ArrayList<>();
-        Arrays.stream(days).forEach(day -> daysForm.add(Arrays.asList(day)));
-
-        List<List<Meal>> daysMeal = new ArrayList<>();
-
-//        Get Meals from database
-        daysForm.forEach(day -> {
-            daysMeal.add(new ArrayList<>());
-            day.forEach(idMeal -> {
-                Meal meal = this.mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-                daysMeal.get(daysMeal.size() - 1).add(meal);
-            });
-        });
-
-        //Delete old finalMeals
+    public void updateDiet(Long idDiet, List<List<Long>> daysForm) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        diet.getFinalDays().forEach(finalDay -> {
-            finalDay.getFinalMeals().forEach(finalMeal -> {
-                this.finalIngredientRepository.deleteAll(finalMeal.getFinalIngredients());
-                this.finalMealRepository.delete(finalMeal);
-            });
-            this.finalDayRepository.delete(finalDay);
-        });
 
-//        Create FinalMeals inside FinalDays
-        List<FinalDay> finalDays = new ArrayList<>();
-        daysMeal.forEach(day -> {
-            finalDays.add(new FinalDay());
-            finalDays.get(finalDays.size() - 1).setFinalMeals(new ArrayList<>());
-            this.finalDayRepository.save(finalDays.get(finalDays.size() - 1));
-            day.forEach(meal -> {
-                FinalMeal finalMeal = new FinalMeal();
-                finalMeal.setMeal(meal);
-                meal.setTimesUsed(meal.getTimesUsed() + 1);
-                this.finalMealRepository.save(finalMeal);
-                finalDays.get(finalDays.size() - 1).getFinalMeals().add(finalMeal);
-            });
-        });
+        if(!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        if(userSecurityService.getLoggedUser().getBodyInfo() == null)
-            throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
-
-        Integer calories = userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal();
-
-//        create final meals for each day
-        finalDays.forEach(finalDay -> {
-            List<Integer> percentsOfMeals = calculatePercentagesOfMealsForDay(finalDay.getFinalMeals().size());
-            List<Integer> caloriesGoals = calculateCaloriesGoalsForDay(calories, percentsOfMeals);
-            finalDay.getFinalMeals().forEach(finalMeal -> {
-                finalMeal.setPercentOfDay(percentsOfMeals.get(finalDay.getFinalMeals().indexOf(finalMeal)));
-                finalMeal.setCaloriesGoal(caloriesGoals.get(finalDay.getFinalMeals().indexOf(finalMeal)));
-                finalMeal.setInitialCalories(getInitialCaloriesOfMeal(finalMeal.getMeal()));
-                finalMeal.setIngredientWeightMultiplier(setIngredientsWeightMultiplier(finalMeal.getInitialCalories(), finalMeal.getCaloriesGoal(), finalMeal.getMeal()));
-                finalMeal.setFinalIngredients(getFinalIngredientsOfMeal(finalMeal.getMeal()));
-            });
-        });
-
-        finalDays.forEach(finalDay -> {
-            finalDay.getFinalMeals().forEach(finalMeal -> {
-                setFinalIngredientsValues(finalMeal.getFinalIngredients(), finalMeal.getIngredientWeightMultiplier());
-                setFinalMealValues(finalMeal);
-                this.finalIngredientRepository.saveAll(finalMeal.getFinalIngredients());
-                this.finalMealRepository.save(finalMeal);
-            });
-        });
-
-        finalDays.forEach(this::setFinalDayValues);
-
-        diet.setFinalDays(finalDays);
+        diet.updateDiet(getListOfListsOfMeals(daysForm));
 
         this.dietRepository.save(diet);
     }
@@ -251,40 +81,16 @@ public class DietService {
         if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        List<Grocery> groceries = new ArrayList<>();
-        diet.getFinalDays().forEach(finalDay -> {
-            finalDay.getFinalMeals().forEach(finalMeal -> {
-                finalMeal.getFinalIngredients().forEach(finalIngredient -> {
-                    Grocery grocery = new Grocery();
-                    grocery.setName(finalIngredient.getIngredient().getName());
-                    grocery.setWeight(finalIngredient.getWeight());
-                    groceries.add(grocery);
-                });
-            });
-        });
-
-        List<Grocery> groceriesSummed = new ArrayList<>();
-        groceries.forEach(grocery -> {
-            if(groceriesSummed.stream().anyMatch(grocery1 -> Objects.equals(grocery1.getName(), grocery.getName()))) {
-                groceriesSummed.stream().filter(grocery1 -> Objects.equals(grocery1.getName(), grocery.getName())).forEach(grocery1 -> {
-                    grocery1.setWeight(grocery1.getWeight() + grocery.getWeight());
-                });
-            } else {
-                groceriesSummed.add(grocery);
-            }
-        });
-
-        return groceriesSummed;
+        return diet.getGroceries().stream().toList();
     }
 
     public String generateGroceriesPDF(Long idDiet) throws FileNotFoundException {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        List<Grocery> groceries = getGroceries(idDiet);
 
         if(!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        return this.pdfGeneratorService.generateGroceriesPDF(groceries);
+        return this.pdfGeneratorService.generateGroceriesPDF(diet.getGroceries().stream().toList());
     }
 
     public InputStreamResource getGroceriesPdf(String fileName) throws FileNotFoundException {
@@ -298,98 +104,34 @@ public class DietService {
 
     public List<DietResponseForm> getMyDiets() {
         AppUser appUser = userSecurityService.getLoggedUser();
-        List<Diet> diets = dietRepository.findAllByAppUser(appUser);
 
-        List<DietResponseForm> dietResponseForms = new ArrayList<>();
-        diets.forEach(diet -> {
-            DietResponseForm dietResponseForm = new DietResponseForm();
-
-            dietResponseForm.setIdDiet(diet.getIdDiet());
-            dietResponseForm.setFinalDays(new ArrayList<>());
-
-            diet.getFinalDays().forEach(finalDay -> {
-                FinalDayResponseForm finalDayResponseForm = new FinalDayResponseForm();
-                finalDayResponseForm.setFinalMeals(new ArrayList<>());
-
-                finalDay.getFinalMeals().forEach(finalMeal -> {
-                    FinalMealResponseForm finalMealResponseForm = new FinalMealResponseForm();
-                    finalMealResponseForm.setName(finalMeal.getMeal().getName());
-                    finalMealResponseForm.setImageUrl(ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + finalMeal.getMeal().getIdMeal());
-
-                    finalDayResponseForm.getFinalMeals().add(finalMealResponseForm);
-                });
-                dietResponseForm.getFinalDays().add(finalDayResponseForm);
-                dietResponseForm.setDietFileUrl(ApplicationConstants.DEFAULT_DIET_PDF_URL_WITH_PARAMETER + diet.getIdDiet());
-                dietResponseForm.setShoppingListFileUrl(ApplicationConstants.DEFAULT_GROCERIES_PDF_URL_WITH_PARAMETER + diet.getIdDiet());
-            });
-
-            dietResponseForms.add(dietResponseForm);
-        });
-
-        return dietResponseForms;
+        return dietRepository.findAllByAppUser(appUser).stream().map(DietResponseForm::new).toList();
     }
 
     public List<MealResponseBody> getUnreviewedMealsUsedByUser() {
         AppUser appUser = userSecurityService.getLoggedUser();
-        List<Diet> diets = dietRepository.findAllByAppUser(appUser);
 
-        Set<Meal> meals = new HashSet<>();
-        diets.forEach(diet -> {
-            diet.getFinalDays().forEach(finalDay -> {
-                finalDay.getFinalMeals().forEach(finalMeal -> {
-                    if(finalMeal.getMeal().getMealExtention().getReviews().stream().map(Review::getAuthor).noneMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId())))
-                        meals.add(finalMeal.getMeal());
-                });
-            });
-        });
-
-        List<MealResponseBody> mealResponseBodies = new ArrayList<>();
-        meals.forEach(meal -> {
-            MealResponseBody mealResponseBody = new MealResponseBody(meal.getIdMeal(),
-                    meal.getName(),
-                    ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
-                    meal.getIngredients().keySet().stream().map(Ingredient::getName).collect(Collectors.toList()),
-                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()),
-                    meal.getAvgRating(),
-                    meal.getMealExtention().getProteinRatio(),
-                    meal.getTimesUsed()
-            );
-
-            mealResponseBodies.add(mealResponseBody);
-        });
-
-        return mealResponseBodies;
+        return dietRepository.findAllByAppUser(appUser).stream()
+                .flatMap(diet -> diet.getFinalDays().stream())
+                .flatMap(finalDay -> finalDay.getFinalMeals().stream())
+                .map(FinalMeal::getMeal)
+                .filter(meal -> meal.getMealExtention().getReviews().stream().map(Review::getAuthor).noneMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId()))).collect(Collectors.toSet())
+                .stream()
+                .map(MealResponseBody::new)
+                .collect(Collectors.toList());
     }
-
 
     public List<MealResponseBody> getAlreadyReviewedMealsUsedByUser() {
         AppUser appUser = userSecurityService.getLoggedUser();
-        List<Diet> diets = dietRepository.findAllByAppUser(appUser);
 
-        Set<Meal> meals = new HashSet<>();
-        diets.forEach(diet -> {
-            diet.getFinalDays().forEach(finalDay -> {
-                finalDay.getFinalMeals().forEach(finalMeal -> {
-                    if(finalMeal.getMeal().getMealExtention().getReviews().stream().map(Review::getAuthor).noneMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId())))
-                        meals.add(finalMeal.getMeal());
-                });
-            });
-        });
-
-        List<MealResponseBody> mealResponseBodies = new ArrayList<>();
-        meals.forEach(meal -> {
-            MealResponseBody mealResponseBody = new MealResponseBody(meal.getIdMeal(),
-                    meal.getName(),
-                    ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
-                    meal.getIngredients().keySet().stream().map(Ingredient::getName).collect(Collectors.toList()),
-                    meal.getCategories().stream().map(Category::getName).collect(Collectors.toList()),
-                    meal.getAvgRating(),
-                    meal.getMealExtention().getProteinRatio(),
-                    meal.getTimesUsed());
-            mealResponseBodies.add(mealResponseBody);
-        });
-
-        return mealResponseBodies;
+        return dietRepository.findAllByAppUser(appUser).stream()
+                .flatMap(diet -> diet.getFinalDays().stream())
+                .flatMap(finalDay -> finalDay.getFinalMeals().stream())
+                .map(FinalMeal::getMeal)
+                .filter(meal -> meal.getMealExtention().getReviews().stream().map(Review::getAuthor).anyMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId()))).collect(Collectors.toSet())
+                .stream()
+                .map(MealResponseBody::new)
+                .collect(Collectors.toList());
     }
 
     public void deleteDiet(Long idDiet) {
@@ -435,13 +177,24 @@ public class DietService {
         return calories[0];
     }
 
-    private List<FinalIngredient> getFinalIngredientsOfMeal(Meal meal) {
-        List<FinalIngredient> finalIngredients = new ArrayList<>();
-        meal.getIngredients().forEach((ingredient, specifics) -> {
-            FinalIngredient finalIngredient = new FinalIngredient();
-            finalIngredient.setInitialWeight(specifics.getInitialWeight());
-            finalIngredient.setIngredient(ingredient);
-            finalIngredients.add(finalIngredient);
+    private List<List<Meal>> getListOfListsOfMeals(List<List<Long>> daysForm){
+        List<List<Meal>> days = new ArrayList<>();
+        daysForm.forEach(day -> {
+            days.add(new ArrayList<>());
+            day.forEach(idMeal -> {
+                Meal meal = this.mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+                days.get(days.size() - 1).add(meal);
+            });
+        });
+
+        return days;
+    }
+
+    private void modifyPercentagesOfMealsForDay(DietResponseForm dietResponseForm, Diet diet) {
+//        Verify that the sum of percentages is 100
+        dietResponseForm.getFinalDays().forEach(finalDay -> {
+            if(finalDay.getFinalMeals().stream().map(FinalMealResponseForm::getPercentOfDay).reduce(0, Integer::sum) != 100)
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         });
 
         return finalIngredients;

@@ -39,6 +39,8 @@ public class Meal {
     @ColumnDefault("0")
     private Integer timesUsed = 0;
 
+    private Integer initialCalories;
+
     @OneToMany
     @MapKeyJoinColumn(name = "id_ingredient")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
@@ -52,4 +54,12 @@ public class Meal {
 
     @ManyToOne(optional = true)
     private AppUser author;
+
+    public void setInitialCalories() {
+        final Integer[] calories = {0};
+
+        this.ingredients.forEach((key, value) -> calories[0] += key.getCaloriesPer100g() * value.getInitialWeight() / 100);
+
+        this.initialCalories = calories[0];
+    }
 }

@@ -82,6 +82,7 @@ public class MealService {
         assignCategoriesAutomatically(meal);
 
         meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
+        meal.setInitialCalories();
         mealRepository.save(meal);
 
         return meal.getIdMeal();

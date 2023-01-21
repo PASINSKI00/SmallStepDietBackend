@@ -2,7 +2,6 @@ package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
-import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -131,7 +130,7 @@ public class DietController {
 
     @PostMapping()
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> addDiet(@RequestBody Long[][] days) {
+    public ResponseEntity<?> addDiet(@RequestBody List<List<Long>> days) {
         Long id;
         try {
             id = this.dietService.addDiet(days);
@@ -144,7 +143,7 @@ public class DietController {
 
     @PutMapping()
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody Long[][] days){
+    public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody List<List<Long>> days){
         try {
             this.dietService.updateDiet(idDiet, days);
         } catch (HttpClientErrorException e){
@@ -153,6 +152,19 @@ public class DietController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/final")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> modifyFinalDiet(@RequestBody DietResponseForm dietResponseForm){
+        try {
+            this.dietService.modifyFinalDiet(dietResponseForm);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")

@@ -1,9 +1,10 @@
 package com.pasinski.sl.backend.diet.forms;
 
-import com.pasinski.sl.backend.diet.finalDay.FinalDay;
+import com.pasinski.sl.backend.diet.Diet;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -13,4 +14,11 @@ public class DietResponseForm {
     private List<FinalDayResponseForm> finalDays;
     private String dietFileUrl;
     private String shoppingListFileUrl;
+
+    public DietResponseForm(Diet diet) {
+        this.idDiet = diet.getIdDiet();
+        this.finalDays = new ArrayList<>();
+
+        diet.getFinalDays().forEach(finalDay -> this.finalDays.add(new FinalDayResponseForm(finalDay)));
+    }
 }

@@ -1,9 +1,10 @@
 package com.pasinski.sl.backend.diet.forms;
 
+import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,4 +20,17 @@ public class FinalMealResponseForm {
     private Integer percentOfDay;
 
     private String imageUrl;
+
+    public FinalMealResponseForm(FinalMeal finalMeal) {
+        this.idFinalMeal = finalMeal.getIdFinalMeal();
+        this.name = finalMeal.getMeal().getName();
+        this.finalIngredients = new ArrayList<>();
+        this.calories = finalMeal.getCalories();
+        this.protein = finalMeal.getProtein();
+        this.fats = finalMeal.getFats();
+        this.carbs = finalMeal.getCarbs();
+        this.percentOfDay = finalMeal.getPercentOfDay();
+
+        finalMeal.getFinalIngredients().forEach(finalIngredient -> this.finalIngredients.add(new FinalIngredientResponseForm(finalIngredient)));
+    }
 }

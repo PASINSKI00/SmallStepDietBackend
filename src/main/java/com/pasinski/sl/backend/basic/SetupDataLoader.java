@@ -188,7 +188,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         meal.setIngredients(ingredientWeightHashMap);
         meal.setAuthor(appUserRepository.findById(1L).get());
-
+        meal.setInitialCalories();
         mealRepository.save(meal);
     }
 
