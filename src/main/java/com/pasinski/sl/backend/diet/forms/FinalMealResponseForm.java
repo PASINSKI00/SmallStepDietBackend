@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.diet.forms;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +33,7 @@ public class FinalMealResponseForm {
         this.fats = finalMeal.getFats();
         this.carbs = finalMeal.getCarbs();
         this.percentOfDay = finalMeal.getPercentOfDay();
+        this.imageUrl = ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + finalMeal.getMeal().getIdMeal();
 
         finalMeal.getFinalIngredients().forEach(finalIngredient -> this.finalIngredients.add(new FinalIngredientResponseForm(finalIngredient)));
     }
