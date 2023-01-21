@@ -22,7 +22,7 @@ public class FinalDay {
     @Column(name = "id_final_day", nullable = false)
     private Long idFinalDay;
 
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     private List<FinalMeal> finalMeals;
 

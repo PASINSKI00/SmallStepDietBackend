@@ -28,7 +28,7 @@ public class Diet {
     @Column(name = "id_diet", nullable = false)
     private Long idDiet;
 
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     private List<FinalDay> finalDays;
 

@@ -23,7 +23,7 @@ public class FinalMeal {
     private Long idFinalMeal;
     @ManyToOne
     private Meal meal;
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     private List<FinalIngredient> finalIngredients;
 
