@@ -70,7 +70,7 @@ public class FinalMeal {
     public void modifyFinalMeal(FinalMealResponseForm finalMealResponseForm, IngredientRepository ingredientRepository) {
 //        check for deleted
         List<String> ingredientsNamesToRemove = finalMealResponseForm.getFinalIngredients().stream()
-                .filter(finalIngredientResponseForm -> finalIngredientResponseForm.getRemove() != null)
+                .filter(finalIngredientResponseForm -> finalIngredientResponseForm.getRemove() != null && finalIngredientResponseForm.getRemove())
                 .map(FinalIngredientResponseForm::getName)
                 .toList();
         this.finalIngredients.removeIf(finalIngredient -> ingredientsNamesToRemove.contains(finalIngredient.getIngredient().getName()));
