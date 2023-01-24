@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.image;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.MealRepository;
+import com.pasinski.sl.backend.post.PostRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
@@ -25,12 +26,23 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ImageService {
     private MealRepository mealRepository;
+    private PostRepository postRepository;
     private AppUserRepository appUserRepository;
     private UserSecurityService userSecurityService;
 
     public InputStreamResource getMealImage(Long idMeal) throws FileNotFoundException {
         String name = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)).getImageName();
         File file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
+
+        if (!file.exists())
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+
+        return new InputStreamResource(new FileInputStream(file));
+    }
+
+    public InputStreamResource getPostImage(Long idPost) throws FileNotFoundException {
+        String name = postRepository.findById(idPost).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)).getImage();
+        File file = new File(ApplicationConstants.PATH_TO_POST_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
 
         if (!file.exists())
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
@@ -120,5 +132,39 @@ public class ImageService {
     private void validateImage(String header) {
         if (!Objects.equals(header, "data:image/jpeg;base64"))
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+    }
+
+    public void addPostImage(String base64Image, Long idPost) {
+        String fileName = "post_" + UUID.randomUUID().toString() + ".jpg";
+        String base64header = base64Image.split(",")[0];
+        String base64ImageWithoutHeader = base64Image.split(",")[1];
+
+        byte[] fileContent = Base64Utils.decodeFromString(base64ImageWithoutHeader);
+        MultipartFile image = new Base64EncodedMultipartFile(fileContent, fileName);
+
+        validateImage(base64header);
+
+        Path storageDirectory = Paths.get(ApplicationConstants.PATH_TO_POST_IMAGES_DIRECTORY);
+        Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
+
+        try {
+            Files.copy(image.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            postRepository.findById(idPost).ifPresent(post -> {
+                post.setImage(fileName);
+                postRepository.save(post);
+            });
+        } catch (Exception e) {
+            try {
+                Files.delete(destination);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
