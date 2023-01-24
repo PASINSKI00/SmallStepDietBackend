@@ -40,18 +40,6 @@ public class ImageController {
                 .body(inputStreamResource);
     }
 
-    @PostMapping("/meal")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> addMealImage(@RequestBody String image, @RequestParam Long idMeal) throws IOException {
-        try {
-            imageService.addMealImage(image, idMeal);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/user")
     public ResponseEntity<InputStreamResource> getUserImage(@RequestParam Long idUser) throws IOException {
         InputStreamResource inputStreamResource;
@@ -64,6 +52,18 @@ public class ImageController {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(inputStreamResource);
+    }
+
+    @PostMapping("/meal")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> addMealImage(@RequestBody String image, @RequestParam Long idMeal) throws IOException {
+        try {
+            imageService.addMealImage(image, idMeal);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/user/mine")
