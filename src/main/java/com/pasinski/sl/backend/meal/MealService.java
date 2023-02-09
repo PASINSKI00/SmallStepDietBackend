@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @AllArgsConstructor
@@ -78,11 +79,11 @@ public class MealService {
         if(mealForm.getImageName() != null)
             meal.setImageName(mealForm.getImageName());
 
-        calculateProteinRatioOfAMeal(meal);
-        assignCategoriesAutomatically(meal);
 
         meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
         meal.setInitialCalories();
+        calculateProteinRatioOfAMeal(meal);
+        assignCategoriesAutomatically(meal);
         mealRepository.save(meal);
 
         return meal.getIdMeal();
@@ -121,6 +122,7 @@ public class MealService {
                 ingredients.put(ingredient, mealIngredientSpecifics);
             });
             meal.setIngredients(ingredients);
+            meal.setInitialCalories();
             calculateProteinRatioOfAMeal(meal);
         }
 
@@ -156,7 +158,13 @@ public class MealService {
     }
 
     private void calculateProteinRatioOfAMeal(Meal meal) {
-        //TODO
+        AtomicReference<Float> gramsOfProtein = new AtomicReference<>(0F);
+
+        meal.getIngredients().forEach((ingredient, mealIngredientSpecifics) -> {
+            gramsOfProtein.updateAndGet(v -> v + ingredient.getProteinPer100g() * mealIngredientSpecifics.getInitialWeight() / 100F);
+        });
+
+        meal.getMealExtention().setProteinRatio((int) (gramsOfProtein.get() *4/meal.getInitialCalories() * 100));
     }
 
     private void assignCategoriesAutomatically(Meal meal) {
