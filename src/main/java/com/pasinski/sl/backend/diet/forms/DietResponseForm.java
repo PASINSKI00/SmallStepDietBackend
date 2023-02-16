@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.diet.forms;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.Diet;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,8 @@ public class DietResponseForm {
     public DietResponseForm(Diet diet) {
         this.idDiet = diet.getIdDiet();
         this.finalDays = new ArrayList<>();
+        this.dietFileUrl = ApplicationConstants.DEFAULT_DIET_PDF_URL_WITH_PARAMETER + diet.getIdDiet();
+        this.shoppingListFileUrl = ApplicationConstants.DEFAULT_GROCERIES_PDF_URL_WITH_PARAMETER + diet.getIdDiet();
 
         diet.getFinalDays().forEach(finalDay -> this.finalDays.add(new FinalDayResponseForm(finalDay)));
     }
