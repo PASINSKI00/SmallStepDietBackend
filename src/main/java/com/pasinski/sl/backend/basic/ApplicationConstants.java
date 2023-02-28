@@ -12,7 +12,6 @@ public class ApplicationConstants {
     public static final String DEFAULT_MEAL_IMAGE_NAME = "default_meal.jpg";
     public static final String DEFAULT_USER_IMAGE_NAME = "default_user.jpg";
 
-
     public static final String APP_DIRECTORY = "C:\\Users\\Krystian\\apps\\Dieter";
     public static final String PATH_TO_MEAL_IMAGES_DIRECTORY = APP_DIRECTORY + "\\images\\meals";
     public static final String PATH_TO_USER_IMAGES_DIRECTORY = APP_DIRECTORY + "\\images\\users";
