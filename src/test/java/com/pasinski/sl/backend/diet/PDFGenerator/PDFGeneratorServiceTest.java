@@ -1,11 +1,10 @@
 package com.pasinski.sl.backend.diet.PDFGenerator;
 
-import com.pasinski.sl.backend.diet.DietRepository;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class PDFGeneratorServiceTest {
     private final PDFGeneratorService pdfGeneratorService = new PDFGeneratorService();

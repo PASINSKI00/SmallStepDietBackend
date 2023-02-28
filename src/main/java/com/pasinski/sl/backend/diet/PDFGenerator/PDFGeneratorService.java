@@ -2,15 +2,11 @@ package com.pasinski.sl.backend.diet.PDFGenerator;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
-import com.lowagie.text.pdf.TextField;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.Diet;
-import com.pasinski.sl.backend.diet.DietRepository;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
