@@ -31,7 +31,7 @@ public class ImageService {
     private UserSecurityService userSecurityService;
 
     public InputStreamResource getMealImage(Long idMeal) throws FileNotFoundException {
-        String name = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)).getImageName();
+        String name = "meal_id"+ idMeal + ".jpg";
         File file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
 
         if (!file.exists())
@@ -51,7 +51,7 @@ public class ImageService {
     }
 
     public void addMealImage(String base64Image, Long idMeal) {
-        String fileName = "meal_" + UUID.randomUUID().toString() + ".jpg";
+        String fileName = "meal_id"+ idMeal + ".jpg";
         String base64header = base64Image.split(",")[0];
         String base64ImageWithoutHeader = base64Image.split(",")[1];
 
@@ -61,7 +61,7 @@ public class ImageService {
         validateImage(base64header);
 
         Path storageDirectory = Paths.get(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY);
-        Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
+        Path destination = Paths.get(storageDirectory + FileSystems.getDefault().getSeparator() + fileName);
 
         try {
             Files.copy(image.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
@@ -71,7 +71,6 @@ public class ImageService {
 
         try {
             mealRepository.findById(idMeal).ifPresent(meal -> {
-                meal.setImageName(fileName);
                 mealRepository.save(meal);
             });
         } catch (Exception e) {
@@ -96,7 +95,7 @@ public class ImageService {
     }
 
     public void addMyImage(String base64Image) {
-        String fileName = "user_" + UUID.randomUUID().toString() + ".jpg";
+        String fileName = "user_" + UUID.randomUUID() + ".jpg";
         String base64header = base64Image.split(",")[0];
         String base64ImageWithoutHeader = base64Image.split(",")[1];
 
@@ -106,7 +105,7 @@ public class ImageService {
         validateImage(base64header);
 
         Path storageDirectory = Paths.get(ApplicationConstants.PATH_TO_USER_IMAGES_DIRECTORY);
-        Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
+        Path destination = Paths.get(storageDirectory + FileSystems.getDefault().getSeparator() + fileName);
 
         try {
             Files.copy(image.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
@@ -135,7 +134,7 @@ public class ImageService {
     }
 
     public void addPostImage(String base64Image, Long idPost) {
-        String fileName = "post_" + UUID.randomUUID().toString() + ".jpg";
+        String fileName = "post_" + UUID.randomUUID() + ".jpg";
         String base64header = base64Image.split(",")[0];
         String base64ImageWithoutHeader = base64Image.split(",")[1];
 
@@ -145,7 +144,7 @@ public class ImageService {
         validateImage(base64header);
 
         Path storageDirectory = Paths.get(ApplicationConstants.PATH_TO_POST_IMAGES_DIRECTORY);
-        Path destination = Paths.get(storageDirectory.toString() + FileSystems.getDefault().getSeparator() + fileName);
+        Path destination = Paths.get(storageDirectory + FileSystems.getDefault().getSeparator() + fileName);
 
         try {
             Files.copy(image.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);

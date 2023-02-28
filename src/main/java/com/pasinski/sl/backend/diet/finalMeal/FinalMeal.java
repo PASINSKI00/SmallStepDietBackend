@@ -9,11 +9,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.hibernate.annotations.CascadeType;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -46,13 +47,8 @@ public class FinalMeal {
         this.ingredientWeightMultiplier = (float) caloriesGoal / meal.getInitialCalories();
 
         this.meal.setTimesUsed(this.meal.getTimesUsed() + 1);
-        meal.getIngredients().forEach((ingredient, specifics) -> {
-            this.finalIngredients.add(new FinalIngredient(ingredient, specifics, ingredientWeightMultiplier));
-        });
-        this.calories = this.finalIngredients.stream().mapToInt(FinalIngredient::getCalories).sum();
-        this.protein = this.finalIngredients.stream().mapToInt(FinalIngredient::getProtein).sum();
-        this.fats = this.finalIngredients.stream().mapToInt(FinalIngredient::getFats).sum();
-        this.carbs = this.finalIngredients.stream().mapToInt(FinalIngredient::getCarbs).sum();
+        this.finalIngredients = meal.getIngredients().stream().map(mealIngredient -> new FinalIngredient(mealIngredient, ingredientWeightMultiplier)).collect(Collectors.toList());
+        calculateEnergeticValues();
     }
 
     public void modifyPercentOfDay(Integer percentOfDay, Integer caloriesGoal) {
@@ -61,9 +57,7 @@ public class FinalMeal {
         this.ingredientWeightMultiplier = (float) caloriesGoal / meal.getInitialCalories();
 
         this.finalIngredients.removeAll(finalIngredients);
-        meal.getIngredients().forEach((ingredient, specifics) -> {
-            this.finalIngredients.add(new FinalIngredient(ingredient, specifics, ingredientWeightMultiplier));
-        });
+        this.finalIngredients = meal.getIngredients().stream().map(mealIngredient -> new FinalIngredient(mealIngredient, ingredientWeightMultiplier)).collect(Collectors.toList());
         calculateEnergeticValues();
     }
 

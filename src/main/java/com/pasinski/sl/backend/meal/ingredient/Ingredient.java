@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.meal.ingredient;
 
+import com.pasinski.sl.backend.meal.forms.IngredientForm;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,16 +21,24 @@ public class Ingredient {
     @NotNull
     private String name;
     @NotNull
-    private Integer caloriesPer100g;
+    private Float caloriesPer100g;
     @NotNull
-    private Integer proteinPer100g;
+    private Float proteinPer100g;
     @NotNull
-    private Integer fatsPer100g;
+    private Float fatsPer100g;
     @NotNull
-    private Integer carbsPer100g;
+    private Float carbsPer100g;
 
     public Ingredient(Long idIngredient, String name) {
         this.idIngredient = idIngredient;
         this.name = name;
+    }
+
+    public Ingredient(IngredientForm ingredientForm) {
+        this.name = ingredientForm.getName();
+        this.caloriesPer100g = ingredientForm.getCalories();
+        this.proteinPer100g = ingredientForm.getProtein();
+        this.fatsPer100g = ingredientForm.getFats();
+        this.carbsPer100g = ingredientForm.getCarbs();
     }
 }
