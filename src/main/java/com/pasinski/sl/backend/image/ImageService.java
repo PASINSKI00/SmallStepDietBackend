@@ -35,6 +35,11 @@ public class ImageService {
         File file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
 
         if (!file.exists())
+            name = ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
+
+        file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
+
+        if (!file.exists())
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
 
         return new InputStreamResource(new FileInputStream(file));
