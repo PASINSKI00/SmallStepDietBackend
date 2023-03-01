@@ -177,4 +177,16 @@ public class DietController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/pdfs")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> clearOutPdfDirectory(){
+        try {
+            this.dietService.clearOutPdfDirectory();
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

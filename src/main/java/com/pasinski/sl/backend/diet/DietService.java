@@ -46,7 +46,7 @@ public class DietService {
     }
 
     public Long addDiet(List<List<Long>> daysForm) {
-        if(userSecurityService.getLoggedUser().getBodyInfo().getCaloriesGoal() == null)
+        if(userSecurityService.getLoggedUser().getBodyInfo() == null)
             throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY, "You have to set your body info first");
 
         return this.dietRepository.save(new Diet(getListOfListsOfMeals(daysForm), userSecurityService.getLoggedUser())).getIdDiet();
@@ -170,5 +170,18 @@ public class DietService {
         });
 
         return days;
+    }
+
+    public void clearOutPdfDirectory() {
+        File directory = new File(ApplicationConstants.PATH_TO_PDF_DIRECTORY);
+
+        if (!directory.exists())
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+
+        File[] files = directory.listFiles();
+
+        if (files != null)
+            for (File file : files)
+                file.delete();
     }
 }
