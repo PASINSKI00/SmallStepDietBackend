@@ -3,16 +3,24 @@ package com.pasinski.sl.backend.user;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.user.accessManagment.Privilege;
+import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.forms.UserForm;
 import com.pasinski.sl.backend.user.forms.UserResponseForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -83,5 +91,33 @@ public class AppUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return this.appUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", email)));
+    }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(
+            Collection<Role> roles) {
+
+        return getGrantedAuthorities(getPrivileges(roles));
+    }
+
+    private List<String> getPrivileges(Collection<Role> roles) {
+
+        List<String> privileges = new ArrayList<>();
+        List<Privilege> collection = new ArrayList<>();
+        for (Role role : roles) {
+            privileges.add(role.getName());
+            collection.addAll(role.getPrivileges());
+        }
+        for (Privilege item : collection) {
+            privileges.add(item.getName());
+        }
+        return privileges;
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (String privilege : privileges) {
+            authorities.add(new SimpleGrantedAuthority(privilege));
+        }
+        return authorities;
     }
 }

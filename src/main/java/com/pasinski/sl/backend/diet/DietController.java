@@ -179,7 +179,7 @@ public class DietController {
     }
 
     @DeleteMapping("/pdfs")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> clearOutPdfDirectory(){
         try {
             this.dietService.clearOutPdfDirectory();
