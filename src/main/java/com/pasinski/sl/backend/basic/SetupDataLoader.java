@@ -15,6 +15,11 @@ import com.pasinski.sl.backend.user.accessManagment.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +39,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final IngredientRepository ingredientRepository;
     private final CategoryRepository categoryRepository;
     private final MealService mealService;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     @Transactional
@@ -160,6 +166,11 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredientsIds.put(1L, 100);
         ingredientsIds.put(2L, 150);
         mealForm.setIngredients(ingredientsIds);
+
+        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken("email@email.com", "Password1!");
+        Authentication authentication = authenticationManager.authenticate(authReq);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);
 
         this.mealService.addMeal(mealForm);
 
