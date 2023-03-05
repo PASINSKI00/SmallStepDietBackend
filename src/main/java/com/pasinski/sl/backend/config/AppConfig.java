@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-
     AppUserRepository appUserRepository;
 
     @Bean
