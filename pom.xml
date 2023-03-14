@@ -72,6 +72,11 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 			<version>2.7.5</version>
 		</dependency>
+		<dependency>
+			<groupId>com.mailersend</groupId>
+			<artifactId>java-sdk</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

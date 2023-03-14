@@ -17,4 +17,6 @@ public class ApplicationConstants {
     public static final String PATH_TO_USER_IMAGES_DIRECTORY = APP_DIRECTORY + "\\images\\users";
     public static final String PATH_TO_POST_IMAGES_DIRECTORY = APP_DIRECTORY + "\\images\\posts";
     public static final String PATH_TO_PDF_DIRECTORY = APP_DIRECTORY + "\\pdfs";
+
+    public static final String EMAIL_CONFIRMATION_URL = DEFAULT_APP_URL + "/api/user/verify?token=";
 }

@@ -59,6 +59,19 @@ public class AppUserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyUserEmail(@RequestParam String token) {
+        try {
+            appUserService.verifyUserEmail(token);
+        } catch (HttpClientErrorException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        } catch (Error e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PutMapping()
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateUser(@RequestBody UserForm userForm) {

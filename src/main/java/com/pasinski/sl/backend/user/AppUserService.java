@@ -1,6 +1,9 @@
 package com.pasinski.sl.backend.user;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
+import com.pasinski.sl.backend.email.EmailSenderService;
+import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationToken;
+import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationTokenService;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
@@ -21,6 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -28,6 +32,8 @@ public class AppUserService implements UserDetailsService {
     private AppUserRepository appUserRepository;
     private MealRepository mealRepository;
     private UserSecurityService userSecurityService;
+    private final EmailConfirmationTokenService emailConfirmationTokenService;
+    private final EmailSenderService emailSenderService;
     private PasswordEncoder passwordEncoder;
 
     public UserResponseForm getUser(Long idUser) {
@@ -53,6 +59,16 @@ public class AppUserService implements UserDetailsService {
         appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
 
         appUserRepository.save(appUser);
+
+        String token = UUID.randomUUID().toString();
+        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
+                token,
+                appUser
+        );
+
+        emailConfirmationTokenService.saveEmailConfirmationToken(emailConfirmationToken);
+
+        emailSenderService.emailAddressVerification(appUser, emailConfirmationToken);
     }
 
     public void updateUser(UserForm userForm) {
@@ -119,5 +135,15 @@ public class AppUserService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(privilege));
         }
         return authorities;
+    }
+
+    public void verifyUserEmail(String token) {
+        EmailConfirmationToken emailConfirmationToken = emailConfirmationTokenService.findEmailConfirmationTokenByToken(token)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        AppUser appUser = emailConfirmationToken.getAppUser();
+        appUser.setEmailVerified(true);
+
+        appUserRepository.save(appUser);
     }
 }
