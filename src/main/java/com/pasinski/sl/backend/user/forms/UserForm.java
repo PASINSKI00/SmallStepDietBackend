@@ -13,6 +13,4 @@ public class UserForm {
 
     @NotBlank(message = "Password is mandatory")
     private String password;
-
-    private String image;
 }
