@@ -36,21 +36,6 @@ public class ImageController {
                 .body(inputStreamResource);
     }
 
-
-    @GetMapping("/post")
-    public ResponseEntity<InputStreamResource> getPostImage(@RequestParam Long idPost) throws IOException {
-        InputStreamResource inputStreamResource;
-        try {
-            inputStreamResource = imageService.getPostImage(idPost);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(inputStreamResource);
-    }
-
     @GetMapping("/user")
     public ResponseEntity<InputStreamResource> getUserImage(@RequestParam Long idUser) throws IOException {
         InputStreamResource inputStreamResource;
@@ -70,18 +55,6 @@ public class ImageController {
     public ResponseEntity<?> addMealImage(@RequestBody String image, @RequestParam Long idMeal) throws IOException {
         try {
             imageService.addMealImage(image, idMeal);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/post")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> addPostImage(@RequestBody String image, @RequestParam Long idPost) throws IOException {
-        try {
-            imageService.addPostImage(image, idPost);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
