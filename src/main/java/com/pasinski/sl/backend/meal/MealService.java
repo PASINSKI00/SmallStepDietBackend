@@ -32,6 +32,10 @@ public class MealService {
     private final UserSecurityService userSecurityService;
     private final MealIngredientRepository mealIngredientRepository;
 
+    public Meal getMealById(Long idMeal) {
+        return mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    }
+
     public List<MealResponseBody> getMeals() {
         return mealRepository.findAll().stream().map(MealResponseBody::new).collect(Collectors.toList());
     }
