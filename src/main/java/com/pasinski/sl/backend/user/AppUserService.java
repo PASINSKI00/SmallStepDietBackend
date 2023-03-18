@@ -88,9 +88,6 @@ public class AppUserService implements UserDetailsService {
 
         if (userForm.getPassword() != null && !userForm.getPassword().isBlank() && !userForm.getPassword().isEmpty())
             appUser.setPassword(userForm.getPassword());
-
-        if (userForm.getImage() != null && !userForm.getImage().isBlank() && !userForm.getImage().isEmpty())
-            appUser.setImage(userForm.getImage());
     }
 
     public void deleteUserOwnAccount() {
