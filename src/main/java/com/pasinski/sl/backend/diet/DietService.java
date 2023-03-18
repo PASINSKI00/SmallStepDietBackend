@@ -1,7 +1,7 @@
 package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
-import com.pasinski.sl.backend.diet.PDFGenerator.PDFGeneratorService;
+import com.pasinski.sl.backend.PDFGenerator.PDFGeneratorService;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;

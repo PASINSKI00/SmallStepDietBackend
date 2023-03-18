@@ -1,4 +1,4 @@
-package com.pasinski.sl.backend.diet.PDFGenerator;
+package com.pasinski.sl.backend.PDFGenerator;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;

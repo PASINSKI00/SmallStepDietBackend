@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.diet.PDFGenerator;
 
+import com.pasinski.sl.backend.PDFGenerator.PDFGeneratorService;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
