@@ -5,7 +5,7 @@ import com.pasinski.sl.backend.email.EmailSenderService;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationToken;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationTokenService;
 import com.pasinski.sl.backend.meal.MealRepository;
-import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.forms.UserForm;

@@ -2,7 +2,7 @@ package com.pasinski.sl.backend.post;
 
 import com.pasinski.sl.backend.post.forms.PostForm;
 import com.pasinski.sl.backend.post.forms.PostResponseForm;
-import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

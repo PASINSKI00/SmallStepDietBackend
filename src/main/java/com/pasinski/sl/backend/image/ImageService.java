@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealService;
-import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
 import lombok.AllArgsConstructor;

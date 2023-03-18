@@ -1,4 +1,4 @@
-package com.pasinski.sl.backend.security;
+package com.pasinski.sl.backend.config.security;
 
 import com.pasinski.sl.backend.user.AppUserService;
 import org.springframework.context.annotation.Bean;

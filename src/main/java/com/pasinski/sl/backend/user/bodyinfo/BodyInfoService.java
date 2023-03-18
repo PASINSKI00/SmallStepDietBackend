@@ -1,6 +1,6 @@
 package com.pasinski.sl.backend.user.bodyinfo;
 
-import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
 import com.pasinski.sl.backend.user.bodyinfo.forms.BodyInfoForm;

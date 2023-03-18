@@ -10,7 +10,7 @@ import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.review.Review;
-import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
