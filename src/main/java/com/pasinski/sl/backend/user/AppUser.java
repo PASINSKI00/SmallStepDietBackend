@@ -26,7 +26,7 @@ public class AppUser implements UserDetails {
     private String name;
     private String email;
     private String password;
-    private String image = ApplicationConstants.DEFAULT_USER_IMAGE_NAME;
+    private boolean imageSet = false;
     private boolean isEmailVerified = false;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

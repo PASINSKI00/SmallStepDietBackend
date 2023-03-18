@@ -25,6 +25,7 @@ public class Meal {
 
     @NotNull
     private String name;
+    private boolean imageSet = false;
 
     @NotNull
     @ColumnDefault("0")
