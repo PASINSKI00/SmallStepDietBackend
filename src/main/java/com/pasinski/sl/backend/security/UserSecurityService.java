@@ -24,4 +24,10 @@ public class UserSecurityService {
     public AppUser getLoggedUser() {
         return (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+    public void setImageSetBooleanValue(boolean value) {
+        AppUser appUser = getLoggedUser();
+        appUser.setImageSet(value);
+        appUserRepository.save(appUser);
+    }
 }
