@@ -1,16 +1,15 @@
 package com.pasinski.sl.backend.email;
 
+import com.mailersend.sdk.MailerSend;
+import com.mailersend.sdk.MailerSendResponse;
+import com.mailersend.sdk.emails.Email;
+import com.mailersend.sdk.exceptions.MailerSendException;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationToken;
 import com.pasinski.sl.backend.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import com.mailersend.sdk.emails.Email;
-import com.mailersend.sdk.MailerSend;
-import com.mailersend.sdk.MailerSendResponse;
-import com.mailersend.sdk.exceptions.MailerSendException;
 
 
 @Service

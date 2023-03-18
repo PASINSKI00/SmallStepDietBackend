@@ -1,6 +1,5 @@
 package com.pasinski.sl.backend.user;
 
-import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
 import lombok.Getter;
