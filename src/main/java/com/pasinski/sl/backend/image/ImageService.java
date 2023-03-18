@@ -1,8 +1,12 @@
 package com.pasinski.sl.backend.image;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
-import com.pasinski.sl.backend.meal.MealRepository;
-import com.pasinski.sl.backend.post.PostRepository;
+import com.pasinski.sl.backend.meal.Meal;
+import com.pasinski.sl.backend.meal.MealService;
 import com.pasinski.sl.backend.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
@@ -14,80 +18,82 @@ import org.springframework.util.Base64Utils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
 public class ImageService {
-    private MealRepository mealRepository;
-    private PostRepository postRepository;
-    private AppUserRepository appUserRepository;
-    private UserSecurityService userSecurityService;
+    private final AppUserRepository appUserRepository;
+    private final UserSecurityService userSecurityService;
+    private final MealService mealService;
+    private final AmazonS3Client amazonS3Client;
 
     public InputStreamResource getMealImage(Long idMeal) throws FileNotFoundException {
-        String name = "meal_id"+ idMeal + ".jpg";
-        File file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
+        String fileName = "default_meal.jpg";
+        Meal meal = mealService.getMealById(idMeal);
 
-        if (!file.exists())
-            name = ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
+        if(meal.isImageSet())
+            fileName = "meal_id_"+ idMeal + ".jpg";
 
-        file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + name);
+        GetObjectRequest request = new GetObjectRequest("dev-ssd", "images/meals/" + fileName);
+        S3Object s3Object = amazonS3Client.getObject(request);
 
-        if (!file.exists())
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-
-        return new InputStreamResource(new FileInputStream(file));
+        return new InputStreamResource(s3Object.getObjectContent());
     }
 
     public InputStreamResource getUserImage(Long idUser) throws FileNotFoundException {
+        String fileName = "default_user.jpg";
         AppUser appUser = this.appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        String fileName = appUser.getImage();
-        File file = new File(ApplicationConstants.PATH_TO_USER_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName);
 
-        if (!file.exists())
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        if(appUser.isImageSet())
+            fileName = "user_id_" + idUser + ".jpg";
 
-        return new InputStreamResource(new FileInputStream(file));
+        GetObjectRequest request = new GetObjectRequest("dev-ssd", "images/users/" + fileName);
+        S3Object s3Object = amazonS3Client.getObject(request);
+
+        return new InputStreamResource(s3Object.getObjectContent());
     }
 
-    public void addMyImage(String base64Image) {
-        String fileName = "user_" + UUID.randomUUID() + ".jpg";
-        String base64header = base64Image.split(",")[0];
-        String base64ImageWithoutHeader = base64Image.split(",")[1];
+    public void addMealImage(String base64Image, Long idMeal) throws IOException {
+        File file;
+        String bucketName = "dev-ssd";
+        String fileName = "meal_id_"+ idMeal + ".jpg";
+        validateImage(base64Image.split(",")[0]);
+        MultipartFile image = new Base64EncodedMultipartFile(Base64Utils.decodeFromString(base64Image.split(",")[1]), fileName);
 
-        byte[] fileContent = Base64Utils.decodeFromString(base64ImageWithoutHeader);
-        MultipartFile image = new Base64EncodedMultipartFile(fileContent, fileName);
+        Files.copy(image.getInputStream(),
+                Paths.get(Paths.get(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY) + FileSystems.getDefault().getSeparator() + fileName),
+                StandardCopyOption.REPLACE_EXISTING);
+        file = new File(ApplicationConstants.PATH_TO_MEAL_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName);
 
-        validateImage(base64header);
+        PutObjectRequest request = new PutObjectRequest(bucketName, "images/meals/" + fileName, file);
+        amazonS3Client.putObject(request);
 
-        Path storageDirectory = Paths.get(ApplicationConstants.PATH_TO_USER_IMAGES_DIRECTORY);
-        Path destination = Paths.get(storageDirectory + FileSystems.getDefault().getSeparator() + fileName);
+        mealService.setImageBooleanValue(idMeal, true);
 
-        try {
-            Files.copy(image.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        }
+        file.delete();
+    }
 
-        try {
-            appUserRepository.findById(this.userSecurityService.getLoggedUser().getIdUser()).ifPresent(appUser -> {
-                appUser.setImage(fileName);
-                appUserRepository.save(appUser);
-            });
-        } catch (Exception e) {
-            try {
-                Files.delete(destination);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        }
+    public void addMyImage(String base64Image) throws IOException {
+        File file;
+        String bucketName = "dev-ssd";
+        String fileName = "user_id_" + userSecurityService.getLoggedUserId()  + ".jpg";
+        validateImage(base64Image.split(",")[0]);
+        MultipartFile image = new Base64EncodedMultipartFile(Base64Utils.decodeFromString(base64Image.split(",")[1]), fileName);
+
+        Files.copy(image.getInputStream(),
+                Paths.get(Paths.get(ApplicationConstants.PATH_TO_USER_IMAGES_DIRECTORY) + FileSystems.getDefault().getSeparator() + fileName),
+                StandardCopyOption.REPLACE_EXISTING);
+        file = new File(ApplicationConstants.PATH_TO_USER_IMAGES_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName);
+
+        PutObjectRequest request = new PutObjectRequest(bucketName, "images/users/" + fileName, file);
+        amazonS3Client.putObject(request);
+
+        userSecurityService.setImageSetBooleanValue(true);
+
+        file.delete();
     }
 
     private void validateImage(String header) {
