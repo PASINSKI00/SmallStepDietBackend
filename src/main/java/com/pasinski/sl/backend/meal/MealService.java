@@ -91,6 +91,16 @@ public class MealService {
         return new MealResponseBodyExtended(meal, meal.getMealExtention());
     }
 
+    public void setImageBooleanValue(Long idMeal, Boolean value) {
+        Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        meal.setImageSet(value);
+        mealRepository.save(meal);
+    }
+
     private List<MealIngredient> getMealIngredientsFromMealForm(MealForm mealForm) {
         List<MealIngredient> ingredients = new ArrayList<>();
         Integer mealWeight = mealForm.getIngredients().values().stream().reduce(0, Integer::sum);
