@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }

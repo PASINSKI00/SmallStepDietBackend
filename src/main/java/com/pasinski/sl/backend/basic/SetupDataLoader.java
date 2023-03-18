@@ -82,7 +82,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         return role;
     }
 
-    private void addUsers(){
+    private void addUsers() {
         Privilege readPrivilege = createPrivilegeIfNotFound("READ_PRIVILEGE");
         Privilege writePrivilege = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
 
@@ -99,7 +99,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         appUserRepository.save(user);
     }
 
-    private void addIngredients(){
+    private void addIngredients() {
         Ingredient ingredient = new Ingredient();
         ingredient.setName("Chicken breast");
         ingredient.setCaloriesPer100g(164F);
@@ -117,7 +117,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredientRepository.save(ingredient2);
     }
 
-    private void addCategories(){
+    private void addCategories() {
         addCategory("Breakfast");
         addCategory("Lunch");
         addCategory("Dinner");
@@ -135,13 +135,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         addCategory("Drink");
     }
 
-    private void addCategory(String name){
+    private void addCategory(String name) {
         Category category = new Category();
         category.setName(name);
         categoryRepository.save(category);
     }
 
-    private void addMeals(){
+    private void addMeals() {
         addMeal("Meal1");
         addMeal("Meal2");
         addMeal("Meal3");
@@ -156,7 +156,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         addMeal("Meal12");
     }
 
-    private void addMeal(String name){
+    private void addMeal(String name) {
         MealForm mealForm = new MealForm();
         mealForm.setName(name);
         mealForm.setRecipe("Cook the chicken. Boil the rice. Voila!");

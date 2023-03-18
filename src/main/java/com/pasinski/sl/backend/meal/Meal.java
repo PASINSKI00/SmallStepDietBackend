@@ -61,22 +61,22 @@ public class Meal {
         this.mealExtention = new MealExtention(mealForm.getRecipe(), mealForm.getTimeToPrepare(), proteinRatio, fatsRatio, carbsRatio);
     }
 
-    public void modify(MealForm mealForm, List<MealIngredient> ingredients, List<Category> categories){
-        if(mealForm.getName() != null)
+    public void modify(MealForm mealForm, List<MealIngredient> ingredients, List<Category> categories) {
+        if (mealForm.getName() != null)
             this.name = mealForm.getName();
 
-        if(ingredients != null) {
+        if (ingredients != null) {
             this.ingredients.removeAll(this.ingredients);
             this.ingredients.addAll(ingredients);
         }
 
-        if(categories != null)
+        if (categories != null)
             this.categories = categories;
 
-        if(mealForm.getRecipe() != null)
+        if (mealForm.getRecipe() != null)
             this.mealExtention.setRecipe(mealForm.getRecipe());
 
-        if(mealForm.getTimeToPrepare() != null)
+        if (mealForm.getTimeToPrepare() != null)
             this.mealExtention.setTimeToPrepare(mealForm.getTimeToPrepare());
     }
 }

@@ -23,7 +23,7 @@ public class PostResponseForm {
         this.username = post.getAuthor().getName();
         this.postDate = post.getPostDate();
         this.content = post.getContent();
-        if(post.getImage() != null)
+        if (post.getImage() != null)
             this.imageUrl = ApplicationConstants.DEFAULT_POST_IMAGE_URL_WITH_PARAMETER + post.getIdPost();
     }
 }

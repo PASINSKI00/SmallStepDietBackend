@@ -23,7 +23,7 @@ public class BodyInfoController {
         BodyInfoResponseForm retrievedBodyInfo;
         try {
             retrievedBodyInfo = bodyInfoService.getBodyInfo();
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
@@ -35,7 +35,7 @@ public class BodyInfoController {
     public ResponseEntity<?> addBodyInfo(@Valid @RequestBody BodyInfoForm bodyInfoForm) {
         try {
             this.bodyInfoService.addBodyInfo(bodyInfoForm);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 

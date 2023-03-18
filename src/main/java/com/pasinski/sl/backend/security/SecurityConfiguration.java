@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                 .and()
                 .build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();

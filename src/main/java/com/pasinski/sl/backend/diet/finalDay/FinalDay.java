@@ -50,10 +50,10 @@ public class FinalDay {
 
     private List<Integer> calculateMealRatiosForFinalMeals(Integer size) {
         List<Integer> percents = new ArrayList<>();
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
             percents.add(100 / size);
 
-        if(percents.stream().mapToInt(Integer::intValue).sum() != 100)
+        if (percents.stream().mapToInt(Integer::intValue).sum() != 100)
             percents.set(percents.size() - 1, percents.get(percents.size() - 1) + (100 - percents.stream().mapToInt(Integer::intValue).sum()));
 
         return percents;
@@ -65,7 +65,7 @@ public class FinalDay {
             caloriesGoals.add((caloriesGoal * percent) / 100);
         });
 
-        if(caloriesGoals.stream().mapToInt(Integer::intValue).sum() != caloriesGoal)
+        if (caloriesGoals.stream().mapToInt(Integer::intValue).sum() != caloriesGoal)
             caloriesGoals.set(caloriesGoals.size() - 1, caloriesGoals.get(caloriesGoals.size() - 1) + (caloriesGoal - caloriesGoals.stream().mapToInt(Integer::intValue).sum()));
 
         return caloriesGoals;
@@ -88,7 +88,7 @@ public class FinalDay {
         }
 
         finalDayResponseForm.getFinalMeals().forEach(finalMealResponseForm -> {
-            if(finalMealResponseForm.getFinalIngredients() != null)
+            if (finalMealResponseForm.getFinalIngredients() != null)
                 finalMeals.stream()
                         .filter(finalMeal -> finalMeal.getIdFinalMeal().equals(finalMealResponseForm.getIdFinalMeal())).findFirst()
                         .get().modifyFinalMeal(finalMealResponseForm, ingredientRepository);

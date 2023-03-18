@@ -52,7 +52,7 @@ public class AppUserService implements UserDetailsService {
     }
 
     public void addUser(UserForm userForm) {
-        if(userSecurityService.isEmailTaken(userForm.getEmail()))
+        if (userSecurityService.isEmailTaken(userForm.getEmail()))
             throw new HttpClientErrorException(HttpStatus.CONFLICT);
 
         AppUser appUser = new AppUser(userForm.getName(), userForm.getEmail(), userForm.getPassword());
@@ -80,7 +80,7 @@ public class AppUserService implements UserDetailsService {
     }
 
     private void applyChanges(AppUser appUser, UserForm userForm) {
-        if(userForm.getName() != null && !userForm.getName().isEmpty() && !userForm.getName().isBlank())
+        if (userForm.getName() != null && !userForm.getName().isEmpty() && !userForm.getName().isBlank())
             appUser.setName(userForm.getName());
 
         if (userForm.getEmail() != null && !userForm.getEmail().isBlank() && !userForm.getEmail().isEmpty())
@@ -94,8 +94,8 @@ public class AppUserService implements UserDetailsService {
         AppUser appUser = userSecurityService.getLoggedUser();
 
         mealRepository.findAllByAuthor(appUser).forEach(meal -> {
-                meal.setAuthor(null);
-                mealRepository.save(meal);
+            meal.setAuthor(null);
+            mealRepository.save(meal);
         });
 
         appUserRepository.delete(appUser);

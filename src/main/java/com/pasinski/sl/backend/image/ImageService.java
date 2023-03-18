@@ -39,8 +39,8 @@ public class ImageService {
         String fileName = "default_meal.jpg";
         Meal meal = mealService.getMealById(idMeal);
 
-        if(meal.isImageSet())
-            fileName = "meal_id_"+ idMeal + ".jpg";
+        if (meal.isImageSet())
+            fileName = "meal_id_" + idMeal + ".jpg";
 
         GetObjectRequest request = new GetObjectRequest("dev-ssd", "images/meals/" + fileName);
         S3Object s3Object = amazonS3Client.getObject(request);
@@ -52,7 +52,7 @@ public class ImageService {
         String fileName = "default_user.jpg";
         AppUser appUser = this.appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        if(appUser.isImageSet())
+        if (appUser.isImageSet())
             fileName = "user_id_" + idUser + ".jpg";
 
         GetObjectRequest request = new GetObjectRequest("dev-ssd", "images/users/" + fileName);
@@ -64,7 +64,7 @@ public class ImageService {
     public void addMealImage(String base64Image, Long idMeal) throws IOException {
         File file;
         String bucketName = "dev-ssd";
-        String fileName = "meal_id_"+ idMeal + ".jpg";
+        String fileName = "meal_id_" + idMeal + ".jpg";
         validateImage(base64Image.split(",")[0]);
         MultipartFile image = new Base64EncodedMultipartFile(Base64Utils.decodeFromString(base64Image.split(",")[1]), fileName);
 
@@ -84,7 +84,7 @@ public class ImageService {
     public void addMyImage(String base64Image) throws IOException {
         File file;
         String bucketName = "dev-ssd";
-        String fileName = "user_id_" + userSecurityService.getLoggedUserId()  + ".jpg";
+        String fileName = "user_id_" + userSecurityService.getLoggedUserId() + ".jpg";
         validateImage(base64Image.split(",")[0]);
         MultipartFile image = new Base64EncodedMultipartFile(Base64Utils.decodeFromString(base64Image.split(",")[1]), fileName);
 

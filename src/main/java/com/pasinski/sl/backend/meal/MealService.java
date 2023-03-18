@@ -41,7 +41,7 @@ public class MealService {
     }
 
     public Long addMeal(MealForm mealForm) {
-        if(mealForm.getCategoriesIds() == null || mealForm.getCategoriesIds().isEmpty())
+        if (mealForm.getCategoriesIds() == null || mealForm.getCategoriesIds().isEmpty())
             mealForm.setCategoriesIds(List.of(0L));
 
         return mealRepository.save(new Meal(mealForm, getMealIngredientsFromMealForm(mealForm), categoryRepository.findAllById(mealForm.getCategoriesIds()), userSecurityService.getLoggedUser())).getIdMeal();
@@ -68,7 +68,7 @@ public class MealService {
         if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        if(mealForm.getCategoriesIds() == null || mealForm.getCategoriesIds().isEmpty())
+        if (mealForm.getCategoriesIds() == null || mealForm.getCategoriesIds().isEmpty())
             mealForm.setCategoriesIds(List.of(0L));
 
         meal.modify(mealForm, getMealIngredientsFromMealForm(mealForm), categoryRepository.findAllById(mealForm.getCategoriesIds()));

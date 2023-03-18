@@ -36,7 +36,7 @@ public class PDFGeneratorService {
         Integer[] i = {1};
 
         diet.getFinalDays().forEach(day -> {
-            Paragraph dayTitle = new Paragraph("\n\nDay "+ i[0]++, fontDayAndMeal);
+            Paragraph dayTitle = new Paragraph("\n\nDay " + i[0]++, fontDayAndMeal);
             dayTitle.setAlignment(Element.ALIGN_CENTER);
             document.add(dayTitle);
 

@@ -22,9 +22,9 @@ public class AppUserController {
         UserResponseForm retrievedUser;
         try {
             retrievedUser = appUserService.getUser(idUser);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Error e){
+        } catch (Error e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -37,9 +37,9 @@ public class AppUserController {
         UserResponseForm retrievedUser;
         try {
             retrievedUser = appUserService.getMe();
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Error e){
+        } catch (Error e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -50,9 +50,9 @@ public class AppUserController {
     public ResponseEntity<?> addUser(@Valid @RequestBody UserForm userForm) {
         try {
             appUserService.addUser(userForm);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Error e){
+        } catch (Error e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -63,9 +63,9 @@ public class AppUserController {
     public ResponseEntity<?> verifyUserEmail(@RequestParam String token) {
         try {
             appUserService.verifyUserEmail(token);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Error e){
+        } catch (Error e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -77,9 +77,9 @@ public class AppUserController {
     public ResponseEntity<?> updateUser(@RequestBody UserForm userForm) {
         try {
             appUserService.updateUser(userForm);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Error e){
+        } catch (Error e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -91,9 +91,9 @@ public class AppUserController {
     public ResponseEntity<?> deleteUserOwnAccount() {
         try {
             appUserService.deleteUserOwnAccount();
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
-        } catch (Error e){
+        } catch (Error e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 

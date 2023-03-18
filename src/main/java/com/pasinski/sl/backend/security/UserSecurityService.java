@@ -17,7 +17,7 @@ public class UserSecurityService {
     }
 
     public Long getLoggedUserId() {
-        AppUser appUser= (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return appUser.getIdUser();
     }
 

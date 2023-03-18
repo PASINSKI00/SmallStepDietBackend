@@ -134,7 +134,7 @@ public class DietController {
         Long id;
         try {
             id = this.dietService.addDiet(days);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
@@ -143,10 +143,10 @@ public class DietController {
 
     @PutMapping()
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody List<List<Long>> days){
+    public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody List<List<Long>> days) {
         try {
             this.dietService.updateDiet(idDiet, days);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
@@ -155,10 +155,10 @@ public class DietController {
 
     @PutMapping("/final")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> modifyFinalDiet(@RequestBody DietResponseForm dietResponseForm){
+    public ResponseEntity<?> modifyFinalDiet(@RequestBody DietResponseForm dietResponseForm) {
         try {
             this.dietService.modifyFinalDiet(dietResponseForm);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
@@ -168,10 +168,10 @@ public class DietController {
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteDiet(@RequestParam Long idDiet){
+    public ResponseEntity<?> deleteDiet(@RequestParam Long idDiet) {
         try {
             this.dietService.deleteDiet(idDiet);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
@@ -180,10 +180,10 @@ public class DietController {
 
     @DeleteMapping("/pdfs")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> clearOutPdfDirectory(){
+    public ResponseEntity<?> clearOutPdfDirectory() {
         try {
             this.dietService.clearOutPdfDirectory();
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
