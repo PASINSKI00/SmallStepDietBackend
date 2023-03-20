@@ -46,8 +46,7 @@ public class AppUserService implements UserDetailsService {
         if (userSecurityService.isEmailTaken(userForm.getEmail()))
             throw new HttpClientErrorException(HttpStatus.CONFLICT);
 
-        AppUser appUser = new AppUser(userForm.getName(), userForm.getEmail(), userForm.getPassword());
-        appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
+        AppUser appUser = new AppUser(userForm.getName(), userForm.getEmail(), passwordEncoder.encode(userForm.getPassword()));
 
         appUserRepository.save(appUser);
 
