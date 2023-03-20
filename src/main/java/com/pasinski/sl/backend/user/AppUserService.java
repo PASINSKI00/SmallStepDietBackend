@@ -1,6 +1,5 @@
 package com.pasinski.sl.backend.user;
 
-import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.email.EmailSenderService;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationToken;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationTokenService;
@@ -9,7 +8,6 @@ import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.forms.UserForm;
-import com.pasinski.sl.backend.user.forms.UserResponseForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,19 +34,12 @@ public class AppUserService implements UserDetailsService {
     private final EmailSenderService emailSenderService;
     private PasswordEncoder passwordEncoder;
 
-    public UserResponseForm getUser(Long idUser) {
-        AppUser appUser;
-        appUser = appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        UserResponseForm userResponseForm = new UserResponseForm();
-        userResponseForm.setName(appUser.getName());
-        userResponseForm.setImageUrl(ApplicationConstants.DEFAULT_USER_IMAGE_URL_WITH_PARAMETER + appUser.getIdUser());
-
-        return userResponseForm;
+    public AppUser getUser(Long idUser) {
+        return appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
     }
 
-    public UserResponseForm getMe() {
-        return getUser(userSecurityService.getLoggedUserId());
+    public AppUser getMe() {
+        return userSecurityService.getLoggedUser();
     }
 
     public void addUser(UserForm userForm) {

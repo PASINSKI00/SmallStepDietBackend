@@ -21,7 +21,7 @@ public class AppUserController {
     public ResponseEntity<?> getUser(@RequestParam Long idUser) {
         UserResponseForm retrievedUser;
         try {
-            retrievedUser = appUserService.getUser(idUser);
+            retrievedUser = new UserResponseForm(appUserService.getUser(idUser));
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         } catch (Error e) {
@@ -36,7 +36,7 @@ public class AppUserController {
     public ResponseEntity<?> getMe() {
         UserResponseForm retrievedUser;
         try {
-            retrievedUser = appUserService.getMe();
+            retrievedUser = new UserResponseForm(appUserService.getMe());
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         } catch (Error e) {
