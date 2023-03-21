@@ -48,8 +48,8 @@ public class BodyInfo {
     @Column(nullable = false)
     private Integer additionalCalories;
 
-    private Integer TDEE;
-    private Integer BEE;
+    private Double TDEE;
+    private Double BEE;
     private Integer CaloriesGoal;
 
     @NotNull
@@ -74,17 +74,17 @@ public class BodyInfo {
         this.CaloriesGoal = calculateCaloriesGoal();
     }
 
-    private Integer calculateBEE() {
+    private Double calculateBEE() {
         int constant = -161;
 
         if (gender.equals(Gender.MALE))
             constant = 5;
 
-        return (int) (10 * getWeight() + 6.25 * getHeight() - 5 * getAge() + constant);
+        return 10 * getWeight() + 6.25 * getHeight() - 5 * getAge() + constant;
     }
 
-    private Integer calculateTDEE() {
-        return (int) (getBEE() * getPal());
+    private Double calculateTDEE() {
+        return Math.round(getBEE() * getPal() * 1000) / 1000.0;
     }
 
 

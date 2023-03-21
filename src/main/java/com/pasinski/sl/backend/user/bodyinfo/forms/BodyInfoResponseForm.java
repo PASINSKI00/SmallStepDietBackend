@@ -27,8 +27,8 @@ public class BodyInfoResponseForm {
         this.gender = bodyInfo.getGender();
         this.pal = bodyInfo.getPal();
         this.additionalCalories = bodyInfo.getAdditionalCalories();
-        this.TDEE = bodyInfo.getTDEE();
-        this.BEE = bodyInfo.getBEE();
+        this.TDEE = bodyInfo.getTDEE().intValue();
+        this.BEE = bodyInfo.getBEE().intValue();
         this.caloriesGoal = bodyInfo.getCaloriesGoal();
     }
 }
