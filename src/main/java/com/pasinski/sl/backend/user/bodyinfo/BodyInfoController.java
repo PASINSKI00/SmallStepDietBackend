@@ -20,14 +20,15 @@ public class BodyInfoController {
     @GetMapping()
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getBodyInfo() {
-        BodyInfoResponseForm retrievedBodyInfo;
+        BodyInfoResponseForm bodyInfoResponseForm;
         try {
-            retrievedBodyInfo = bodyInfoService.getBodyInfo();
+            BodyInfo bodyInfo = bodyInfoService.getBodyInfo();
+            bodyInfoResponseForm = new BodyInfoResponseForm(bodyInfo);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
-        return new ResponseEntity<>(retrievedBodyInfo, HttpStatus.OK);
+        return new ResponseEntity<>(bodyInfoResponseForm, HttpStatus.OK);
     }
 
     @PostMapping()

@@ -4,7 +4,6 @@ import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
 import com.pasinski.sl.backend.user.bodyinfo.forms.BodyInfoForm;
-import com.pasinski.sl.backend.user.bodyinfo.forms.BodyInfoResponseForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,25 +16,8 @@ public class BodyInfoService {
     private UserSecurityService userSecurityService;
     private AppUserRepository appUserRepository;
 
-    public BodyInfoResponseForm getBodyInfo() {
-        AppUser appUser = userSecurityService.getLoggedUser();
-        BodyInfo bodyInfo = bodyInfoRepository.findByAppUser(appUser);
-
-        if (bodyInfo == null)
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-
-        BodyInfoResponseForm bodyInfoResponseForm = new BodyInfoResponseForm();
-        bodyInfoResponseForm.setGoal(bodyInfo.getGoal());
-        bodyInfoResponseForm.setHeight(bodyInfo.getHeight());
-        bodyInfoResponseForm.setWeight(bodyInfo.getWeight());
-        bodyInfoResponseForm.setAge(bodyInfo.getAge());
-        bodyInfoResponseForm.setPal(bodyInfo.getPal());
-        bodyInfoResponseForm.setAdditionalCalories(bodyInfo.getAdditionalCalories());
-        bodyInfoResponseForm.setTDEE(bodyInfo.getTDEE());
-        bodyInfoResponseForm.setBEE(bodyInfo.getBEE());
-        bodyInfoResponseForm.setCaloriesGoal(bodyInfo.getCaloriesGoal());
-
-        return bodyInfoResponseForm;
+    public BodyInfo getBodyInfo() {
+        return bodyInfoRepository.findByAppUser(userSecurityService.getLoggedUser()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
     }
 
     public void addBodyInfo(BodyInfoForm bodyInfoForm) {
