@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.user.bodyinfo.forms;
 
+import com.pasinski.sl.backend.user.bodyinfo.Gender;
 import lombok.Getter;
 
 import javax.validation.constraints.DecimalMax;
@@ -19,6 +20,9 @@ public class BodyInfoForm {
 
     @NotNull
     private Integer age;
+
+    @NotNull
+    private Gender gender;
 
     @NotNull
     @DecimalMin(value = "1.39", message = "PAL must be between 1.4 and 2.4")

@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.user.bodyinfo.forms;
 
 import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
+import com.pasinski.sl.backend.user.bodyinfo.Gender;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ public class BodyInfoResponseForm {
     private Integer height;
     private Integer weight;
     private Integer age;
+    private Gender gender;
     private Float pal;
     private Integer additionalCalories;
     private Integer TDEE;
@@ -22,6 +24,7 @@ public class BodyInfoResponseForm {
         this.height = bodyInfo.getHeight();
         this.weight = bodyInfo.getWeight();
         this.age = bodyInfo.getAge();
+        this.gender = bodyInfo.getGender();
         this.pal = bodyInfo.getPal();
         this.additionalCalories = bodyInfo.getAdditionalCalories();
         this.TDEE = bodyInfo.getTDEE();
