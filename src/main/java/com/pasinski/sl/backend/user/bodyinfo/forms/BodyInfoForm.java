@@ -1,13 +1,19 @@
 package com.pasinski.sl.backend.user.bodyinfo.forms;
 
 import com.pasinski.sl.backend.user.bodyinfo.Gender;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BodyInfoForm {
     @NotNull
     private Goals goal;
