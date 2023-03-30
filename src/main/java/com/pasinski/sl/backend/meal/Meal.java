@@ -54,11 +54,8 @@ public class Meal {
         this.ingredients = ingredients;
         this.categories = categories;
         this.author = author;
-        this.initialCalories = this.ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getCaloriesPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum).intValue();
-        int proteinRatio = (int) (ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getProteinPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum) * 4 / this.initialCalories * 100);
-        int fatsRatio = (int) (ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getFatsPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum) * 9 / this.initialCalories * 100);
-        int carbsRatio = (int) (ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getCarbsPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum) * 4 / this.initialCalories * 100);
-        this.mealExtention = new MealExtention(mealForm.getRecipe(), mealForm.getTimeToPrepare(), proteinRatio, fatsRatio, carbsRatio);
+        this.mealExtention = new MealExtention(mealForm.getRecipe(), mealForm.getTimeToPrepare());
+        setInitialCaloriesAndRatios();
     }
 
     public void modify(MealForm mealForm, List<MealIngredient> ingredients, List<Category> categories) {
@@ -68,6 +65,7 @@ public class Meal {
         if (ingredients != null) {
             this.ingredients.removeAll(this.ingredients);
             this.ingredients.addAll(ingredients);
+            setInitialCaloriesAndRatios();
         }
 
         if (categories != null)
@@ -78,5 +76,15 @@ public class Meal {
 
         if (mealForm.getTimeToPrepare() != null)
             this.mealExtention.setTimeToPrepare(mealForm.getTimeToPrepare());
+    }
+
+    private void setInitialCaloriesAndRatios() {
+        this.initialCalories = this.ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getCaloriesPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum).intValue();
+        int proteinRatio = (int) (ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getProteinPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum) * 4 / this.initialCalories * 100);
+        int fatsRatio = (int) (ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getFatsPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum) * 9 / this.initialCalories * 100);
+        int carbsRatio = (int) (ingredients.stream().reduce(0F, (sum, mealIngredient) -> sum + (mealIngredient.getIngredient().getCarbsPer100g() * mealIngredient.getInitialWeight() / 100), Float::sum) * 4 / this.initialCalories * 100);
+        this.mealExtention.setProteinRatio(proteinRatio);
+        this.mealExtention.setFatsRatio(fatsRatio);
+        this.mealExtention.setCarbsRatio(carbsRatio);
     }
 }
