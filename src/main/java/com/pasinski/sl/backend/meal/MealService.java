@@ -8,7 +8,6 @@ import com.pasinski.sl.backend.meal.forms.ReviewForm;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.mealIngredient.MealIngredient;
-import com.pasinski.sl.backend.meal.mealIngredient.MealIngredientRepository;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import com.pasinski.sl.backend.config.security.UserSecurityService;
