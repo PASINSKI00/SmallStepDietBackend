@@ -27,11 +27,8 @@ public class MealExtention {
     @OneToMany
     private List<Review> reviews = new ArrayList<>();
 
-    public MealExtention(String recipe, int timeToPrepare, int proteinRatio, int fatsRatio, int carbsRatio) {
+    public MealExtention(String recipe, int timeToPrepare) {
         this.recipe = recipe;
         this.timeToPrepare = timeToPrepare;
-        this.proteinRatio = proteinRatio;
-        this.fatsRatio = fatsRatio;
-        this.carbsRatio = carbsRatio;
     }
 }
