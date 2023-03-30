@@ -21,11 +21,9 @@ public class MealIngredient {
     @JoinColumn(name = "ingredient_id_ingredient")
     private Ingredient ingredient;
     private Integer initialWeight;
-    private Integer initialRatioInMeal;
 
-    public MealIngredient(Ingredient ingredient, Integer amount, Integer mealWeight) {
+    public MealIngredient(Ingredient ingredient, Integer amount) {
         this.ingredient = ingredient;
         this.initialWeight = amount;
-        this.initialRatioInMeal = (int) Math.round((double) amount / mealWeight * 100);
     }
 }
