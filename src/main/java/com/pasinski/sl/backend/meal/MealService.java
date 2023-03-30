@@ -107,7 +107,7 @@ public class MealService {
 
         mealForm.getIngredients().forEach((id, amount) -> {
             Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-            MealIngredient mealIngredient = new MealIngredient(ingredient, amount, mealWeight);
+            MealIngredient mealIngredient = new MealIngredient(ingredient, amount);
             ingredients.add(mealIngredient);
         });
 
