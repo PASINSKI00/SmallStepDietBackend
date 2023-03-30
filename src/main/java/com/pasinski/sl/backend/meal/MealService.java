@@ -30,7 +30,6 @@ public class MealService {
     private final IngredientRepository ingredientRepository;
     private final ReviewRepository reviewRepository;
     private final UserSecurityService userSecurityService;
-    private final MealIngredientRepository mealIngredientRepository;
 
     public Meal getMealById(Long idMeal) {
         return mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
