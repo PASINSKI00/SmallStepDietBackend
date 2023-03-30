@@ -103,7 +103,6 @@ public class MealService {
 
     private List<MealIngredient> getMealIngredientsFromMealForm(MealForm mealForm) {
         List<MealIngredient> ingredients = new ArrayList<>();
-        Integer mealWeight = mealForm.getIngredients().values().stream().reduce(0, Integer::sum);
 
         mealForm.getIngredients().forEach((id, amount) -> {
             Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
