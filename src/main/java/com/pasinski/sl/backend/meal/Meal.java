@@ -63,7 +63,7 @@ public class Meal {
             this.name = mealForm.getName();
 
         if (ingredients != null) {
-            this.ingredients.removeAll(this.ingredients);
+            this.ingredients.clear();
             this.ingredients.addAll(ingredients);
             setInitialCaloriesAndRatios();
         }
