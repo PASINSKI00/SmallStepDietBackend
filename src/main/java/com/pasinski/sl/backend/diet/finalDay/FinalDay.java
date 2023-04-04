@@ -48,29 +48,6 @@ public class FinalDay {
         this.carbs = finalMeals.stream().mapToInt(FinalMeal::getCarbs).sum();
     }
 
-    private List<Integer> calculateMealRatiosForFinalMeals(Integer size) {
-        List<Integer> percents = new ArrayList<>();
-        for (int i = 0; i < size; i++)
-            percents.add(100 / size);
-
-        if (percents.stream().mapToInt(Integer::intValue).sum() != 100)
-            percents.set(percents.size() - 1, percents.get(percents.size() - 1) + (100 - percents.stream().mapToInt(Integer::intValue).sum()));
-
-        return percents;
-    }
-
-    private List<Integer> calculateCaloriesGoalsForFinalMeals(Integer caloriesGoal, List<Integer> mealRatios) {
-        List<Integer> caloriesGoals = new ArrayList<>();
-        mealRatios.forEach(percent -> {
-            caloriesGoals.add((caloriesGoal * percent) / 100);
-        });
-
-        if (caloriesGoals.stream().mapToInt(Integer::intValue).sum() != caloriesGoal)
-            caloriesGoals.set(caloriesGoals.size() - 1, caloriesGoals.get(caloriesGoals.size() - 1) + (caloriesGoal - caloriesGoals.stream().mapToInt(Integer::intValue).sum()));
-
-        return caloriesGoals;
-    }
-
     public void modifyFinalDay(FinalDayResponseForm finalDayResponseForm, IngredientRepository ingredientRepository, Integer caloriesGoal) {
         if (finalDayResponseForm.getFinalMeals().get(0).getPercentOfDay() != null) {
             List<Integer> percents = new ArrayList<>();
@@ -98,5 +75,28 @@ public class FinalDay {
             this.fats = finalMeals.stream().mapToInt(FinalMeal::getFats).sum();
             this.carbs = finalMeals.stream().mapToInt(FinalMeal::getCarbs).sum();
         });
+    }
+
+    private List<Integer> calculateMealRatiosForFinalMeals(Integer size) {
+        List<Integer> percents = new ArrayList<>();
+        for (int i = 0; i < size; i++)
+            percents.add(100 / size);
+
+        if (percents.stream().mapToInt(Integer::intValue).sum() != 100)
+            percents.set(percents.size() - 1, percents.get(percents.size() - 1) + (100 - percents.stream().mapToInt(Integer::intValue).sum()));
+
+        return percents;
+    }
+
+    private List<Integer> calculateCaloriesGoalsForFinalMeals(Integer caloriesGoal, List<Integer> mealRatios) {
+        List<Integer> caloriesGoals = new ArrayList<>();
+        mealRatios.forEach(percent -> {
+            caloriesGoals.add((caloriesGoal * percent) / 100);
+        });
+
+        if (caloriesGoals.stream().mapToInt(Integer::intValue).sum() != caloriesGoal)
+            caloriesGoals.set(caloriesGoals.size() - 1, caloriesGoals.get(caloriesGoals.size() - 1) + (caloriesGoal - caloriesGoals.stream().mapToInt(Integer::intValue).sum()));
+
+        return caloriesGoals;
     }
 }
