@@ -30,7 +30,7 @@ public class MealController {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
-        return ResponseEntity.ok(mealResponseBodies);
+        return ResponseEntity.ok(mealResponseBodies.stream().sorted((o1, o2) -> o2.getAvgRating().compareTo(o1.getAvgRating())));
     }
 
     @PostMapping()
