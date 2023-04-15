@@ -40,8 +40,10 @@ public class FinalDay {
 
         List<Integer> mealRatios = calculateMealRatiosForFinalMeals(meals.size());
         List<Integer> caloriesGoals = calculateCaloriesGoalsForFinalMeals(caloriesGoal, mealRatios);
+
         for (int i = 0; i < meals.size(); i++)
             this.finalMeals.add(new FinalMeal(meals.get(i), caloriesGoals.get(i), mealRatios.get(i)));
+
         this.calories = finalMeals.stream().mapToInt(FinalMeal::getCalories).sum();
         this.protein = finalMeals.stream().mapToInt(FinalMeal::getProtein).sum();
         this.fats = finalMeals.stream().mapToInt(FinalMeal::getFats).sum();
