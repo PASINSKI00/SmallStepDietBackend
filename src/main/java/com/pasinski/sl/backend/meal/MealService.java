@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.meal;
 
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
@@ -10,7 +11,6 @@ import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.mealIngredient.MealIngredient;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.meal.review.ReviewRepository;
-import com.pasinski.sl.backend.config.security.UserSecurityService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

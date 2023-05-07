@@ -2,7 +2,6 @@ package com.pasinski.sl.backend.user.forms;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.user.AppUser;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

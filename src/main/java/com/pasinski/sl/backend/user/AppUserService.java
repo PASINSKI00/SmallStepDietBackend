@@ -1,10 +1,10 @@
 package com.pasinski.sl.backend.user;
 
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.email.EmailSenderService;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationToken;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationTokenService;
 import com.pasinski.sl.backend.meal.MealRepository;
-import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.forms.UserForm;
@@ -27,11 +27,11 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class AppUserService implements UserDetailsService {
+    private final EmailConfirmationTokenService emailConfirmationTokenService;
+    private final EmailSenderService emailSenderService;
     private AppUserRepository appUserRepository;
     private MealRepository mealRepository;
     private UserSecurityService userSecurityService;
-    private final EmailConfirmationTokenService emailConfirmationTokenService;
-    private final EmailSenderService emailSenderService;
     private PasswordEncoder passwordEncoder;
 
     public AppUser getUser(Long idUser) {

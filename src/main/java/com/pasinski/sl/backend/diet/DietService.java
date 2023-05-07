@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.PDFGenerator.PDFGeneratorService;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
@@ -10,7 +11,6 @@ import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.review.Review;
-import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.user.AppUser;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;

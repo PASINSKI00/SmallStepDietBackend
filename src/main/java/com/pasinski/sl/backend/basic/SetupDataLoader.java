@@ -30,8 +30,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
-    boolean alreadySetup = false;
-
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
     private final PrivilegeRepository privilegeRepository;
@@ -40,6 +38,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final CategoryRepository categoryRepository;
     private final MealService mealService;
     private final AuthenticationManager authenticationManager;
+    boolean alreadySetup = false;
 
     @Override
     @Transactional
