@@ -1,4 +1,4 @@
-package com.pasinski.sl.backend.security;
+package com.pasinski.sl.backend.config.security;
 
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.AppUserRepository;
@@ -17,11 +17,17 @@ public class UserSecurityService {
     }
 
     public Long getLoggedUserId() {
-        AppUser appUser= (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return appUser.getIdUser();
     }
 
     public AppUser getLoggedUser() {
         return (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public void setImageSetBooleanValue(boolean value) {
+        AppUser appUser = getLoggedUser();
+        appUser.setImageSet(value);
+        appUserRepository.save(appUser);
     }
 }

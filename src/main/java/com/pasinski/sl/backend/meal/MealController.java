@@ -3,6 +3,7 @@ package com.pasinski.sl.backend.meal;
 import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.forms.MealResponseBodyExtended;
+import com.pasinski.sl.backend.meal.forms.ReviewForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class MealController {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
-        return ResponseEntity.ok(mealResponseBodies);
+        return ResponseEntity.ok(mealResponseBodies.stream().sorted((o1, o2) -> o2.getAvgRating().compareTo(o1.getAvgRating())));
     }
 
     @PostMapping()
@@ -43,6 +44,18 @@ public class MealController {
         }
 
         return new ResponseEntity<Long>(idMeal, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/review")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> addReview(@RequestBody ReviewForm reviewForm) {
+        try {
+            mealService.addReview(reviewForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping()
@@ -70,11 +83,11 @@ public class MealController {
     }
 
     @GetMapping("/extend")
-    public ResponseEntity<?> extendMeal(@RequestBody MealForm mealForm) {
+    public ResponseEntity<?> extendMeal(@RequestParam Long idMeal) {
         MealResponseBodyExtended mealResponseBodyExtended;
 
         try {
-            mealResponseBodyExtended = mealService.extendMeal(mealForm);
+            mealResponseBodyExtended = mealService.extendMeal(idMeal);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }

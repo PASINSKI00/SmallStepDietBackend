@@ -9,11 +9,11 @@ public class IngredientForm {
     @NotNull
     private String name;
     @NotNull
-    private Integer calories;
+    private Float calories;
     @NotNull
-    private Integer protein;
+    private Float protein;
     @NotNull
-    private Integer fats;
+    private Float fats;
     @NotNull
-    private Integer carbs;
+    private Float carbs;
 }

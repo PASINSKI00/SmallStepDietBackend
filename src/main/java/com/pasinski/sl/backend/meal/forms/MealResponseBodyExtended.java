@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.meal.forms;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealExtention;
 import com.pasinski.sl.backend.meal.review.Review;
@@ -29,9 +30,9 @@ public class MealResponseBodyExtended {
 
         this.reviews = reviews.stream().map(
                 review -> new ReviewResponseBody(
-                        review.getAuthor().getImage(),
+                        ApplicationConstants.DEFAULT_USER_IMAGE_URL_WITH_PARAMETER + review.getAuthor().getIdUser(),
                         review.getAuthor().getName(),
                         review.getRating(),
-                        review.getContent())).collect(Collectors.toList());
+                        review.getComment())).collect(Collectors.toList());
     }
 }

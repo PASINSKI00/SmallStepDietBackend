@@ -1,7 +1,6 @@
 package com.pasinski.sl.backend.meal.ingredient;
 
 import com.pasinski.sl.backend.meal.forms.IngredientForm;
-import com.pasinski.sl.backend.meal.forms.IngredientWithMealSpecifics;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,19 +40,5 @@ public class IngredientController {
         }
 
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @GetMapping("/all/meal")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getIngredientsForMeal(@RequestParam Long idMeal) {
-        List<IngredientWithMealSpecifics> ingredients;
-
-        try {
-            ingredients = ingredientService.getIngredientsForMeal(idMeal);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return ResponseEntity.ok(ingredients);
     }
 }

@@ -1,6 +1,6 @@
 package com.pasinski.sl.backend.basic;
 
-import com.pasinski.sl.backend.security.UserSecurityService;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
     Ingredient findByName(String name);
+
     List<Ingredient> findAllByNameIn(List<String> names);
 
     @Query("select new Ingredient(i.idIngredient, i.name) from Ingredient i")

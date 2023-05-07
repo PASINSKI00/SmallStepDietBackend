@@ -1,13 +1,12 @@
 package com.pasinski.sl.backend.image;
 
+import org.apache.commons.io.FileUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.io.FileUtils;
 
 public class Base64EncodedMultipartFile implements MultipartFile {
     private final byte[] fileContent;

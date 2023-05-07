@@ -7,11 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @AllArgsConstructor
@@ -38,6 +36,20 @@ public class ImageController {
                 .body(inputStreamResource);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<InputStreamResource> getUserImage(@RequestParam Long idUser) throws IOException {
+        InputStreamResource inputStreamResource;
+        try {
+            inputStreamResource = imageService.getUserImage(idUser);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(inputStreamResource);
+    }
+
     @PostMapping("/meal")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> addMealImage(@RequestBody String image, @RequestParam Long idMeal) throws IOException {
@@ -49,4 +61,17 @@ public class ImageController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/user/mine")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> addMyImage(@RequestBody String image) throws IOException {
+        try {
+            imageService.addMyImage(image);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
 }

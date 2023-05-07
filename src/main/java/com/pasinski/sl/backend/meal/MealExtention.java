@@ -2,7 +2,10 @@ package com.pasinski.sl.backend.meal;
 
 import com.pasinski.sl.backend.meal.review.Review;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class MealExtention {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,7 +26,13 @@ public class MealExtention {
     private int fatsRatio;
     private int carbsRatio;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_meal_extention")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Review> reviews = new ArrayList<>();
 
+    public MealExtention(String recipe, int timeToPrepare) {
+        this.recipe = recipe;
+        this.timeToPrepare = timeToPrepare;
+    }
 }

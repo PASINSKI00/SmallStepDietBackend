@@ -1,26 +1,25 @@
 package com.pasinski.sl.backend.meal;
 
-import com.pasinski.sl.backend.basic.ApplicationConstants;
-import com.pasinski.sl.backend.meal.mealIngredientSpecifics.MealIngredientSpecifics;
-import com.pasinski.sl.backend.meal.category.Category;
+import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.forms.MealResponseBodyExtended;
+import com.pasinski.sl.backend.meal.forms.ReviewForm;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
-import com.pasinski.sl.backend.security.UserSecurityService;
-import com.pasinski.sl.backend.user.AppUserRepository;
+import com.pasinski.sl.backend.meal.mealIngredient.MealIngredient;
+import com.pasinski.sl.backend.meal.review.Review;
+import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -28,56 +27,37 @@ public class MealService {
     private final MealRepository mealRepository;
     private final CategoryRepository categoryRepository;
     private final IngredientRepository ingredientRepository;
-    private final AppUserRepository appUserRepository;
+    private final ReviewRepository reviewRepository;
     private final UserSecurityService userSecurityService;
 
+    public Meal getMealById(Long idMeal) {
+        return mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    }
+
     public List<MealResponseBody> getMeals() {
-        List<Meal> meals = mealRepository.findAll();
-        List<MealResponseBody> mealResponseBodies = new ArrayList<>();
-
-        meals.forEach(meal -> {
-            mealResponseBodies.add(new MealResponseBody(
-                    meal.getIdMeal(),
-                    meal.getName(),
-                    ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal(),
-                    meal.getIngredients().keySet().stream().map(Ingredient::getName).toList(),
-                    meal.getCategories().stream().map(Category::getName).toList()
-        ));
-        });
-
-        return mealResponseBodies;
+        return mealRepository.findAll().stream().map(MealResponseBody::new).collect(Collectors.toList());
     }
 
     public Long addMeal(MealForm mealForm) {
-        Meal meal = new Meal();
+        if (mealForm.getCategoriesIds() == null || mealForm.getCategoriesIds().isEmpty())
+            mealForm.setCategoriesIds(List.of(0L));
 
-        HashMap<Ingredient, MealIngredientSpecifics> ingredients = new HashMap<>();
-        mealForm.getIngredients().forEach((id, amount) -> {
-            MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
-            Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-            mealIngredientSpecifics.setInitialWeight(amount);
-            ingredients.put(ingredient, mealIngredientSpecifics);
-        });
+        return mealRepository.save(new Meal(mealForm, getMealIngredientsFromMealForm(mealForm), categoryRepository.findAllById(mealForm.getCategoriesIds()), userSecurityService.getLoggedUser())).getIdMeal();
+    }
 
-        meal.setName(mealForm.getName());
-        meal.setIngredients(ingredients);
 
-        meal.getMealExtention().setRecipe(mealForm.getRecipe());
-        meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
+    public void addReview(ReviewForm reviewForm) {
+        Meal meal = mealRepository.findById(reviewForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        Review review = new Review();
+        review.setRating(reviewForm.getRating());
+        review.setComment(reviewForm.getComment());
+        review.setAuthor(this.userSecurityService.getLoggedUser());
+        this.reviewRepository.save(review);
 
-        if(mealForm.getCategoriesIds() != null)
-            meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
+        meal.getMealExtention().getReviews().add(review);
+        meal.setAvgRating((float) (meal.getMealExtention().getReviews().stream().map(Review::getRating).reduce(0, Integer::sum) / meal.getMealExtention().getReviews().size()));
 
-        if(mealForm.getImageName() != null)
-            meal.setImageName(mealForm.getImageName());
-
-        calculateProteinRatioOfAMeal(meal);
-        assignCategoriesAutomatically(meal);
-
-        meal.setAuthor(appUserRepository.findById(userSecurityService.getLoggedUserId()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
         mealRepository.save(meal);
-
-        return meal.getIdMeal();
     }
 
     public void updateMeal(MealForm mealForm) {
@@ -86,37 +66,14 @@ public class MealService {
         if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        if(mealForm.getName() != null)
-            meal.setName(mealForm.getName());
+        if (mealForm.getCategoriesIds() == null || mealForm.getCategoriesIds().isEmpty())
+            mealForm.setCategoriesIds(List.of(0L));
 
-        if(mealForm.getIngredients() != null) {
-            HashMap<Ingredient, MealIngredientSpecifics> ingredients = new HashMap<>();
-            mealForm.getIngredients().forEach((id, amount) -> {
-                Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-                MealIngredientSpecifics mealIngredientSpecifics = new MealIngredientSpecifics();
-                mealIngredientSpecifics.setInitialWeight(amount);
-                ingredients.put(ingredient, mealIngredientSpecifics);
-            });
-            meal.setIngredients(ingredients);
-            calculateProteinRatioOfAMeal(meal);
-        }
-
-        if(mealForm.getRecipe() != null)
-            meal.getMealExtention().setRecipe(mealForm.getRecipe());
-
-        if(mealForm.getTimeToPrepare() != null)
-            meal.getMealExtention().setTimeToPrepare(mealForm.getTimeToPrepare());
-
-        if(mealForm.getCategoriesIds() != null) {
-            meal.setCategories(categoryRepository.findAllById(mealForm.getCategoriesIds()));
-            assignCategoriesAutomatically(meal);
-        }
-
-        if(mealForm.getImageName() != null)
-            meal.setImageName(mealForm.getImageName());
+        meal.modify(mealForm, getMealIngredientsFromMealForm(mealForm), categoryRepository.findAllById(mealForm.getCategoriesIds()));
 
         mealRepository.save(meal);
     }
+
     public void deleteMeal(Long idMeal) {
         Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
 
@@ -126,17 +83,31 @@ public class MealService {
         mealRepository.delete(meal);
     }
 
-    public MealResponseBodyExtended extendMeal(MealForm mealForm) {
-        Meal meal = mealRepository.findById(mealForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    public MealResponseBodyExtended extendMeal(Long idMeal) {
+        Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         return new MealResponseBodyExtended(meal, meal.getMealExtention());
     }
 
-    private void calculateProteinRatioOfAMeal(Meal meal) {
-        //TODO
+    public void setImageBooleanValue(Long idMeal, Boolean value) {
+        Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        if (!Objects.equals(meal.getAuthor().getIdUser(), userSecurityService.getLoggedUserId()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        meal.setImageSet(value);
+        mealRepository.save(meal);
     }
 
-    private void assignCategoriesAutomatically(Meal meal) {
-        //TODO
+    private List<MealIngredient> getMealIngredientsFromMealForm(MealForm mealForm) {
+        List<MealIngredient> ingredients = new ArrayList<>();
+
+        mealForm.getIngredients().forEach((id, amount) -> {
+            Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+            MealIngredient mealIngredient = new MealIngredient(ingredient, amount);
+            ingredients.add(mealIngredient);
+        });
+
+        return ingredients;
     }
 }

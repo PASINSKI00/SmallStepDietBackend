@@ -1,14 +1,16 @@
 package com.pasinski.sl.backend.user;
 
 import com.pasinski.sl.backend.user.accessManagment.Role;
+import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
+import java.util.*;
 
 @Getter
 @Setter
@@ -23,9 +25,10 @@ public class AppUser implements UserDetails {
     private String name;
     private String email;
     private String password;
-    private String image;
+    private boolean imageSet = false;
+    private boolean isEmailVerified = false;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(
@@ -33,6 +36,9 @@ public class AppUser implements UserDetails {
             inverseJoinColumns = @JoinColumn(
                     name = "id_role"))
     private Collection<Role> roles;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private BodyInfo bodyInfo;
 
     public AppUser(String name, String email, String password) {
         this.name = name;
@@ -42,7 +48,14 @@ public class AppUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        Set<Role> roles = getRoles().stream().collect(HashSet::new, HashSet::add, HashSet::addAll);
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+
+        return authorities;
     }
 
     @Override
@@ -68,5 +81,18 @@ public class AppUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AppUser appUser = (AppUser) o;
+        return idUser.equals(appUser.idUser) && name.equals(appUser.name) && email.equals(appUser.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idUser, name, email);
     }
 }
