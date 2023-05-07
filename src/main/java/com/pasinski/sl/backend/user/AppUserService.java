@@ -58,7 +58,7 @@ public class AppUserService implements UserDetailsService {
 
         emailConfirmationTokenService.saveEmailConfirmationToken(emailConfirmationToken);
 
-        emailSenderService.emailAddressVerification(appUser, emailConfirmationToken);
+//        emailSenderService.emailAddressVerification(appUser, emailConfirmationToken);
     }
 
     public void updateUser(UserForm userForm) {
