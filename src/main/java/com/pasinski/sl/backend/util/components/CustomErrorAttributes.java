@@ -15,11 +15,13 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, options);
 
         String defaultMessage = "";
-        String errorJson = errorAttributes.get("errors").toString();
+        if(errorAttributes.get("errors") != null) {
+            String errorJson = errorAttributes.get("errors").toString();
 
-        int index = errorJson.lastIndexOf("default message [");
-        if (index != -1) {
-            defaultMessage = errorJson.substring(index + "default message [".length(), errorJson.length() - 2);
+            int index = errorJson.lastIndexOf("default message [");
+            if (index != -1) {
+                defaultMessage = errorJson.substring(index + "default message [".length(), errorJson.length() - 2);
+            }
         }
 
         errorAttributes.remove("timestamp");
