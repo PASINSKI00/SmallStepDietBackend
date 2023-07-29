@@ -27,10 +27,8 @@ public class MealResponseBody {
         this.idMeal = meal.getIdMeal();
         this.name = meal.getName();
         this.imageUrl = ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal();
-        this.ingredientsNames = meal.getIngredients().stream()
-                .map(MealIngredient::getIngredient)
-                .map(Ingredient::getName)
-                .collect(Collectors.toList());
+        this.ingredientsNames = meal.getIngredients().stream().map(MealIngredient::getIngredient)
+                .map(Ingredient::getName).collect(Collectors.toList());
         this.categoriesNames = meal.getCategories().stream().map(Category::getName).collect(Collectors.toList());
         this.avgRating = meal.getAvgRating();
         this.proteinRatio = meal.getMealExtention().getProteinRatio();
