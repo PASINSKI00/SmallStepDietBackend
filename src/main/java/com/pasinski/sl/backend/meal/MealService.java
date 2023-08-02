@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.meal;
 
 import com.pasinski.sl.backend.config.security.UserSecurityService;
+import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.forms.MealForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
@@ -12,11 +13,13 @@ import com.pasinski.sl.backend.meal.mealIngredient.MealIngredient;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.meal.review.ReviewRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -34,8 +37,15 @@ public class MealService {
         return mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
     }
 
-    public List<MealResponseBody> getMeals() {
-        return mealRepository.findAll().stream().map(MealResponseBody::new).collect(Collectors.toList());
+    public List<MealResponseBody> getMeals(String nameContains, String sortBy, List<String> categories, int pageNumber,
+                                           int pageSize) {
+        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
+        List<Category> categoriesList = categoryRepository.findAllByNameIn(categories);
+        categoriesList = categoriesList.isEmpty() ? null : categoriesList;
+        Long categoriesSize = categoriesList == null ? 0 : (long) categoriesList.size();
+
+        return mealRepository.findMealsByNameAndCategories(nameContains, categoriesList, categoriesSize, pageable)
+                .stream().map(MealResponseBody::new).sorted(sortMap(sortBy)).collect(Collectors.toList());
     }
 
     public Long addMeal(MealForm mealForm) {
@@ -109,5 +119,14 @@ public class MealService {
         });
 
         return ingredients;
+    }
+
+    private Comparator<MealResponseBody> sortMap(String sortBy){
+        return switch (sortBy) {
+            case "Protein percent" -> Comparator.comparing(MealResponseBody::getProteinRatio).reversed();
+            case "Ranking" -> Comparator.comparing(MealResponseBody::getAvgRating).reversed();
+            case "Popularity" -> Comparator.comparing(MealResponseBody::getTimesUsed).reversed();
+            default -> Comparator.comparing(MealResponseBody::getIdMeal);
+        };
     }
 }

@@ -21,16 +21,20 @@ public class MealController {
     private final MealService mealService;
 
     @GetMapping("/search")
-    public ResponseEntity<?> getMeals() {
+    public ResponseEntity<?> getMeals(@RequestParam(required = false, defaultValue = "") String nameContains,
+                                      @RequestParam(required = false, defaultValue = "") String sortBy,
+                                      @RequestParam(required = false, defaultValue = "") List<String> categories,
+                                      @RequestParam(required = false, defaultValue = "0") int pageNumber,
+                                      @RequestParam(required = false, defaultValue = "20") int pageSize) {
         List<MealResponseBody> mealResponseBodies;
 
         try {
-            mealResponseBodies = mealService.getMeals();
+            mealResponseBodies = mealService.getMeals(nameContains, sortBy, categories, pageNumber, pageSize);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
-        return ResponseEntity.ok(mealResponseBodies.stream().sorted((o1, o2) -> o2.getAvgRating().compareTo(o1.getAvgRating())));
+        return ResponseEntity.ok(mealResponseBodies);
     }
 
     @PostMapping()
