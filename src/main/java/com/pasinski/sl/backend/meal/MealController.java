@@ -47,7 +47,7 @@ public class MealController {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
-        return new ResponseEntity<Long>(idMeal, HttpStatus.CREATED);
+        return new ResponseEntity<>(idMeal, HttpStatus.CREATED);
     }
 
     @PostMapping("/review")
