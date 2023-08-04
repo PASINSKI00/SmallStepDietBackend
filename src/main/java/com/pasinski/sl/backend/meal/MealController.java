@@ -25,7 +25,7 @@ public class MealController {
                                       @RequestParam(required = false, defaultValue = "") String sortBy,
                                       @RequestParam(required = false, defaultValue = "") List<String> categories,
                                       @RequestParam(required = false, defaultValue = "0") int pageNumber,
-                                      @RequestParam(required = false, defaultValue = "20") int pageSize) {
+                                      @RequestParam(required = false, defaultValue = "15") int pageSize) {
         List<MealResponseBody> mealResponseBodies;
 
         try {
