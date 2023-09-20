@@ -56,8 +56,10 @@ public class FinalMeal {
         this.caloriesGoal = caloriesGoal;
         this.ingredientWeightMultiplier = (float) caloriesGoal / meal.getInitialCalories();
 
-        this.finalIngredients.removeAll(finalIngredients);
-        this.finalIngredients = meal.getIngredients().stream().map(mealIngredient -> new FinalIngredient(mealIngredient, ingredientWeightMultiplier)).collect(Collectors.toList());
+        this.finalIngredients.clear();
+        meal.getIngredients().stream()
+                .map(mealIngredient -> new FinalIngredient(mealIngredient, ingredientWeightMultiplier))
+                .forEach(finalIngredient -> this.finalIngredients.add(finalIngredient));
         calculateEnergeticValues();
     }
 
