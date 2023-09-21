@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -25,5 +26,6 @@ public class DietResponseForm {
         this.shoppingListFileUrl = ApplicationConstants.DEFAULT_GROCERIES_PDF_URL_WITH_PARAMETER + diet.getIdDiet();
 
         diet.getFinalDays().forEach(finalDay -> this.finalDays.add(new FinalDayResponseForm(finalDay)));
+        this.finalDays.sort(Comparator.comparing(FinalDayResponseForm::getIdFinalDay));
     }
 }

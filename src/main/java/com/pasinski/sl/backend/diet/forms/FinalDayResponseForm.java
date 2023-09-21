@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -28,5 +29,6 @@ public class FinalDayResponseForm {
         this.fats = finalDay.getFats();
 
         finalDay.getFinalMeals().forEach(finalMeal -> this.finalMeals.add(new FinalMealResponseForm(finalMeal)));
+        this.finalMeals.sort(Comparator.comparing(FinalMealResponseForm::getIdFinalMeal));
     }
 }
