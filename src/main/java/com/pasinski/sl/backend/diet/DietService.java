@@ -3,6 +3,7 @@ package com.pasinski.sl.backend.diet;
 import com.pasinski.sl.backend.PDFGenerator.PDFGeneratorService;
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.config.security.UserSecurityService;
+import com.pasinski.sl.backend.diet.finalDay.FinalDayRepository;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
@@ -183,5 +184,16 @@ public class DietService {
         if (files != null)
             for (File file : files)
                 file.delete();
+    }
+
+    public void resetDay(Long idDiet, Long idDay) {
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        diet.resetDay(idDay);
+
+        this.dietRepository.save(diet);
     }
 }

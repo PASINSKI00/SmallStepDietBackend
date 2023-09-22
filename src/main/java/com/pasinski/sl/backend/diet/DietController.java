@@ -165,6 +165,18 @@ public class DietController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PutMapping("/final/day/reset")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> resetDay(@RequestParam Long idDiet, @RequestParam Long idFinalDay) {
+        try {
+            this.dietService.resetDay(idDiet, idFinalDay);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")

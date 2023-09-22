@@ -48,8 +48,20 @@ public class FinalMeal {
         this.ingredientWeightMultiplier = (float) caloriesGoal / meal.getInitialCalories();
 
         this.meal.setTimesUsed(this.meal.getTimesUsed() + 1);
-        this.finalIngredients = meal.getIngredients().stream().map(mealIngredient -> new FinalIngredient(mealIngredient, ingredientWeightMultiplier)).collect(Collectors.toList());
-        calculateEnergeticValues();
+        this.finalIngredients = meal.getIngredients().stream()
+                .map(mealIngredient -> new FinalIngredient(mealIngredient, ingredientWeightMultiplier)).toList();
+        this.calculateEnergeticValues();
+    }
+
+    public void resetMeal(Integer calorieGoal, Integer percentOfDay) {
+        this.caloriesGoal = calorieGoal;
+        this.percentOfDay = percentOfDay;
+        this.ingredientWeightMultiplier = (float) caloriesGoal / meal.getInitialCalories();
+
+        this.finalIngredients.clear();
+        meal.getIngredients().forEach(mealIngredient ->
+                this.finalIngredients.add(new FinalIngredient(mealIngredient, ingredientWeightMultiplier)));
+        this.calculateEnergeticValues();
     }
 
     public void modifyPercentOfDay(Integer percentOfDay, Integer caloriesGoal) {
@@ -64,7 +76,7 @@ public class FinalMeal {
                 .forEach(finalIngredient -> this.finalIngredients.add(finalIngredient));
 
         this.finalIngredients.removeIf(finalIngredient -> !ingredientsBefore.contains(finalIngredient.getIngredient()));
-        calculateEnergeticValues();
+        this.calculateEnergeticValues();
     }
 
     public void modifyIngredients(FinalMealResponseForm modifiedMeal, IngredientRepository ingredientRepository) {
@@ -94,7 +106,7 @@ public class FinalMeal {
                     this.finalIngredients.add(new FinalIngredient(finalIngredientResponseForm, ingredientRepository));
                 });
 
-        calculateEnergeticValues();
+        this.calculateEnergeticValues();
     }
 
     private void calculateEnergeticValues() {

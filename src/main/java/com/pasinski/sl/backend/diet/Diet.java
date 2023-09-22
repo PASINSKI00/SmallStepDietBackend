@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -43,8 +45,14 @@ public class Diet {
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 
+    public void resetDay(Long idDay) {
+        this.finalDays.stream().findFirst().filter(finalDay -> finalDay.getIdFinalDay().equals(idDay))
+                .ifPresentOrElse(finalDay -> finalDay.resetDay(appUser.getBodyInfo().getCaloriesGoal()),
+                    () -> { throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Day with id " + idDay + " not found"); });
+    }
+
     public void updateDiet(List<List<Meal>> days) {
-        this.finalDays.removeAll(this.finalDays);
+        this.finalDays.clear();
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 

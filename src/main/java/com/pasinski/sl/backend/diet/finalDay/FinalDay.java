@@ -44,10 +44,17 @@ public class FinalDay {
         for (int i = 0; i < meals.size(); i++)
             this.finalMeals.add(new FinalMeal(meals.get(i), caloriesGoals.get(i), mealRatios.get(i)));
 
-        this.calories = finalMeals.stream().mapToInt(FinalMeal::getCalories).sum();
-        this.protein = finalMeals.stream().mapToInt(FinalMeal::getProtein).sum();
-        this.fats = finalMeals.stream().mapToInt(FinalMeal::getFats).sum();
-        this.carbs = finalMeals.stream().mapToInt(FinalMeal::getCarbs).sum();
+        this.calculateMacro();
+    }
+
+    public void resetDay(Integer caloriesGoal) {
+        List<Integer> mealRatios = calculateMealRatiosForFinalMeals(this.finalMeals.size());
+        List<Integer> caloriesGoals = calculateCaloriesGoalsForFinalMeals(caloriesGoal, mealRatios);
+
+        for (int i = 0; i < this.finalMeals.size(); i++)
+            this.finalMeals.get(i).resetMeal(caloriesGoals.get(i), mealRatios.get(i));
+
+        this.calculateMacro();
     }
 
     public void modifyFinalDay(FinalDayResponseForm modifiedDay, IngredientRepository ingredientRepository, Integer caloriesGoal) {
@@ -73,10 +80,7 @@ public class FinalDay {
                         .filter(finalMeal -> finalMeal.getIdFinalMeal().equals(modifiedMeal.getIdFinalMeal())).findFirst()
                         .get().modifyIngredients(modifiedMeal, ingredientRepository);
 
-            this.calories = finalMeals.stream().mapToInt(FinalMeal::getCalories).sum();
-            this.protein = finalMeals.stream().mapToInt(FinalMeal::getProtein).sum();
-            this.fats = finalMeals.stream().mapToInt(FinalMeal::getFats).sum();
-            this.carbs = finalMeals.stream().mapToInt(FinalMeal::getCarbs).sum();
+            this.calculateMacro();
         });
     }
 
@@ -101,5 +105,12 @@ public class FinalDay {
             caloriesGoals.set(caloriesGoals.size() - 1, caloriesGoals.get(caloriesGoals.size() - 1) + (caloriesGoal - caloriesGoals.stream().mapToInt(Integer::intValue).sum()));
 
         return caloriesGoals;
+    }
+
+    private void calculateMacro(){
+        this.calories = finalMeals.stream().mapToInt(FinalMeal::getCalories).sum();
+        this.protein = finalMeals.stream().mapToInt(FinalMeal::getProtein).sum();
+        this.fats = finalMeals.stream().mapToInt(FinalMeal::getFats).sum();
+        this.carbs = finalMeals.stream().mapToInt(FinalMeal::getCarbs).sum();
     }
 }
