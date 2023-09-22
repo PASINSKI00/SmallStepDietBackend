@@ -4,6 +4,7 @@ import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredient;
 import com.pasinski.sl.backend.diet.forms.FinalIngredientResponseForm;
 import com.pasinski.sl.backend.diet.forms.FinalMealResponseForm;
 import com.pasinski.sl.backend.meal.Meal;
+import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,24 +57,27 @@ public class FinalMeal {
         this.caloriesGoal = caloriesGoal;
         this.ingredientWeightMultiplier = (float) caloriesGoal / meal.getInitialCalories();
 
+        List<Ingredient> ingredientsBefore = new ArrayList<>(this.finalIngredients.stream().map(FinalIngredient::getIngredient).toList());
         this.finalIngredients.clear();
         meal.getIngredients().stream()
                 .map(mealIngredient -> new FinalIngredient(mealIngredient, ingredientWeightMultiplier))
                 .forEach(finalIngredient -> this.finalIngredients.add(finalIngredient));
+
+        this.finalIngredients.removeIf(finalIngredient -> !ingredientsBefore.contains(finalIngredient.getIngredient()));
         calculateEnergeticValues();
     }
 
-    public void modifyFinalMeal(FinalMealResponseForm finalMealResponseForm, IngredientRepository ingredientRepository) {
+    public void modifyIngredients(FinalMealResponseForm modifiedMeal, IngredientRepository ingredientRepository) {
 //        check for deleted
-        List<String> ingredientsNamesToRemove = finalMealResponseForm.getFinalIngredients().stream()
-                .filter(finalIngredientResponseForm -> finalIngredientResponseForm.getRemove() != null && finalIngredientResponseForm.getRemove())
+        List<String> ingredientsNamesToRemove = modifiedMeal.getFinalIngredients().stream()
+                .filter(modifiedIngredient -> modifiedIngredient.getRemove() != null && modifiedIngredient.getRemove())
                 .map(FinalIngredientResponseForm::getName)
                 .toList();
         this.finalIngredients.removeIf(finalIngredient -> ingredientsNamesToRemove.contains(finalIngredient.getIngredient().getName()));
 
 
 //        modify weights
-        finalMealResponseForm.getFinalIngredients().forEach((finalIngredientResponseForm) -> {
+        modifiedMeal.getFinalIngredients().forEach((finalIngredientResponseForm) -> {
             this.finalIngredients.stream()
                     .filter(finalIngredient -> finalIngredient.getIngredient().getName().equals(finalIngredientResponseForm.getName()))
                     .findFirst()
@@ -84,7 +88,7 @@ public class FinalMeal {
         });
 
 //        add new if present
-        finalMealResponseForm.getFinalIngredients().stream()
+        modifiedMeal.getFinalIngredients().stream()
                 .filter(finalIngredientResponseForm -> finalIngredientResponseForm.getIdNewIngredient() != null)
                 .forEach(finalIngredientResponseForm -> {
                     this.finalIngredients.add(new FinalIngredient(finalIngredientResponseForm, ingredientRepository));

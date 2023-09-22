@@ -155,9 +155,9 @@ public class DietController {
 
     @PutMapping("/final")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> modifyFinalDiet(@RequestBody DietResponseForm dietResponseForm) {
+    public ResponseEntity<?> modifyFinalDiet(@RequestBody DietResponseForm modifiedDiet) {
         try {
-            this.dietService.modifyFinalDiet(dietResponseForm);
+            this.dietService.modifyFinalDiet(modifiedDiet);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }

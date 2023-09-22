@@ -50,11 +50,11 @@ public class FinalDay {
         this.carbs = finalMeals.stream().mapToInt(FinalMeal::getCarbs).sum();
     }
 
-    public void modifyFinalDay(FinalDayResponseForm finalDayResponseForm, IngredientRepository ingredientRepository, Integer caloriesGoal) {
-        if (finalDayResponseForm.getFinalMeals().get(0).getPercentOfDay() != null) {
+    public void modifyFinalDay(FinalDayResponseForm modifiedDay, IngredientRepository ingredientRepository, Integer caloriesGoal) {
+        if (modifiedDay.getFinalMeals().get(0).getPercentOfDay() != null) {
             List<Integer> percents = new ArrayList<>();
-            finalDayResponseForm.getFinalMeals().forEach(finalMealResponseForm1 -> {
-                percents.add(finalMealResponseForm1.getPercentOfDay());
+            modifiedDay.getFinalMeals().forEach(modifiedMeal -> {
+                percents.add(modifiedMeal.getPercentOfDay());
             });
 
             if (percents.stream().mapToInt(Integer::intValue).sum() != 100)
@@ -62,15 +62,16 @@ public class FinalDay {
 
             List<Integer> caloriesGoals = calculateCaloriesGoalsForFinalMeals(caloriesGoal, percents);
 
-            for (int i = 0; i < finalMeals.size(); i++)
+            for (int i = 0; i < finalMeals.size(); i++) {
                 finalMeals.get(i).modifyPercentOfDay(percents.get(i), caloriesGoals.get(i));
+            }
         }
 
-        finalDayResponseForm.getFinalMeals().forEach(finalMealResponseForm -> {
-            if (finalMealResponseForm.getFinalIngredients() != null)
+        modifiedDay.getFinalMeals().forEach(modifiedMeal -> {
+            if (modifiedMeal.getFinalIngredients() != null)
                 finalMeals.stream()
-                        .filter(finalMeal -> finalMeal.getIdFinalMeal().equals(finalMealResponseForm.getIdFinalMeal())).findFirst()
-                        .get().modifyFinalMeal(finalMealResponseForm, ingredientRepository);
+                        .filter(finalMeal -> finalMeal.getIdFinalMeal().equals(modifiedMeal.getIdFinalMeal())).findFirst()
+                        .get().modifyIngredients(modifiedMeal, ingredientRepository);
 
             this.calories = finalMeals.stream().mapToInt(FinalMeal::getCalories).sum();
             this.protein = finalMeals.stream().mapToInt(FinalMeal::getProtein).sum();

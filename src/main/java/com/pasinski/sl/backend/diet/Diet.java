@@ -48,11 +48,11 @@ public class Diet {
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 
-    public void modifyDiet(DietResponseForm dietResponseForm, IngredientRepository ingredientRepository) {
-        dietResponseForm.getFinalDays().forEach(finalDayResponseForm -> {
+    public void modifyDiet(DietResponseForm modifiedDiet, IngredientRepository ingredientRepository) {
+        modifiedDiet.getFinalDays().forEach(modifiedDay -> {
             finalDays.forEach(finalDay -> {
-                if (Objects.equals(finalDayResponseForm.getIdFinalDay(), finalDay.getIdFinalDay()))
-                    finalDay.modifyFinalDay(finalDayResponseForm, ingredientRepository, appUser.getBodyInfo().getCaloriesGoal());
+                if (Objects.equals(modifiedDay.getIdFinalDay(), finalDay.getIdFinalDay()))
+                    finalDay.modifyFinalDay(modifiedDay, ingredientRepository, appUser.getBodyInfo().getCaloriesGoal());
             });
         });
     }

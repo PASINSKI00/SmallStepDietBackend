@@ -148,13 +148,13 @@ public class DietService {
         this.dietRepository.delete(diet);
     }
 
-    public void modifyFinalDiet(DietResponseForm dietResponseForm) {
-        Diet diet = this.dietRepository.findById(dietResponseForm.getIdDiet()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    public void modifyFinalDiet(DietResponseForm modifiedDiet) {
+        Diet diet = this.dietRepository.findById(modifiedDiet.getIdDiet()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        diet.modifyDiet(dietResponseForm, ingredientRepository);
+        diet.modifyDiet(modifiedDiet, ingredientRepository);
 
         this.dietRepository.save(diet);
     }
