@@ -37,12 +37,9 @@ public class DietController {
     @GetMapping("/pdf")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> generateDietPDF(@RequestParam Long idDiet) {
-        String fileName;
-        InputStreamResource inputStreamResource;
-
+        String url;
         try {
-            fileName = this.dietService.generateDietPDF(idDiet);
-            inputStreamResource = dietService.getDietPdf(fileName);
+            url = this.dietService.generateDietPDF(idDiet);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         } catch (FileNotFoundException e) {
@@ -50,9 +47,20 @@ public class DietController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(inputStreamResource);
+        return new ResponseEntity<>(url, HttpStatus.OK);
+    }
+
+    @GetMapping("/pdf/url")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getDietPDFUrl(@RequestParam Long idDiet) {
+        String url;
+        try {
+            url = this.dietService.getDietPDFUrl(idDiet);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(url, HttpStatus.OK);
     }
 
     @GetMapping("/groceries")
@@ -71,12 +79,9 @@ public class DietController {
     @GetMapping("/groceries/pdf")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> generateGroceriesPDF(@RequestParam Long idDiet) {
-        String fileName;
-        InputStreamResource inputStreamResource;
-
+        String url;
         try {
-            fileName = this.dietService.generateGroceriesPDF(idDiet);
-            inputStreamResource = dietService.getGroceriesPdf(fileName);
+            url = this.dietService.generateGroceriesPDF(idDiet);
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         } catch (FileNotFoundException e) {
@@ -84,9 +89,20 @@ public class DietController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(inputStreamResource);
+        return new ResponseEntity<>(url, HttpStatus.OK);
+    }
+
+    @GetMapping("/groceries/pdf/url")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getGroceriesPDFUrl(@RequestParam Long idDiet) {
+        String url;
+        try {
+            url = this.dietService.getGroceriesPDFUrl(idDiet);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(url, HttpStatus.OK);
     }
 
     @GetMapping("/mine")
@@ -183,18 +199,6 @@ public class DietController {
     public ResponseEntity<?> deleteDiet(@RequestParam Long idDiet) {
         try {
             this.dietService.deleteDiet(idDiet);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @DeleteMapping("/pdfs")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> clearOutPdfDirectory() {
-        try {
-            this.dietService.clearOutPdfDirectory();
         } catch (HttpClientErrorException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }

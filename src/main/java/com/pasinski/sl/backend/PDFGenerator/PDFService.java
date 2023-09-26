@@ -2,26 +2,33 @@ package com.pasinski.sl.backend.PDFGenerator;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
-import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.Diet;
 import com.pasinski.sl.backend.diet.forms.Grocery;
+import com.pasinski.sl.backend.file.FileType;
+import com.pasinski.sl.backend.file.S3Service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.UUID;
 
+import static com.pasinski.sl.backend.basic.ApplicationConstants.PATH_TO_PDF_DIRECTORY;
+
 @Service
 @AllArgsConstructor
-public class PDFGeneratorService {
+public class PDFService {
+    final String SEPARATOR = FileSystems.getDefault().getSeparator();
+    final S3Service s3Service;
 
     public String generateDietPDF(Diet diet) throws FileNotFoundException {
         Document document = new Document();
-        String fileName = "Diet_" + UUID.randomUUID() + ".pdf";
-        PdfWriter.getInstance(document, new FileOutputStream(ApplicationConstants.PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName));
+        String fileName = "Diet_" + diet.getIdDiet() + "_" +UUID.randomUUID() + ".pdf";
+        PdfWriter.getInstance(document,
+                new FileOutputStream(PATH_TO_PDF_DIRECTORY + SEPARATOR + fileName));
 
         Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 20, Font.BOLD);
         Font fontDayAndMeal = FontFactory.getFont(FontFactory.HELVETICA, 16, Font.BOLD);
@@ -67,14 +74,17 @@ public class PDFGeneratorService {
         });
 
         document.close();
+        File file = new File(PATH_TO_PDF_DIRECTORY + SEPARATOR + fileName);
+        this.s3Service.uploadFile(fileName, FileType.DIET_PDF, file);
+        file.delete();
 
         return fileName;
     }
 
-    public String generateGroceriesPDF(List<Grocery> groceries) throws FileNotFoundException {
+    public String generateGroceriesPDF(List<Grocery> groceries, Long idDiet) throws FileNotFoundException {
         Document document = new Document();
-        String fileName = "Groceries_" + UUID.randomUUID() + ".pdf";
-        PdfWriter.getInstance(document, new FileOutputStream(ApplicationConstants.PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName));
+        String fileName = "Groceries_" + idDiet + "_"  + UUID.randomUUID() + ".pdf";
+        PdfWriter.getInstance(document, new FileOutputStream(PATH_TO_PDF_DIRECTORY + FileSystems.getDefault().getSeparator() + fileName));
 
         Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA, 20, Font.BOLD);
         Font fontContentBold = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL);
@@ -91,7 +101,14 @@ public class PDFGeneratorService {
         });
 
         document.close();
-
+        File file = new File(PATH_TO_PDF_DIRECTORY + SEPARATOR + fileName);
+        this.s3Service.uploadFile(fileName, FileType.GROCERIES_PDF, file);
+        file.delete();
         return fileName;
+    }
+
+    public void deleteDietPDFs(String pdfName, String groceriesPdfName) {
+        this.s3Service.deleteFile(pdfName, FileType.DIET_PDF);
+        this.s3Service.deleteFile(groceriesPdfName, FileType.GROCERIES_PDF);
     }
 }
