@@ -1,7 +1,6 @@
 package com.pasinski.sl.backend.meal;
 
 import com.pasinski.sl.backend.config.security.UserSecurityService;
-import com.pasinski.sl.backend.file.FileType;
 import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
@@ -96,7 +95,7 @@ public class MealService {
     public MealResponseBodyExtended extendMeal(Long idMeal) {
         Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        return new MealResponseBodyExtended(meal, meal.getMealExtention());
+        return new MealResponseBodyExtended(meal.getMealExtention(), s3Service);
     }
 
     public void setImageBooleanValue(Long idMeal, Boolean value) {
