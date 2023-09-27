@@ -14,7 +14,6 @@ public class ApplicationConstants {
     public static final String APP_DIRECTORY = HOME_DIRECTORY + SPRT + "apps" + SPRT + "Dieter";
     public static final String PATH_TO_PDF_DIRECTORY = APP_DIRECTORY + SPRT + "pdfs";
 
-
     public static String getMealImageName(Long idMeal) {
         return "meal_id_" + idMeal + ".jpg";
     }
