@@ -35,8 +35,10 @@ public class FinalMealResponseForm {
         this.fats = finalMeal.getFats();
         this.carbs = finalMeal.getCarbs();
         this.percentOfDay = finalMeal.getPercentOfDay();
-        this.imageUrl = s3Service.getFileUrl("meal_id_" + finalMeal.getMeal().getIdMeal() + ".jpg", FileType.MEAL_IMAGE);
-
+        String imageName = finalMeal.getMeal().isImageSet() ?
+                ApplicationConstants.getMealImageName(finalMeal.getMeal().getIdMeal()) :
+                ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
+        this.imageUrl = s3Service.getFileUrl(imageName, FileType.MEAL_IMAGE);
         finalMeal.getFinalIngredients().forEach(finalIngredient -> this.finalIngredients.add(new FinalIngredientResponseForm(finalIngredient)));
     }
 }

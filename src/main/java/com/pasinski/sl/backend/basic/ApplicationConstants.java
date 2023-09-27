@@ -18,5 +18,13 @@ public class ApplicationConstants {
     public static final String PATH_TO_POST_IMAGES_DIRECTORY = APP_DIRECTORY + "\\images\\posts";
     public static final String PATH_TO_PDF_DIRECTORY = APP_DIRECTORY + "\\pdfs";
 
-    public static final String EMAIL_CONFIRMATION_URL = DEFAULT_APP_URL + "/api/user/verify?token=";
+    public static String getMealImageName(Long idMeal) {
+        return "meal_id_" + idMeal + ".jpg";
+    }
+
+    public static String getUserImageName(AppUser appUser) {
+        return appUser.isImageSet() ?
+                appUser.getImageName() :
+                DEFAULT_USER_IMAGE_NAME;
+    }
 }
