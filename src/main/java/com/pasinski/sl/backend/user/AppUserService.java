@@ -1,13 +1,17 @@
 package com.pasinski.sl.backend.user;
 
+import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.email.EmailSenderService;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationToken;
 import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationTokenService;
+import com.pasinski.sl.backend.file.FileType;
+import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.MealRepository;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.forms.UserForm;
+import com.pasinski.sl.backend.user.forms.UserResponseForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,13 +37,17 @@ public class AppUserService implements UserDetailsService {
     private MealRepository mealRepository;
     private UserSecurityService userSecurityService;
     private PasswordEncoder passwordEncoder;
+    private S3Service s3Service;
 
-    public AppUser getUser(Long idUser) {
-        return appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    public UserResponseForm getUser(Long idUser) {
+        AppUser appUser = appUserRepository.findById(idUser).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        String imageUrl = s3Service.getFileUrl(ApplicationConstants.getUserImageName(appUser), FileType.USER_IMAGE);
+
+        return new UserResponseForm(appUser.getName(), imageUrl);
     }
 
-    public AppUser getMe() {
-        return userSecurityService.getLoggedUser();
+    public UserResponseForm getMe() {
+        return getUser(userSecurityService.getLoggedUserId());
     }
 
     public void addUser(UserForm userForm) {
