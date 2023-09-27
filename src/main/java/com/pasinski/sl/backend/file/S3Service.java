@@ -14,7 +14,7 @@ import java.io.InputStream;
 public class S3Service {
     private final AmazonS3Client amazonS3Client;
     @Value("${AWSBucketName}")
-    String bucketName;
+    private String bucketName;
 
     public S3Service(AmazonS3Client amazonS3Client) {
         this.amazonS3Client = amazonS3Client;
