@@ -29,7 +29,7 @@ public class MealResponseBody {
         this.name = meal.getName();
         this.ingredientsNames = meal.getIngredients().stream().map(MealIngredient::getIngredient)
                 .map(Ingredient::getName).collect(Collectors.toList());
-        this.imageUrl = s3Service.getFileUrl("Meal_" + meal.getIdMeal() + ".jpg", FileType.MEAL_IMAGE);
+        this.imageUrl = s3Service.getFileUrl("meal_id_" + meal.getIdMeal() + ".jpg", FileType.MEAL_IMAGE);
         this.categoriesNames = meal.getCategories().stream().map(Category::getName).collect(Collectors.toList());
         this.avgRating = meal.getAvgRating();
         this.proteinRatio = meal.getMealExtention().getProteinRatio();
