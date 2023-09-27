@@ -114,7 +114,7 @@ public class DietService {
                 .map(FinalMeal::getMeal)
                 .filter(meal -> meal.getMealExtention().getReviews().stream().map(Review::getAuthor).noneMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId()))).collect(Collectors.toSet())
                 .stream()
-                .map(MealResponseBody::new)
+                .map(meal -> new MealResponseBody(meal, s3Service))
                 .collect(Collectors.toList());
     }
 
@@ -127,7 +127,7 @@ public class DietService {
                 .map(FinalMeal::getMeal)
                 .filter(meal -> meal.getMealExtention().getReviews().stream().map(Review::getAuthor).anyMatch(appUser1 -> Objects.equals(appUser1.getIdUser(), userSecurityService.getLoggedUserId()))).collect(Collectors.toSet())
                 .stream()
-                .map(MealResponseBody::new)
+                .map(meal -> new MealResponseBody(meal, s3Service))
                 .collect(Collectors.toList());
     }
 
