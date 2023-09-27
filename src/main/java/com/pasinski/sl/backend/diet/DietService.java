@@ -40,7 +40,7 @@ public class DietService {
         if (!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        return new DietResponseForm(diet);
+        return new DietResponseForm(diet, s3Service);
     }
 
     public Long addDiet(List<List<Long>> daysForm) {
@@ -102,7 +102,7 @@ public class DietService {
     public List<DietResponseForm> getMyDiets() {
         AppUser appUser = userSecurityService.getLoggedUser();
 
-        return dietRepository.findAllByAppUser(appUser).stream().map(DietResponseForm::new).toList();
+        return dietRepository.findAllByAppUser(appUser).stream().map(diet -> new DietResponseForm(diet, s3Service)).toList();
     }
 
     public List<MealResponseBody> getUnreviewedMealsUsedByUser() {
