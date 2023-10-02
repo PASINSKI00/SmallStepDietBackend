@@ -2,6 +2,8 @@ package com.pasinski.sl.backend.diet.forms;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
+import com.pasinski.sl.backend.file.FileType;
+import com.pasinski.sl.backend.file.S3Service;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +26,7 @@ public class FinalMealResponseForm {
 
     private String imageUrl;
 
-    public FinalMealResponseForm(FinalMeal finalMeal) {
+    public FinalMealResponseForm(FinalMeal finalMeal, S3Service s3Service) {
         this.idFinalMeal = finalMeal.getIdFinalMeal();
         this.name = finalMeal.getMeal().getName();
         this.finalIngredients = new ArrayList<>();
@@ -33,8 +35,10 @@ public class FinalMealResponseForm {
         this.fats = finalMeal.getFats();
         this.carbs = finalMeal.getCarbs();
         this.percentOfDay = finalMeal.getPercentOfDay();
-        this.imageUrl = ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + finalMeal.getMeal().getIdMeal();
-
+        String imageName = finalMeal.getMeal().isImageSet() ?
+                ApplicationConstants.getMealImageName(finalMeal.getMeal().getIdMeal()) :
+                ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
+        this.imageUrl = s3Service.getFileUrl(imageName, FileType.MEAL_IMAGE);
         finalMeal.getFinalIngredients().forEach(finalIngredient -> this.finalIngredients.add(new FinalIngredientResponseForm(finalIngredient)));
     }
 }

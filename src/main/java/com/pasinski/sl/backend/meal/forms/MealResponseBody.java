@@ -1,6 +1,8 @@
 package com.pasinski.sl.backend.meal.forms;
 
 import com.pasinski.sl.backend.basic.ApplicationConstants;
+import com.pasinski.sl.backend.file.FileType;
+import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
@@ -23,12 +25,15 @@ public class MealResponseBody {
     private Integer proteinRatio;
     private Integer timesUsed;
 
-    public MealResponseBody(Meal meal) {
+    public MealResponseBody(Meal meal, S3Service s3Service) {
         this.idMeal = meal.getIdMeal();
         this.name = meal.getName();
-        this.imageUrl = ApplicationConstants.DEFAULT_MEAL_IMAGE_URL_WITH_PARAMETER + meal.getIdMeal();
         this.ingredientsNames = meal.getIngredients().stream().map(MealIngredient::getIngredient)
                 .map(Ingredient::getName).collect(Collectors.toList());
+        String mealImageName = meal.isImageSet() ?
+                ApplicationConstants.getMealImageName(meal.getIdMeal()) :
+                ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
+        this.imageUrl = s3Service.getFileUrl(mealImageName, FileType.MEAL_IMAGE);
         this.categoriesNames = meal.getCategories().stream().map(Category::getName).collect(Collectors.toList());
         this.avgRating = meal.getAvgRating();
         this.proteinRatio = meal.getMealExtention().getProteinRatio();

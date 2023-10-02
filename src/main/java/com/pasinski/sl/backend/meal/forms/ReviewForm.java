@@ -8,5 +8,5 @@ import lombok.Setter;
 public class ReviewForm {
     private Long idMeal;
     private Integer rating;
-    private String comment;
+    private String comment = "";
 }

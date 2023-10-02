@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.meal;
 
 import com.pasinski.sl.backend.config.security.UserSecurityService;
+import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.category.CategoryRepository;
 import com.pasinski.sl.backend.meal.forms.MealForm;
@@ -32,10 +33,7 @@ public class MealService {
     private final IngredientRepository ingredientRepository;
     private final ReviewRepository reviewRepository;
     private final UserSecurityService userSecurityService;
-
-    public Meal getMealById(Long idMeal) {
-        return mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-    }
+    private final S3Service s3Service;
 
     public List<MealResponseBody> getMeals(String nameContains, String sortBy, List<String> categories, int pageNumber,
                                            int pageSize) {
@@ -44,8 +42,10 @@ public class MealService {
         categoriesList = categoriesList.isEmpty() ? null : categoriesList;
         Long categoriesSize = categoriesList == null ? 0 : (long) categoriesList.size();
 
-        return mealRepository.findMealsByNameAndCategories(nameContains, categoriesList, categoriesSize, pageable)
-                .stream().map(MealResponseBody::new).sorted(sortMap(sortBy)).collect(Collectors.toList());
+        return mealRepository
+                .findMealsByNameAndCategories(nameContains, categoriesList, categoriesSize, pageable).stream()
+                .map(meal -> new MealResponseBody(meal, s3Service))
+                .sorted(sortMap(sortBy)).collect(Collectors.toList());
     }
 
     public Long addMeal(MealForm mealForm) {
@@ -54,7 +54,6 @@ public class MealService {
 
         return mealRepository.save(new Meal(mealForm, getMealIngredientsFromMealForm(mealForm), categoryRepository.findAllById(mealForm.getCategoriesIds()), userSecurityService.getLoggedUser())).getIdMeal();
     }
-
 
     public void addReview(ReviewForm reviewForm) {
         Meal meal = mealRepository.findById(reviewForm.getIdMeal()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
@@ -96,7 +95,7 @@ public class MealService {
     public MealResponseBodyExtended extendMeal(Long idMeal) {
         Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        return new MealResponseBodyExtended(meal, meal.getMealExtention());
+        return new MealResponseBodyExtended(meal.getMealExtention(), s3Service);
     }
 
     public void setImageBooleanValue(Long idMeal, Boolean value) {

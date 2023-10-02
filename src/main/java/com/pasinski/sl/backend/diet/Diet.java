@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ public class Diet {
     @OneToMany(orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     private List<FinalDay> finalDays;
+    private String pdfName;
+    private String groceriesPdfName;
 
     @ManyToOne
     private AppUser appUser;
@@ -43,16 +47,22 @@ public class Diet {
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 
+    public void resetDay(Long idDay) {
+        this.finalDays.stream().findFirst().filter(finalDay -> finalDay.getIdFinalDay().equals(idDay))
+                .ifPresentOrElse(finalDay -> finalDay.resetDay(appUser.getBodyInfo().getCaloriesGoal()),
+                    () -> { throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Day with id " + idDay + " not found"); });
+    }
+
     public void updateDiet(List<List<Meal>> days) {
-        this.finalDays.removeAll(this.finalDays);
+        this.finalDays.clear();
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 
-    public void modifyDiet(DietResponseForm dietResponseForm, IngredientRepository ingredientRepository) {
-        dietResponseForm.getFinalDays().forEach(finalDayResponseForm -> {
+    public void modifyDiet(DietResponseForm modifiedDiet, IngredientRepository ingredientRepository) {
+        modifiedDiet.getFinalDays().forEach(modifiedDay -> {
             finalDays.forEach(finalDay -> {
-                if (Objects.equals(finalDayResponseForm.getIdFinalDay(), finalDay.getIdFinalDay()))
-                    finalDay.modifyFinalDay(finalDayResponseForm, ingredientRepository, appUser.getBodyInfo().getCaloriesGoal());
+                if (Objects.equals(modifiedDay.getIdFinalDay(), finalDay.getIdFinalDay()))
+                    finalDay.modifyFinalDay(modifiedDay, ingredientRepository, appUser.getBodyInfo().getCaloriesGoal());
             });
         });
     }
