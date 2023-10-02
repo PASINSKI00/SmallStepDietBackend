@@ -2,6 +2,8 @@ package com.pasinski.sl.backend.basic;
 
 import com.pasinski.sl.backend.user.AppUser;
 
+import java.util.UUID;
+
 public class ApplicationConstants {
     public static final String DEFAULT_APP_URL = "http://localhost:8080";
     public static final String EMAIL_CONFIRMATION_URL = DEFAULT_APP_URL + "/api/user/verify?token=";
@@ -19,8 +21,6 @@ public class ApplicationConstants {
     }
 
     public static String getUserImageName(AppUser appUser) {
-        return appUser.isImageSet() ?
-                appUser.getImageName() :
-                DEFAULT_USER_IMAGE_NAME;
+        return appUser.isImageSet() ? appUser.getImageName() : DEFAULT_USER_IMAGE_NAME;
     }
 }
