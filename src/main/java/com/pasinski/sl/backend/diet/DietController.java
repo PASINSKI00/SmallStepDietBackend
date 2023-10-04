@@ -4,15 +4,12 @@ import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import lombok.AllArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 @RestController
@@ -34,35 +31,6 @@ public class DietController {
         return new ResponseEntity<>(dietResponseForm, HttpStatus.OK);
     }
 
-    @GetMapping("/pdf")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> generateDietPDF(@RequestParam Long idDiet) {
-        String url;
-        try {
-            url = this.dietService.generateDietPDF(idDiet);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(url, HttpStatus.OK);
-    }
-
-    @GetMapping("/pdf/url")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getDietPDFUrl(@RequestParam Long idDiet) {
-        String url;
-        try {
-            url = this.dietService.getDietPDFUrl(idDiet);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return new ResponseEntity<>(url, HttpStatus.OK);
-    }
-
     @GetMapping("/groceries")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getGroceries(@RequestParam Long idDiet) {
@@ -74,35 +42,6 @@ public class DietController {
         }
 
         return new ResponseEntity<>(groceries, HttpStatus.OK);
-    }
-
-    @GetMapping("/groceries/pdf")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> generateGroceriesPDF(@RequestParam Long idDiet) {
-        String url;
-        try {
-            url = this.dietService.generateGroceriesPDF(idDiet);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(url, HttpStatus.OK);
-    }
-
-    @GetMapping("/groceries/pdf/url")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getGroceriesPDFUrl(@RequestParam Long idDiet) {
-        String url;
-        try {
-            url = this.dietService.getGroceriesPDFUrl(idDiet);
-        } catch (HttpClientErrorException e) {
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-
-        return new ResponseEntity<>(url, HttpStatus.OK);
     }
 
     @GetMapping("/mine")

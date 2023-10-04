@@ -35,8 +35,6 @@ public class Diet {
     @OneToMany(orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     private List<FinalDay> finalDays;
-    private String pdfName;
-    private String groceriesPdfName;
 
     @ManyToOne
     private AppUser appUser;
