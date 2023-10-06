@@ -138,4 +138,14 @@ public class DietService {
         diet.resetDay(idDay);
         this.dietRepository.save(diet);
     }
+
+    public void reCalculate(Long idDiet) {
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+
+        diet.reCalculate();
+        this.dietRepository.save(diet);
+    }
 }

@@ -45,6 +45,10 @@ public class Diet {
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 
+    public void reCalculate() {
+        this.finalDays.forEach(finalDay -> this.resetDay(finalDay.getIdFinalDay()));
+    }
+
     public void resetDay(Long idDay) {
         this.finalDays.stream().findFirst().filter(finalDay -> finalDay.getIdFinalDay().equals(idDay))
                 .ifPresentOrElse(finalDay -> finalDay.resetDay(appUser.getBodyInfo().getCaloriesGoal()),

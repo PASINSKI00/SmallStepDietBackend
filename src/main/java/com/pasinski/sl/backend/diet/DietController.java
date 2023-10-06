@@ -132,6 +132,18 @@ public class DietController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PutMapping("/final/recalculate")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> reCalculate(@RequestParam Long idDiet) {
+        try {
+            this.dietService.reCalculate(idDiet);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
