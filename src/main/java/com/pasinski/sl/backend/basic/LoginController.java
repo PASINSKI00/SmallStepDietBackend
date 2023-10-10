@@ -10,14 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-public class BasicController {
+public class LoginController {
 
     private UserSecurityService userSecurityService;
-
-    @GetMapping("/hello")
-    public String helloWorld() {
-        return "Hello";
-    }
 
     @GetMapping("/api/login")
     @PreAuthorize("isAuthenticated()")
