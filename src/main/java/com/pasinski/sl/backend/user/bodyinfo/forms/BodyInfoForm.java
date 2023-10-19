@@ -31,8 +31,8 @@ public class BodyInfoForm {
     private Gender gender;
 
     @NotNull
-    @DecimalMin(value = "1.39", message = "PAL must be between 1.4 and 2.4")
-    @DecimalMax(value = "2.41", message = "PAL must be between 1.4 and 2.4")
+    @DecimalMin(value = "1.39", message = "PAL must be between 1.4 and 2.5")
+    @DecimalMax(value = "2.51", message = "PAL must be between 1.4 and 2.5")
     private Float pal;
 
     @NotNull
