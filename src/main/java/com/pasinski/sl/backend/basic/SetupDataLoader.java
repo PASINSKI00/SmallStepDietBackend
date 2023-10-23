@@ -141,18 +141,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     private void addMeals() {
-        addMeal("Meal1");
-        addMeal("Meal2");
-        addMeal("Meal3");
-        addMeal("Meal4");
-        addMeal("Meal5");
-        addMeal("Meal6");
-        addMeal("Meal7");
-        addMeal("Meal8");
-        addMeal("Meal9");
-        addMeal("Meal10");
-        addMeal("Meal11");
-        addMeal("Meal12");
+        for(int i = 0; i < 100; i++) {
+            addMeal("Meal " + i);
+        }
     }
 
     private void addMeal(String name) {
