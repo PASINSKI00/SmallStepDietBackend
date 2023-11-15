@@ -25,6 +25,7 @@ public class BodyInfoForm {
     private Integer weight;
 
     @NotNull
+    @DecimalMin(value = "13", message = "You must be at least 13 years old to use our service")
     private Integer age;
 
     @NotNull
