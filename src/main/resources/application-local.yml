@@ -1,8 +1,6 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:49153/postgres
-    username: postgres
-    password: postgrespw
+  config:
+    import: secrets-local.yaml
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -24,9 +22,6 @@ cloud:
       auto: false
     stack:
       auto: false
-    credentials:
-        accessKey:
-        secretKey:
 
 logging:
   level:
