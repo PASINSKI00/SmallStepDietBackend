@@ -116,13 +116,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
-				</configuration>
-			</plugin>
 
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
 					<image>
 						<name>registry.digitalocean.com/container-registry-smallstepdiet/${project.artifactId}:${project.version}</name>
 					</image>
