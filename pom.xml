@@ -124,4 +124,29 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>publish-image</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<image>
+								<publish>true</publish>
+							</image>
+							<docker>
+								<publishRegistry>
+									<username>${env.DO_TOKEN}</username>
+									<password>${env.DO_TOKEN}</password>
+								</publishRegistry>
+							</docker>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
