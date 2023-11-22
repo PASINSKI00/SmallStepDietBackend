@@ -99,7 +99,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>smallstepdiet-backend-${activeProfile}-${project.version}</finalName>
+		<finalName>smallstepdiet-backend-${project.version}</finalName>
 
 		<plugins>
 			<plugin>
