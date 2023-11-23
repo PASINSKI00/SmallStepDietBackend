@@ -21,4 +21,8 @@ public class UserMonitoring {
     private Long appUserId;
 
     private Timestamp createdOn = new Timestamp(new Date().getTime());
+
+    public UserMonitoring(Long appUserId) {
+        this.appUserId = appUserId;
+    }
 }
