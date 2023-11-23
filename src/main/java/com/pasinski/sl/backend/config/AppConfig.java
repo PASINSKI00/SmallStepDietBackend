@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.config;
 
 import com.pasinski.sl.backend.config.security.UserSecurityService;
+import com.pasinski.sl.backend.interceptors.AppUserInterceptor;
 import com.pasinski.sl.backend.user.AppUserRepository;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
@@ -19,5 +20,10 @@ public class AppConfig {
     @Bean
     public ErrorAttributes errorAttributes() {
         return new CustomErrorAttributes();
+    }
+
+    @Bean
+    public AppUserInterceptor appUserInterceptor() {
+        return new AppUserInterceptor();
     }
 }
