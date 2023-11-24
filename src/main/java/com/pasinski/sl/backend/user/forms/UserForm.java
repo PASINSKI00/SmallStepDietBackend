@@ -1,7 +1,6 @@
 package com.pasinski.sl.backend.user.forms;
 
 import com.pasinski.sl.backend.util.annotations.Password;
-import lombok.Getter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
