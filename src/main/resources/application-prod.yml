@@ -1,6 +1,6 @@
 spring:
   config:
-    import: secrets-dev.yaml
+    import: secrets-prod.yaml
   jpa:
     hibernate:
       ddl-auto: update
