@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BaseForIntegrationTesting {
     protected static String userAuthorizationHeader;
+    protected static String adminUserAuthorizationHeader;
     static String host = "http://localhost:8080";
     static HttpClient httpClient = HttpClient.newHttpClient();
     static Gson gson = new Gson();
@@ -24,12 +25,13 @@ public class BaseForIntegrationTesting {
     @BeforeAll
     public static void setUpUsers() throws IOException, InterruptedException {
         userAuthorizationHeader = createUser("Charlie", "email@email.com", "Password1");
-        System.out.println("userAuthorizationHeader: " + userAuthorizationHeader);
+        String adminCredentials = "admin@email.com:Password1";
+        adminUserAuthorizationHeader = "Basic " + Base64.getEncoder().encodeToString(adminCredentials.getBytes(StandardCharsets.UTF_8));
     }
 
     @AfterAll
     public static void deleteUsers() throws IOException, InterruptedException {
-        deleteUser();
+        deleteUser(userAuthorizationHeader);
     }
 
     private static String createUser(String name, String email, String password) throws IOException, InterruptedException {
@@ -48,15 +50,13 @@ public class BaseForIntegrationTesting {
         return "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     }
 
-    private static void deleteUser() throws IOException, InterruptedException {
+    private static void deleteUser(String authorizationHeader) throws IOException, InterruptedException {
         String url = host + "/api/user";
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .DELETE()
-                .header("Authorization", userAuthorizationHeader)
+                .header("Authorization", authorizationHeader)
                 .build();
-
-
 
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
