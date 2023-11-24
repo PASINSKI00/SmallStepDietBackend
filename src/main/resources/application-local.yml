@@ -8,12 +8,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    defer-datasource-initialization: true
   jackson:
     default-property-inclusion: non_null
-  sql:
-    init:
-      mode: always
 
 cloud:
   aws:
