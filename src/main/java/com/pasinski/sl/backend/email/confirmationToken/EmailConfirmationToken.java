@@ -4,6 +4,8 @@ import com.pasinski.sl.backend.user.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -30,6 +32,7 @@ public class EmailConfirmationToken {
     private LocalDateTime confirmedAt;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private AppUser appUser;
 
     public EmailConfirmationToken(String token, AppUser appUser) {
