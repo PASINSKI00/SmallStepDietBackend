@@ -54,10 +54,10 @@ public class AppUserService implements UserDetailsService {
     }
 
     public void addUser(UserForm userForm) {
-        if (userSecurityService.isEmailTaken(userForm.getEmail()))
+        if (userSecurityService.isEmailTaken(userForm.email()))
             throw new HttpClientErrorException(HttpStatus.CONFLICT);
 
-        AppUser appUser = new AppUser(userForm.getName(), userForm.getEmail(), passwordEncoder.encode(userForm.getPassword()));
+        AppUser appUser = new AppUser(userForm.name(), userForm.email(), passwordEncoder.encode(userForm.password()));
 
         appUserRepository.save(appUser);
         userMonitoringRepository.save(new UserMonitoring(appUser, Action.CREATE));
@@ -80,14 +80,14 @@ public class AppUserService implements UserDetailsService {
     }
 
     private void applyChanges(AppUser appUser, UserForm userForm) {
-        if (userForm.getName() != null && !userForm.getName().isEmpty() && !userForm.getName().isBlank())
-            appUser.setName(userForm.getName());
+        if (userForm.name() != null && !userForm.name().isEmpty() && !userForm.name().isBlank())
+            appUser.setName(userForm.name());
 
-        if (userForm.getEmail() != null && !userForm.getEmail().isBlank() && !userForm.getEmail().isEmpty())
-            appUser.setEmail(userForm.getEmail());
+        if (userForm.email() != null && !userForm.email().isBlank() && !userForm.email().isEmpty())
+            appUser.setEmail(userForm.email());
 
-        if (userForm.getPassword() != null && !userForm.getPassword().isBlank() && !userForm.getPassword().isEmpty())
-            appUser.setPassword(userForm.getPassword());
+        if (userForm.password() != null && !userForm.password().isBlank() && !userForm.password().isEmpty())
+            appUser.setPassword(userForm.password());
     }
 
     public void deleteUserOwnAccount() {

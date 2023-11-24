@@ -6,16 +6,15 @@ import lombok.Getter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-@Getter
-public class UserForm {
+public record UserForm (
     @NotBlank(message = "Name is mandatory")
-    private String name;
+    String name,
 
     @NotBlank(message = "Email is mandatory")
     @Email(message = "Email should be valid")
-    private String email;
+    String email,
 
     @NotBlank(message = "Password is mandatory")
     @Password
-    private String password;
-}
+    String password
+) {}
