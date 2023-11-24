@@ -64,8 +64,12 @@ public class AppUserService implements UserDetailsService {
                 appUser
         );
 
-        emailConfirmationTokenService.saveEmailConfirmationToken(emailConfirmationToken);
-
+//        String token = UUID.randomUUID().toString();
+//        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
+//                token,
+//                appUser
+//        );
+//        emailConfirmationTokenService.saveEmailConfirmationToken(emailConfirmationToken);
 //        emailSenderService.emailAddressVerification(appUser, emailConfirmationToken);
     }
 
