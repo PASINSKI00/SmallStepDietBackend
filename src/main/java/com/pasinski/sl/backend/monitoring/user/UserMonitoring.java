@@ -1,5 +1,7 @@
 package com.pasinski.sl.backend.monitoring.user;
 
+import com.pasinski.sl.backend.monitoring.Action;
+import com.pasinski.sl.backend.user.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,10 +21,13 @@ public class UserMonitoring {
     private Long id_user_monitoring_entity;
 
     private Long appUserId;
+    @Enumerated(EnumType.STRING)
+    private Action action;
 
-    private Timestamp createdOn = new Timestamp(new Date().getTime());
+    private Timestamp timestamp = new Timestamp(new Date().getTime());
 
-    public UserMonitoring(Long appUserId) {
-        this.appUserId = appUserId;
+    public UserMonitoring(AppUser appUser, Action action) {
+        this.appUserId = appUser.getIdUser();
+        this.action = action;
     }
 }

@@ -8,6 +8,9 @@ import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationTokenSer
 import com.pasinski.sl.backend.file.FileType;
 import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.MealRepository;
+import com.pasinski.sl.backend.monitoring.Action;
+import com.pasinski.sl.backend.monitoring.user.UserMonitoring;
+import com.pasinski.sl.backend.monitoring.user.UserMonitoringRepository;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.forms.UserForm;
@@ -26,7 +29,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +36,7 @@ public class AppUserService implements UserDetailsService {
     private final EmailConfirmationTokenService emailConfirmationTokenService;
     private final EmailSenderService emailSenderService;
     private AppUserRepository appUserRepository;
+    private UserMonitoringRepository userMonitoringRepository;
     private MealRepository mealRepository;
     private UserSecurityService userSecurityService;
     private PasswordEncoder passwordEncoder;
@@ -57,12 +60,7 @@ public class AppUserService implements UserDetailsService {
         AppUser appUser = new AppUser(userForm.getName(), userForm.getEmail(), passwordEncoder.encode(userForm.getPassword()));
 
         appUserRepository.save(appUser);
-
-        String token = UUID.randomUUID().toString();
-        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
-                token,
-                appUser
-        );
+        userMonitoringRepository.save(new UserMonitoring(appUser, Action.CREATE));
 
 //        String token = UUID.randomUUID().toString();
 //        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
@@ -100,6 +98,7 @@ public class AppUserService implements UserDetailsService {
             mealRepository.save(meal);
         });
 
+        userMonitoringRepository.save(new UserMonitoring(appUser, Action.DELETE));
         appUserRepository.delete(appUser);
     }
 
