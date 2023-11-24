@@ -1,11 +1,9 @@
 package com.pasinski.sl.backend.integration;
 
 import com.google.gson.Gson;
-import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.forms.UserForm;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
