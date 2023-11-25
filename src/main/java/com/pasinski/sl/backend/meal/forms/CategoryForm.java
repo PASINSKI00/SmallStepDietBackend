@@ -4,8 +4,7 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 
-@Getter
-public class CategoryForm {
+public record CategoryForm (
     @NotNull
-    private String name;
-}
+    String name
+) {}

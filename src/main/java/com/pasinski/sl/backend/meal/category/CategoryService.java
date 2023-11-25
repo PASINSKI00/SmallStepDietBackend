@@ -18,7 +18,7 @@ public class CategoryService {
     public void addCategory(CategoryForm categoryForm) {
         Category category = new Category();
 
-        category.setName(categoryForm.getName());
+        category.setName(categoryForm.name());
 
         categoryRepository.save(category);
     }
