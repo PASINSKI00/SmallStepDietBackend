@@ -13,8 +13,10 @@ import com.pasinski.sl.backend.user.accessManagment.PrivilegeRepository;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.accessManagment.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,11 +42,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final AuthenticationManager authenticationManager;
     boolean alreadySetup = false;
 
+    @Autowired
+    private Environment environment;
+
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (alreadySetup)
+        if (alreadySetup || !environment.matchesProfiles("local"))
             return;
 
         addUsers();
