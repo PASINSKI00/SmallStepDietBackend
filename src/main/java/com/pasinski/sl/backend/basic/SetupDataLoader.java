@@ -162,7 +162,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredientsIds.put(2L, 150);
         mealForm.setIngredients(ingredientsIds);
 
-        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken("email@email.com", "Password1!");
+        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken("admin@email.com", "Password1");
         Authentication authentication = authenticationManager.authenticate(authReq);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
