@@ -7,7 +7,7 @@
           <option name="delegateBuildToMaven" value="false" />
           <option name="environmentProperties">
             <map>
-              <entry key="DO_TOKEN" value="dop_v1_bcd588c0dc67ecb0c4b87a381326177157353deb6d8fff53ed2d9782b22c3f7d" />
+              <entry key="DO_TOKEN" value="dop_v1_3d26dd2579db4918b1cf5437e0e966a9996cb0c6a6b40712c13bc0205b34d800" />
             </map>
           </option>
           <option name="jreName" value="#USE_PROJECT_JDK" />
