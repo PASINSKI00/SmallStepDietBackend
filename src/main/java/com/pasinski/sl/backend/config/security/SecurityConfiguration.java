@@ -41,10 +41,6 @@ public class SecurityConfiguration {
                 .cors().and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests((authz) ->
-                        authz
-                                .antMatchers("/api/login").authenticated()
-                                .antMatchers("/api/user").permitAll())
                 .httpBasic();
 
         return http.build();
