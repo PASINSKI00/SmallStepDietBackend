@@ -1,11 +1,9 @@
 package com.pasinski.sl.backend.diet;
 
-import com.pasinski.sl.backend.PDFGenerator.PDFService;
 import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
-import com.pasinski.sl.backend.file.FileType;
 import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
@@ -18,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +27,6 @@ public class DietService {
     private final DietRepository dietRepository;
     private final MealRepository mealRepository;
     private final UserSecurityService userSecurityService;
-    private final PDFService pdfService;
     private final IngredientRepository ingredientRepository;
     private final S3Service s3Service;
 
@@ -61,42 +57,12 @@ public class DietService {
         this.dietRepository.save(diet);
     }
 
-    public String generateDietPDF(Long idDiet) throws FileNotFoundException {
-        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        if(diet.getPdfName() != null)
-            return this.s3Service.getFileUrl(diet.getPdfName(), FileType.DIET_PDF);
-
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-
-        String pdfName = this.pdfService.generateDietPDF(diet);
-        diet.setPdfName(pdfName);
-        this.dietRepository.save(diet);
-
-        return this.s3Service.getFileUrl(pdfName, FileType.DIET_PDF);
-    }
-
     public List<Grocery> getGroceries(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
         if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
         return diet.getGroceries().stream().toList();
-    }
-
-    public String generateGroceriesPDF(Long idDiet) throws FileNotFoundException {
-        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        if(diet.getGroceriesPdfName() != null)
-            return this.s3Service.getFileUrl(diet.getGroceriesPdfName(), FileType.GROCERIES_PDF);
-
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-
-        String pdfName = this.pdfService.generateGroceriesPDF(diet.getGroceries().stream().toList(), diet.getIdDiet());
-        diet.setGroceriesPdfName(pdfName);
-        this.dietRepository.save(diet);
-
-        return this.s3Service.getFileUrl(pdfName, FileType.GROCERIES_PDF);
     }
 
     public List<DietResponseForm> getMyDiets() {
@@ -137,7 +103,6 @@ public class DietService {
         if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        this.pdfService.deleteDietPDFs(diet.getPdfName(), diet.getGroceriesPdfName());
         this.dietRepository.delete(diet);
     }
 
@@ -174,25 +139,13 @@ public class DietService {
         this.dietRepository.save(diet);
     }
 
-    public String getGroceriesPDFUrl(Long idDiet) {
+    public void reCalculate(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        if(diet.getGroceriesPdfName() == null)
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "PDF not found");
 
         if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 
-        return this.s3Service.getFileUrl(diet.getGroceriesPdfName(), FileType.GROCERIES_PDF);
-    }
-
-    public String getDietPDFUrl(Long idDiet) {
-        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        if(diet.getPdfName() == null)
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "PDF not found");
-
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
-
-        return this.s3Service.getFileUrl(diet.getPdfName(), FileType.DIET_PDF);
+        diet.reCalculate();
+        this.dietRepository.save(diet);
     }
 }

@@ -13,8 +13,10 @@ import com.pasinski.sl.backend.user.accessManagment.PrivilegeRepository;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.accessManagment.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,11 +42,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private final AuthenticationManager authenticationManager;
     boolean alreadySetup = false;
 
+    @Autowired
+    private Environment environment;
+
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        if (alreadySetup)
+        if (alreadySetup || !environment.matchesProfiles("local"))
             return;
 
         addUsers();
@@ -91,9 +96,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         AppUser user = new AppUser();
-        user.setName("Charlie");
-        user.setPassword(passwordEncoder.encode("Password1!"));
-        user.setEmail("email@email.com");
+        user.setName("Admin");
+        user.setPassword(passwordEncoder.encode("Password1"));
+        user.setEmail("admin@email.com");
         user.setRoles(Collections.singletonList(adminRole));
         appUserRepository.save(user);
     }
@@ -141,18 +146,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     private void addMeals() {
-        addMeal("Meal1");
-        addMeal("Meal2");
-        addMeal("Meal3");
-        addMeal("Meal4");
-        addMeal("Meal5");
-        addMeal("Meal6");
-        addMeal("Meal7");
-        addMeal("Meal8");
-        addMeal("Meal9");
-        addMeal("Meal10");
-        addMeal("Meal11");
-        addMeal("Meal12");
+        for(int i = 0; i < 100; i++) {
+            addMeal("Meal " + i);
+        }
     }
 
     private void addMeal(String name) {
@@ -166,7 +162,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         ingredientsIds.put(2L, 150);
         mealForm.setIngredients(ingredientsIds);
 
-        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken("email@email.com", "Password1!");
+        UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken("admin@email.com", "Password1");
         Authentication authentication = authenticationManager.authenticate(authReq);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);

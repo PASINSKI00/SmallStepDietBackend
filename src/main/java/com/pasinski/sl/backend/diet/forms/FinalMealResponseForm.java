@@ -23,7 +23,7 @@ public class FinalMealResponseForm {
     private Integer fats;
     private Integer carbs;
     private Integer percentOfDay;
-
+    private String recipe;
     private String imageUrl;
 
     public FinalMealResponseForm(FinalMeal finalMeal, S3Service s3Service) {
@@ -39,6 +39,7 @@ public class FinalMealResponseForm {
                 ApplicationConstants.getMealImageName(finalMeal.getMeal().getIdMeal()) :
                 ApplicationConstants.DEFAULT_MEAL_IMAGE_NAME;
         this.imageUrl = s3Service.getFileUrl(imageName, FileType.MEAL_IMAGE);
+        this.recipe = finalMeal.getMeal().getMealExtention().getRecipe();
         finalMeal.getFinalIngredients().forEach(finalIngredient -> this.finalIngredients.add(new FinalIngredientResponseForm(finalIngredient)));
     }
 }

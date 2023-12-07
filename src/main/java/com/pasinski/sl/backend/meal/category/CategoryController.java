@@ -4,6 +4,7 @@ import com.pasinski.sl.backend.meal.forms.CategoryForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -30,6 +31,7 @@ public class CategoryController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addCategory(@Valid @RequestBody CategoryForm categoryForm) {
         try {
             categoryService.addCategory(categoryForm);

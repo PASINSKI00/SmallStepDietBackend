@@ -35,8 +35,6 @@ public class Diet {
     @OneToMany(orphanRemoval = true)
     @Cascade(CascadeType.ALL)
     private List<FinalDay> finalDays;
-    private String pdfName;
-    private String groceriesPdfName;
 
     @ManyToOne
     private AppUser appUser;
@@ -47,10 +45,14 @@ public class Diet {
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 
+    public void reCalculate() {
+        this.finalDays.forEach(finalDay -> this.resetDay(finalDay.getIdFinalDay()));
+    }
+
     public void resetDay(Long idDay) {
-        this.finalDays.stream().findFirst().filter(finalDay -> finalDay.getIdFinalDay().equals(idDay))
-                .ifPresentOrElse(finalDay -> finalDay.resetDay(appUser.getBodyInfo().getCaloriesGoal()),
-                    () -> { throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Day with id " + idDay + " not found"); });
+        this.finalDays.stream().filter(finalDay -> Objects.equals(finalDay.getIdFinalDay(), idDay))
+                .findFirst().ifPresentOrElse(finalDay -> finalDay.resetDay(appUser.getBodyInfo().getCaloriesGoal()),
+                        () -> { throw new HttpClientErrorException(HttpStatus.NOT_FOUND); });
     }
 
     public void updateDiet(List<List<Meal>> days) {

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -14,14 +14,15 @@ public class MonitoringService {
     private final UserMonitoringRepository userMonitoringRepository;
 
     public UserMonitoringForm getUserMonitoringInfo() {
+        Timestamp today = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp dayAgo = Timestamp.valueOf(LocalDateTime.now().minusDays(1));
+        Timestamp weekAgo = Timestamp.valueOf(LocalDateTime.now().minusDays(7));
+
         return new UserMonitoringForm(
-                Math.toIntExact(userMonitoringRepository.count()),
-                Math.toIntExact(userMonitoringRepository.findAllByCreatedOnBetween(
-                        Timestamp.from(java.time.Instant.now().minus(1, ChronoUnit.DAYS)),
-                        Timestamp.from(java.time.Instant.now())).size()),
-                Math.toIntExact(userMonitoringRepository.findAllByCreatedOnBetween(
-                        Timestamp.from(java.time.Instant.now().minus(7, ChronoUnit.DAYS)),
-                        Timestamp.from(java.time.Instant.now())).size())
+                userMonitoringRepository.countByActionEquals(Action.CREATE),
+                userMonitoringRepository.countByTimestampBetweenAndAction(dayAgo, today, Action.CREATE),
+                userMonitoringRepository.countByTimestampBetweenAndAction(weekAgo, today, Action.CREATE),
+                userMonitoringRepository.countByActionEquals(Action.DELETE)
         );
     }
 }

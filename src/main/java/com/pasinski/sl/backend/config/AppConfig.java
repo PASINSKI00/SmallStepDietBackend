@@ -20,4 +20,5 @@ public class AppConfig {
     public ErrorAttributes errorAttributes() {
         return new CustomErrorAttributes();
     }
+
 }

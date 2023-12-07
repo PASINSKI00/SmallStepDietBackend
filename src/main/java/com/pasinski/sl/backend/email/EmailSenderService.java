@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class EmailSenderService {
 
     @Async
+//    TODO: Before activating validate that OnDelete.Cascade doesn't delete user
     public void emailAddressVerification(AppUser appUser, EmailConfirmationToken token) {
         Email email = new Email();
 

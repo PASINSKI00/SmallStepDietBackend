@@ -95,7 +95,7 @@ public class MealService {
     public MealResponseBodyExtended extendMeal(Long idMeal) {
         Meal meal = mealRepository.findById(idMeal).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        return new MealResponseBodyExtended(meal.getMealExtention(), s3Service);
+        return new MealResponseBodyExtended(meal, s3Service);
     }
 
     public void setImageBooleanValue(Long idMeal, Boolean value) {

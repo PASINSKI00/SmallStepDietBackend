@@ -7,23 +7,21 @@ import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.category.Category;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.mealIngredient.MealIngredient;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 @Getter
 public class MealResponseBody {
-    private Long idMeal;
-    private String name;
-    private String imageUrl;
-    private List<String> ingredientsNames;
-    private List<String> categoriesNames;
-    private Float avgRating;
-    private Integer proteinRatio;
-    private Integer timesUsed;
+    private final Long idMeal;
+    private final String name;
+    private final String imageUrl;
+    private final List<String> ingredientsNames;
+    private final List<String> categoriesNames;
+    private final Float avgRating;
+    private final Integer proteinRatio;
+    private final Integer timesUsed;
 
     public MealResponseBody(Meal meal, S3Service s3Service) {
         this.idMeal = meal.getIdMeal();

@@ -1,8 +1,10 @@
 package com.pasinski.sl.backend.config.security;
 
 import com.pasinski.sl.backend.user.AppUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,11 +19,21 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration {
+    @Autowired
+    private Environment environment;
+    Map<String, List<String>> allowedOrigins = new HashMap<>() {{
+        put("local", List.of("http://localhost:4200"));
+        put("dev", List.of("https://dev.smallstepdiet.com"));
+        put("prod", List.of("https://smallstepdiet.com"));
+    }};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,10 +41,6 @@ public class SecurityConfiguration {
                 .cors().and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests((authz) ->
-                        authz
-                                .antMatchers("/api/login").authenticated()
-                                .antMatchers("/api/user").permitAll())
                 .httpBasic();
 
         return http.build();
@@ -54,9 +62,11 @@ public class SecurityConfiguration {
 
     @Bean
     public CorsFilter corsFilter() {
+        String activeEnv = environment.getActiveProfiles()[0];
+
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:8080"));
+        corsConfiguration.setAllowedOrigins(allowedOrigins.get(activeEnv));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
                 "Accept", "Authorization", "Origin, Accept", "X-Requested-With",
                 "Access-Control-Request-Method", "Access-Control-Request-Headers"));

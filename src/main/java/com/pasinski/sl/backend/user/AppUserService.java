@@ -8,6 +8,9 @@ import com.pasinski.sl.backend.email.confirmationToken.EmailConfirmationTokenSer
 import com.pasinski.sl.backend.file.FileType;
 import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.MealRepository;
+import com.pasinski.sl.backend.monitoring.Action;
+import com.pasinski.sl.backend.monitoring.user.UserMonitoring;
+import com.pasinski.sl.backend.monitoring.user.UserMonitoringRepository;
 import com.pasinski.sl.backend.user.accessManagment.Privilege;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.forms.UserForm;
@@ -26,7 +29,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +36,7 @@ public class AppUserService implements UserDetailsService {
     private final EmailConfirmationTokenService emailConfirmationTokenService;
     private final EmailSenderService emailSenderService;
     private AppUserRepository appUserRepository;
+    private UserMonitoringRepository userMonitoringRepository;
     private MealRepository mealRepository;
     private UserSecurityService userSecurityService;
     private PasswordEncoder passwordEncoder;
@@ -51,21 +54,20 @@ public class AppUserService implements UserDetailsService {
     }
 
     public void addUser(UserForm userForm) {
-        if (userSecurityService.isEmailTaken(userForm.getEmail()))
+        if (userSecurityService.isEmailTaken(userForm.email()))
             throw new HttpClientErrorException(HttpStatus.CONFLICT);
 
-        AppUser appUser = new AppUser(userForm.getName(), userForm.getEmail(), passwordEncoder.encode(userForm.getPassword()));
+        AppUser appUser = new AppUser(userForm.name(), userForm.email(), passwordEncoder.encode(userForm.password()));
 
         appUserRepository.save(appUser);
+        userMonitoringRepository.save(new UserMonitoring(appUser, Action.CREATE));
 
-        String token = UUID.randomUUID().toString();
-        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
-                token,
-                appUser
-        );
-
-        emailConfirmationTokenService.saveEmailConfirmationToken(emailConfirmationToken);
-
+//        String token = UUID.randomUUID().toString();
+//        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
+//                token,
+//                appUser
+//        );
+//        emailConfirmationTokenService.saveEmailConfirmationToken(emailConfirmationToken);
 //        emailSenderService.emailAddressVerification(appUser, emailConfirmationToken);
     }
 
@@ -78,14 +80,14 @@ public class AppUserService implements UserDetailsService {
     }
 
     private void applyChanges(AppUser appUser, UserForm userForm) {
-        if (userForm.getName() != null && !userForm.getName().isEmpty() && !userForm.getName().isBlank())
-            appUser.setName(userForm.getName());
+        if (userForm.name() != null && !userForm.name().isEmpty() && !userForm.name().isBlank())
+            appUser.setName(userForm.name());
 
-        if (userForm.getEmail() != null && !userForm.getEmail().isBlank() && !userForm.getEmail().isEmpty())
-            appUser.setEmail(userForm.getEmail());
+        if (userForm.email() != null && !userForm.email().isBlank() && !userForm.email().isEmpty())
+            appUser.setEmail(userForm.email());
 
-        if (userForm.getPassword() != null && !userForm.getPassword().isBlank() && !userForm.getPassword().isEmpty())
-            appUser.setPassword(userForm.getPassword());
+        if (userForm.password() != null && !userForm.password().isBlank() && !userForm.password().isEmpty())
+            appUser.setPassword(userForm.password());
     }
 
     public void deleteUserOwnAccount() {
@@ -96,6 +98,7 @@ public class AppUserService implements UserDetailsService {
             mealRepository.save(meal);
         });
 
+        userMonitoringRepository.save(new UserMonitoring(appUser, Action.DELETE));
         appUserRepository.delete(appUser);
     }
 

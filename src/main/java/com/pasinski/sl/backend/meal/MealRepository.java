@@ -17,7 +17,8 @@ public interface MealRepository extends JpaRepository<Meal, Long> {
             "WHERE m.name LIKE CONCAT('%', :name, '%') " +
             "AND (c IN :categories OR :categories IS NULL) " +
             "GROUP BY m " +
-            "HAVING COUNT(DISTINCT c) >= :categoriesCount")
+            "HAVING COUNT(DISTINCT c) >= :categoriesCount " +
+            "ORDER BY m.idMeal ASC")
     Page<Meal> findMealsByNameAndCategories(@Param("name") String name, @Param("categories") List<Category> categories,
                                             @Param("categoriesCount") Long categoriesCount, Pageable pageable);
 }
