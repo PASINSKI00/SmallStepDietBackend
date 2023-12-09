@@ -11,7 +11,7 @@
 
 	<groupId>com.pasinski.smallstepdiet</groupId>
 	<artifactId>backend-api</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 
 	<name>SmallStepDiet-backend</name>
 
@@ -23,7 +23,7 @@
 		<developerConnection>
 			scm:git:git@github.com:PASINSKI00/Dieter2Backend.git
 		</developerConnection>
-		<tag>v1.0.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<dependencies>
