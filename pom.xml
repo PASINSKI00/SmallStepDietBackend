@@ -20,6 +20,13 @@
 		<java.version>17</java.version>
 	</properties>
 
+	<scm>
+		<developerConnection>
+			scm:git:git@github.com:PASINSKI00/Dieter2Backend.git
+		</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>
