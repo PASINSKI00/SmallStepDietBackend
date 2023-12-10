@@ -20,6 +20,7 @@ public class MealExtention {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_meal_extention", nullable = false)
     private Long idMealExtention;
+    @Column(length = 4096)
     private String recipe;
     private int timeToPrepare;
     private int proteinRatio;
