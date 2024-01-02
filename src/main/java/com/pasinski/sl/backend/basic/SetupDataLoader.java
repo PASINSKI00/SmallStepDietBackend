@@ -154,7 +154,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     private void addMeal(String name) {
         MealForm mealForm = new MealForm();
         mealForm.setName(name);
-        mealForm.setRecipe("Cook the chicken. Boil the rice. Voila!");
+        mealForm.setRecipe("Cook the chicken. \nBoil the rice. \nVoila!");
         mealForm.setTimeToPrepare(20);
         mealForm.setCategoriesIds(Arrays.asList(1L, 2L));
         HashMap<Long, Integer> ingredientsIds = new HashMap<>();
