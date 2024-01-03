@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CategoryEndpointTesting extends BaseForIntegrationTesting{
+public class CategoryEndpointIT extends BaseForIT {
     String categoryEndpoint = "/api/category";
     String allCategoriesEndpoint = "/api/category/all";
 

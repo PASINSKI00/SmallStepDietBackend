@@ -15,7 +15,7 @@ import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BaseForIntegrationTesting {
+public class BaseForIT{
     protected static String userAuthorizationHeader;
     protected static String adminUserAuthorizationHeader;
     static String host = "http://localhost:8080";
