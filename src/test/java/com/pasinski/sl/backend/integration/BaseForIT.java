@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BaseForIT{
     protected static String userAuthorizationHeader;
-    protected static String adminUserAuthorizationHeader;
+    protected static String adminAuthorizationHeader;
     static String host = "http://localhost:8080";
     static HttpClient httpClient = HttpClient.newHttpClient();
     static Gson gson = new Gson();
@@ -26,7 +26,7 @@ public class BaseForIT{
     public static void setUpUsers() throws IOException, InterruptedException {
         userAuthorizationHeader = createUser("Charlie", "email@email.com", "Password1");
         String adminCredentials = "admin@email.com:Password1";
-        adminUserAuthorizationHeader = "Basic " + Base64.getEncoder().encodeToString(adminCredentials.getBytes(StandardCharsets.UTF_8));
+        adminAuthorizationHeader = "Basic " + Base64.getEncoder().encodeToString(adminCredentials.getBytes(StandardCharsets.UTF_8));
     }
 
     @AfterAll

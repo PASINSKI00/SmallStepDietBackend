@@ -24,7 +24,7 @@ public class CategoryEndpointIT extends BaseForIT {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .header("Authorization", adminUserAuthorizationHeader)
+                .header("Authorization", adminAuthorizationHeader)
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(categoryForm)))
                 .build();
 
