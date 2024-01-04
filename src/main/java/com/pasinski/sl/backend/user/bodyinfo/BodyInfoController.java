@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -41,5 +42,17 @@ public class BodyInfoController {
         }
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping()
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteBodyInfo() {
+        try {
+            this.bodyInfoService.deleteBodyInfo();
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
