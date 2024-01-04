@@ -31,7 +31,8 @@ public class DietService {
     private final S3Service s3Service;
 
     public DietResponseForm getDiet(Long idDiet) {
-        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        Diet diet = this.dietRepository.findById(idDiet)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         if (!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
