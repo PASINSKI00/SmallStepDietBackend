@@ -1,5 +1,6 @@
 package com.pasinski.sl.backend.user;
 
+import com.pasinski.sl.backend.diet.Diet;
 import com.pasinski.sl.backend.user.accessManagment.Role;
 import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
 import lombok.Getter;
@@ -45,6 +46,9 @@ public class AppUser implements UserDetails {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private BodyInfo bodyInfo;
+
+    @OneToMany(mappedBy = "appUser",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Diet> diets;
 
     public AppUser(String name, String email, String password) {
         this.name = name;
