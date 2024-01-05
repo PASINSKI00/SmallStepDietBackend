@@ -5,10 +5,7 @@ import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.FinalDayResponseForm;
 import com.pasinski.sl.backend.diet.forms.FinalIngredientResponseForm;
 import com.pasinski.sl.backend.diet.forms.FinalMealResponseForm;
-import com.pasinski.sl.backend.diet.forms.request.FinalDayModifyRequestForm;
-import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
-import com.pasinski.sl.backend.diet.forms.request.FinalIngredientModifyRequestForm;
-import com.pasinski.sl.backend.diet.forms.request.FinalMealModifyRequestForm;
+import com.pasinski.sl.backend.diet.forms.request.*;
 import com.pasinski.sl.backend.user.bodyinfo.Gender;
 import com.pasinski.sl.backend.user.bodyinfo.forms.BodyInfoForm;
 import com.pasinski.sl.backend.user.bodyinfo.forms.Goals;
@@ -186,7 +183,7 @@ public class DietEndpointIT extends BaseForIT {
 
         //then
         assertEquals(200, httpResponse.statusCode());
-        DietResponseForm createdDietForm = retrieveDiet();
+        DietResponseForm createdDietForm = retrieveDiet(dietId);
         assertEquals(2,(long) createdDietForm.getFinalDays().size());
         assertEquals(3,(long) createdDietForm.getFinalDays().get(0).getFinalMeals().size());
         assertEquals(1,(long) createdDietForm.getFinalDays().get(1).getFinalMeals().size());
@@ -196,7 +193,7 @@ public class DietEndpointIT extends BaseForIT {
     @Order(7)
     public void authenticatedUser_CanModifyFinalDiet() throws IOException, InterruptedException {
         //given
-        DietResponseForm dietBefore = retrieveDiet();
+        DietResponseForm dietBefore = retrieveDiet(dietId);
         List<FinalDayModifyRequestForm> dayForms = getFinalDayModifyRequestForm(dietBefore);
 
         //Prep diet form
@@ -218,7 +215,7 @@ public class DietEndpointIT extends BaseForIT {
         //then
         assertEquals(200, httpResponse.statusCode());
 
-        DietResponseForm dietAfter = retrieveDiet();
+        DietResponseForm dietAfter = retrieveDiet(dietId);
         FinalMealResponseForm firstMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(0);
         FinalMealResponseForm secondMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(1);
         FinalMealResponseForm thirdMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(2);
@@ -236,7 +233,7 @@ public class DietEndpointIT extends BaseForIT {
     @Order(8)
     public void authenticatedUser_CanResetDay() throws IOException, InterruptedException {
         //given
-        DietResponseForm dietBefore = retrieveDiet();
+        DietResponseForm dietBefore = retrieveDiet(dietId);
         Long idFinalDay = dietBefore.getFinalDays().get(0).getIdFinalDay();
 
         String url = host + dietEndpoint + "/final/day/reset?idDiet=" + dietId + "&idFinalDay=" + idFinalDay;
@@ -254,7 +251,7 @@ public class DietEndpointIT extends BaseForIT {
         //then
         assertEquals(200, httpResponse.statusCode());
 
-        DietResponseForm dietAfter = retrieveDiet();
+        DietResponseForm dietAfter = retrieveDiet(dietId);
         FinalMealResponseForm firstMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(0);
         FinalMealResponseForm secondMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(1);
         FinalMealResponseForm thirdMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(2);
@@ -272,7 +269,7 @@ public class DietEndpointIT extends BaseForIT {
     @Order(8)
     public void authenticatedUser_CanReCalculate() throws IOException, InterruptedException {
         //given
-        DietResponseForm dietBefore = retrieveDiet();
+        DietResponseForm dietBefore = retrieveDiet(dietId);
 
         String url = host + dietEndpoint + "/final/recalculate?idDiet=" + dietId;
 
@@ -287,7 +284,7 @@ public class DietEndpointIT extends BaseForIT {
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
         //then
-        DietResponseForm dietAfter = retrieveDiet();
+        DietResponseForm dietAfter = retrieveDiet(dietId);
         int caloriesBefore = dietBefore.getFinalDays().get(0).getCalories();
         int caloriesAfter = dietAfter.getFinalDays().get(0).getCalories();
 
@@ -320,7 +317,7 @@ public class DietEndpointIT extends BaseForIT {
     @Order(10)
     public void authenticatedUser_CanDeleteDiet() throws IOException, InterruptedException {
         //given
-        DietResponseForm dietBefore = retrieveDiet();
+        DietResponseForm dietBefore = retrieveDiet(dietId);
 
         String url = host + dietEndpoint + "?idDiet=" + dietId;
 
@@ -336,7 +333,31 @@ public class DietEndpointIT extends BaseForIT {
 
         //then
         assertEquals(200, httpResponse.statusCode());
-        assertThrows(AssertionFailedError.class, this::retrieveDiet);
+        assertThrows(AssertionFailedError.class, () -> retrieveDiet(dietId));
+    }
+
+    @Test
+    public void notAuthenticatedUser_CanPostDiet() throws IOException, InterruptedException {
+        //given
+        List<List<Long>> days = new ArrayList<>(List.of(new ArrayList<>(Arrays.asList(1L, 2L))));
+        BodyInfoForm bodyInfoForm = new BodyInfoForm(Goals.MAINTAIN_WEIGHT,182,88,23,Gender.MALE,1.5F,0);
+        DietUnauthenticatedRequestForm requestForm = new DietUnauthenticatedRequestForm(days, bodyInfoForm);
+        String url = host + dietEndpoint + "/unauthenticated";
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .header("Authorization", dietUserAuthHeader)
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(requestForm)))
+                .build();
+
+        //when
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        //then
+        assertEquals(201, httpResponse.statusCode());
+        long dietId = Long.parseLong(httpResponse.body());
+        assertInstanceOf(DietResponseForm.class, retrieveDiet(dietId));
     }
 
     @Test
@@ -418,7 +439,7 @@ public class DietEndpointIT extends BaseForIT {
         assertTrue(httpResponse.statusCode() == 200 || httpResponse.statusCode() == 204);
     }
 
-    private DietResponseForm retrieveDiet() throws IOException, InterruptedException {
+    private DietResponseForm retrieveDiet(Long dietId) throws IOException, InterruptedException {
         //given
         String url = host + dietEndpoint + "?idDiet=" + dietId;
 
