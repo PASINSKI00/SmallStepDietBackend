@@ -1,41 +1,33 @@
 package com.pasinski.sl.backend.user.bodyinfo.forms;
 
 import com.pasinski.sl.backend.user.bodyinfo.Gender;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class BodyInfoForm {
+public record BodyInfoForm (
     @NotNull
-    private Goals goal;
+    Goals goal,
 
     @NotNull
-    private Integer height;
+    Integer height,
 
     @NotNull
-    private Integer weight;
+    Integer weight,
 
     @NotNull
     @DecimalMin(value = "16", message = "You must be at least 16 years old to use our service")
-    private Integer age;
+    Integer age,
 
     @NotNull
-    private Gender gender;
+    Gender gender,
 
     @NotNull
     @DecimalMin(value = "1.39", message = "PAL must be between 1.4 and 2.5")
     @DecimalMax(value = "2.51", message = "PAL must be between 1.4 and 2.5")
-    private Float pal;
+    Float pal,
 
     @NotNull
-    private Integer additionalCalories;
-}
+    Integer additionalCalories
+) {}

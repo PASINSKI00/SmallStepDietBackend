@@ -57,13 +57,13 @@ public class BodyInfo {
     private AppUser appUser;
 
     public BodyInfo(BodyInfoForm bodyInfoForm, AppUser appUser) {
-        this.goal = bodyInfoForm.getGoal();
-        this.height = bodyInfoForm.getHeight();
-        this.weight = bodyInfoForm.getWeight();
-        this.age = bodyInfoForm.getAge();
-        this.gender = bodyInfoForm.getGender();
-        this.pal = bodyInfoForm.getPal();
-        this.additionalCalories = bodyInfoForm.getAdditionalCalories();
+        this.goal = bodyInfoForm.goal();
+        this.height = bodyInfoForm.height();
+        this.weight = bodyInfoForm.weight();
+        this.age = bodyInfoForm.age();
+        this.gender = bodyInfoForm.gender();
+        this.pal = bodyInfoForm.pal();
+        this.additionalCalories = bodyInfoForm.additionalCalories();
         this.appUser = appUser;
         performCalculations();
     }
