@@ -7,6 +7,7 @@ import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.user.AppUser;
+import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,6 +44,12 @@ public class Diet {
         this.appUser = appUser;
         this.finalDays = new ArrayList<>();
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
+    }
+
+    public Diet(List<List<Meal>> days, BodyInfo bodyInfo) {
+        this.appUser = null;
+        this.finalDays = new ArrayList<>();
+        days.forEach(meals -> this.finalDays.add(new FinalDay(meals, bodyInfo.getCaloriesGoal())));
     }
 
     public void reCalculate() {

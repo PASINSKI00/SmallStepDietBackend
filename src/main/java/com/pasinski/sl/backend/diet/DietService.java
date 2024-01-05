@@ -3,6 +3,7 @@ package com.pasinski.sl.backend.diet;
 import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
+import com.pasinski.sl.backend.diet.forms.request.DietUnauthenticatedRequestForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
 import com.pasinski.sl.backend.file.S3Service;
@@ -12,6 +13,7 @@ import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.user.AppUser;
+import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,9 +36,7 @@ public class DietService {
     public DietResponseForm getDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet)
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        if (!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        validateOwner(diet);
 
         return new DietResponseForm(diet, s3Service);
     }
@@ -47,12 +47,16 @@ public class DietService {
 
         return this.dietRepository.save(new Diet(getListOfListsOfMeals(daysForm), userSecurityService.getLoggedUser())).getIdDiet();
     }
+    public Long addDietForUnauthenticated(DietUnauthenticatedRequestForm requestForm) {
+        BodyInfo bodyInfo = new BodyInfo(requestForm.bodyInfo(), null);
+
+        return this.dietRepository.save(new Diet(getListOfListsOfMeals(requestForm.days()), bodyInfo))
+                .getIdDiet();
+    }
 
     public void updateDiet(Long idDiet, List<List<Long>> daysForm) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        if (!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        validateOwner(diet);
 
         diet.updateDiet(getListOfListsOfMeals(daysForm));
 
@@ -61,8 +65,7 @@ public class DietService {
 
     public List<Grocery> getGroceries(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        validateOwner(diet);
 
         return diet.getGroceries().stream().toList();
     }
@@ -101,9 +104,7 @@ public class DietService {
 
     public void deleteDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
-
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        validateOwner(diet);
 
         this.dietRepository.delete(diet);
     }
@@ -111,9 +112,7 @@ public class DietService {
     public void modifyFinalDiet(FinalDietModifyRequestForm modifiedDiet) {
         Diet diet = this.dietRepository.findById(modifiedDiet.idDiet())
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        validateOwner(diet);
 
         diet.modifyDiet(modifiedDiet, ingredientRepository);
         this.dietRepository.save(diet);
@@ -134,9 +133,7 @@ public class DietService {
 
     public void resetDay(Long idDiet, Long idDay) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        validateOwner(diet);
 
         diet.resetDay(idDay);
         this.dietRepository.save(diet);
@@ -144,11 +141,14 @@ public class DietService {
 
     public void reCalculate(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
-            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+        validateOwner(diet);
 
         diet.reCalculate();
         this.dietRepository.save(diet);
+    }
+
+    private void validateOwner(Diet diet) {
+        if (diet.getAppUser() != null && !Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
+            throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
     }
 }

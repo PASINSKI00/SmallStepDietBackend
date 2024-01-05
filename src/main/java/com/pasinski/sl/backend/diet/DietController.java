@@ -1,6 +1,7 @@
 package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
+import com.pasinski.sl.backend.diet.forms.request.DietUnauthenticatedRequestForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
@@ -20,7 +21,6 @@ public class DietController {
     private final DietService dietService;
 
     @GetMapping()
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getDiet(@RequestParam Long idDiet) {
         DietResponseForm dietResponseForm;
         try {
@@ -33,7 +33,6 @@ public class DietController {
     }
 
     @GetMapping("/groceries")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getGroceries(@RequestParam Long idDiet) {
         List<Grocery> groceries;
         try {
@@ -98,7 +97,6 @@ public class DietController {
     }
 
     @PutMapping()
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody List<List<Long>> days) {
         try {
             this.dietService.updateDiet(idDiet, days);
@@ -110,7 +108,6 @@ public class DietController {
     }
 
     @PutMapping("/final")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> modifyFinalDiet(@RequestBody FinalDietModifyRequestForm modifiedDiet) {
         try {
             this.dietService.modifyFinalDiet(modifiedDiet);
@@ -122,7 +119,6 @@ public class DietController {
     }
 
     @PutMapping("/final/day/reset")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> resetDay(@RequestParam Long idDiet, @RequestParam Long idFinalDay) {
         try {
             this.dietService.resetDay(idDiet, idFinalDay);
@@ -156,5 +152,19 @@ public class DietController {
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    // ---------- UNAUTHENTICATED ----------
+    @PostMapping("/unauthenticated")
+    public ResponseEntity<?> addDietForUnauthenticated(@RequestBody DietUnauthenticatedRequestForm requestForm) {
+        Long id;
+        try {
+            id = this.dietService.addDietForUnauthenticated(requestForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 }
