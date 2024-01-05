@@ -1,7 +1,7 @@
 package com.pasinski.sl.backend.diet.finalDay;
 
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
-import com.pasinski.sl.backend.diet.forms.FinalDayResponseForm;
+import com.pasinski.sl.backend.diet.forms.request.FinalDayModifyRequestForm;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import lombok.Getter;
@@ -57,11 +57,11 @@ public class FinalDay {
         this.calculateMacro();
     }
 
-    public void modifyFinalDay(FinalDayResponseForm modifiedDay, IngredientRepository ingredientRepository, Integer caloriesGoal) {
-        if (modifiedDay.getFinalMeals().get(0).getPercentOfDay() != null) {
+    public void modifyFinalDay(FinalDayModifyRequestForm modifiedDay, IngredientRepository ingredientRepository, Integer caloriesGoal) {
+        if (modifiedDay.finalMeals().get(0).percentOfDay() != null) {
             List<Integer> percents = new ArrayList<>();
-            modifiedDay.getFinalMeals().forEach(modifiedMeal -> {
-                percents.add(modifiedMeal.getPercentOfDay());
+            modifiedDay.finalMeals().forEach(modifiedMeal -> {
+                percents.add(modifiedMeal.percentOfDay());
             });
 
             if (percents.stream().mapToInt(Integer::intValue).sum() != 100)
@@ -74,11 +74,11 @@ public class FinalDay {
             }
         }
 
-        modifiedDay.getFinalMeals().forEach(modifiedMeal -> {
-            if (modifiedMeal.getFinalIngredients() != null)
+        modifiedDay.finalMeals().forEach(modifiedMeal -> {
+            if (modifiedMeal.finalIngredients() != null)
                 finalMeals.stream()
-                        .filter(finalMeal -> finalMeal.getIdFinalMeal().equals(modifiedMeal.getIdFinalMeal())).findFirst()
-                        .get().modifyIngredients(modifiedMeal, ingredientRepository);
+                        .filter(finalMeal -> finalMeal.getIdFinalMeal().equals(modifiedMeal.idFinalMeal()))
+                        .findFirst().get().modifyIngredients(modifiedMeal, ingredientRepository);
 
             this.calculateMacro();
         });
