@@ -1,8 +1,8 @@
 package com.pasinski.sl.backend.diet.finalMeal;
 
 import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredient;
-import com.pasinski.sl.backend.diet.forms.FinalIngredientResponseForm;
-import com.pasinski.sl.backend.diet.forms.FinalMealResponseForm;
+import com.pasinski.sl.backend.diet.forms.request.FinalIngredientModifyRequestForm;
+import com.pasinski.sl.backend.diet.forms.request.FinalMealModifyRequestForm;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
@@ -15,7 +15,6 @@ import org.hibernate.annotations.CascadeType;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -79,19 +78,20 @@ public class FinalMeal {
         this.calculateEnergeticValues();
     }
 
-    public void modifyIngredients(FinalMealResponseForm modifiedMeal, IngredientRepository ingredientRepository) {
+    public void modifyIngredients(FinalMealModifyRequestForm modifiedMeal, IngredientRepository ingredientRepository) {
 //        check for deleted
-        List<String> ingredientsNamesToRemove = modifiedMeal.getFinalIngredients().stream()
-                .filter(modifiedIngredient -> modifiedIngredient.getRemove() != null && modifiedIngredient.getRemove())
-                .map(FinalIngredientResponseForm::getName)
+        List<String> ingredientsNamesToRemove = modifiedMeal.finalIngredients().stream()
+                .filter(modifiedIngredient -> modifiedIngredient.remove() != null && modifiedIngredient.remove())
+                .map(FinalIngredientModifyRequestForm::name)
                 .toList();
-        this.finalIngredients.removeIf(finalIngredient -> ingredientsNamesToRemove.contains(finalIngredient.getIngredient().getName()));
+        this.finalIngredients
+                .removeIf(finalIngredient -> ingredientsNamesToRemove.contains(finalIngredient.getIngredient().getName()));
 
 
 //        modify weights
-        modifiedMeal.getFinalIngredients().forEach((finalIngredientResponseForm) -> {
+        modifiedMeal.finalIngredients().forEach((finalIngredientResponseForm) -> {
             this.finalIngredients.stream()
-                    .filter(finalIngredient -> finalIngredient.getIngredient().getName().equals(finalIngredientResponseForm.getName()))
+                    .filter(finalIngredient -> finalIngredient.getIngredient().getName().equals(finalIngredientResponseForm.name()))
                     .findFirst()
                     .ifPresent(finalIngredient -> {
                         finalIngredient.modifyFinalIngredient(finalIngredientResponseForm);
@@ -100,10 +100,10 @@ public class FinalMeal {
         });
 
 //        add new if present
-        modifiedMeal.getFinalIngredients().stream()
-                .filter(finalIngredientResponseForm -> finalIngredientResponseForm.getIdNewIngredient() != null)
-                .forEach(finalIngredientResponseForm -> {
-                    this.finalIngredients.add(new FinalIngredient(finalIngredientResponseForm, ingredientRepository));
+        modifiedMeal.finalIngredients().stream()
+                .filter(ingredientRequest -> ingredientRequest.idNewIngredient() != null)
+                .forEach(ingredientRequest -> {
+                    this.finalIngredients.add(new FinalIngredient(ingredientRequest, ingredientRepository));
                 });
 
         this.calculateEnergeticValues();

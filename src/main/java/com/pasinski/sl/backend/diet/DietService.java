@@ -4,6 +4,7 @@ import com.pasinski.sl.backend.config.security.UserSecurityService;
 import com.pasinski.sl.backend.diet.finalMeal.FinalMeal;
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
+import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
 import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
@@ -31,7 +32,8 @@ public class DietService {
     private final S3Service s3Service;
 
     public DietResponseForm getDiet(Long idDiet) {
-        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        Diet diet = this.dietRepository.findById(idDiet)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         if (!Objects.equals(diet.getAppUser().getIdUser(), this.userSecurityService.getLoggedUserId()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
@@ -106,8 +108,9 @@ public class DietService {
         this.dietRepository.delete(diet);
     }
 
-    public void modifyFinalDiet(DietResponseForm modifiedDiet) {
-        Diet diet = this.dietRepository.findById(modifiedDiet.getIdDiet()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    public void modifyFinalDiet(FinalDietModifyRequestForm modifiedDiet) {
+        Diet diet = this.dietRepository.findById(modifiedDiet.idDiet())
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         if (!Objects.equals(this.userSecurityService.getLoggedUserId(), diet.getAppUser().getIdUser()))
             throw new HttpClientErrorException(HttpStatus.FORBIDDEN);

@@ -2,6 +2,7 @@ package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
+import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -110,7 +111,7 @@ public class DietController {
 
     @PutMapping("/final")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> modifyFinalDiet(@RequestBody DietResponseForm modifiedDiet) {
+    public ResponseEntity<?> modifyFinalDiet(@RequestBody FinalDietModifyRequestForm modifiedDiet) {
         try {
             this.dietService.modifyFinalDiet(modifiedDiet);
         } catch (HttpClientErrorException e) {

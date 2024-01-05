@@ -8,10 +8,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CategoryEndpointTesting extends BaseForIntegrationTesting{
+public class CategoryEndpointIT extends BaseForIT {
     String categoryEndpoint = "/api/category";
     String allCategoriesEndpoint = "/api/category/all";
 
@@ -24,7 +28,7 @@ public class CategoryEndpointTesting extends BaseForIntegrationTesting{
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .header("Authorization", adminUserAuthorizationHeader)
+                .header("Authorization", adminAuthorizationHeader)
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(categoryForm)))
                 .build();
 
@@ -43,12 +47,16 @@ public class CategoryEndpointTesting extends BaseForIntegrationTesting{
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .build();
+        List<String> expectedCategories = new ArrayList<>(Arrays.asList("Breakfast", "Lunch", "Dinner", "Snack",
+                "Dessert", "Shake", "Fast food", "Soup", "Salad", "Bread", "Pasta", "Pizza", "Sandwich", "Sauce",
+                "Drink"));
 
         //when
         HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
         //then
         assertEquals(200, httpResponse.statusCode());
+        expectedCategories.forEach(category -> assertTrue(httpResponse.body().contains(category)));
     }
 
     @Test

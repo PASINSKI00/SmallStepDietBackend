@@ -12,8 +12,6 @@ public class FinalIngredientResponseForm {
     private Long idFinalIngredient;
     private String name;
     private Integer weight;
-    private Long idNewIngredient;
-    private Boolean remove;
 
     public FinalIngredientResponseForm(FinalIngredient finalIngredient) {
         this.idFinalIngredient = finalIngredient.getIdFinalIngredient();

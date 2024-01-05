@@ -2,8 +2,8 @@ package com.pasinski.sl.backend.diet;
 
 import com.pasinski.sl.backend.diet.finalDay.FinalDay;
 import com.pasinski.sl.backend.diet.finalIngredient.FinalIngredient;
-import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
+import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.user.AppUser;
@@ -60,10 +60,10 @@ public class Diet {
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
     }
 
-    public void modifyDiet(DietResponseForm modifiedDiet, IngredientRepository ingredientRepository) {
-        modifiedDiet.getFinalDays().forEach(modifiedDay -> {
+    public void modifyDiet(FinalDietModifyRequestForm modifiedDiet, IngredientRepository ingredientRepository) {
+        modifiedDiet.finalDays().forEach(modifiedDay -> {
             finalDays.forEach(finalDay -> {
-                if (Objects.equals(modifiedDay.getIdFinalDay(), finalDay.getIdFinalDay()))
+                if (Objects.equals(modifiedDay.idFinalDay(), finalDay.getIdFinalDay()))
                     finalDay.modifyFinalDay(modifiedDay, ingredientRepository, appUser.getBodyInfo().getCaloriesGoal());
             });
         });

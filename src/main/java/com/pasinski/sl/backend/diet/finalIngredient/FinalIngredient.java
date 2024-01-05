@@ -1,6 +1,6 @@
 package com.pasinski.sl.backend.diet.finalIngredient;
 
-import com.pasinski.sl.backend.diet.forms.FinalIngredientResponseForm;
+import com.pasinski.sl.backend.diet.forms.request.FinalIngredientModifyRequestForm;
 import com.pasinski.sl.backend.meal.ingredient.Ingredient;
 import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.mealIngredient.MealIngredient;
@@ -43,17 +43,17 @@ public class FinalIngredient {
         this.carbs = (int) (mealIngredient.getIngredient().getCarbsPer100g() * weight / 100);
     }
 
-    public FinalIngredient(FinalIngredientResponseForm finalIngredientResponseForm, IngredientRepository ingredientRepository) {
-        this.ingredient = ingredientRepository.findById(finalIngredientResponseForm.getIdNewIngredient()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        this.weight = finalIngredientResponseForm.getWeight();
+    public FinalIngredient(FinalIngredientModifyRequestForm finalIngredientResponseForm, IngredientRepository ingredientRepository) {
+        this.ingredient = ingredientRepository.findById(finalIngredientResponseForm.idNewIngredient()).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        this.weight = finalIngredientResponseForm.weight();
         this.calories = (int) (ingredient.getCaloriesPer100g() * weight / 100);
         this.protein = (int) (ingredient.getProteinPer100g() * weight / 100);
         this.fats = (int) (ingredient.getFatsPer100g() * weight / 100);
         this.carbs = (int) (ingredient.getCarbsPer100g() * weight / 100);
     }
 
-    public void modifyFinalIngredient(FinalIngredientResponseForm finalIngredientResponseForm) {
-        this.weight = finalIngredientResponseForm.getWeight();
+    public void modifyFinalIngredient(FinalIngredientModifyRequestForm modifiedIngredient) {
+        this.weight = modifiedIngredient.weight();
         this.calories = (int) (ingredient.getCaloriesPer100g() * weight / 100);
         this.protein = (int) (ingredient.getProteinPer100g() * weight / 100);
         this.fats = (int) (ingredient.getFatsPer100g() * weight / 100);
