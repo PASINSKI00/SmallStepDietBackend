@@ -4,7 +4,9 @@ import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.request.DietUnauthenticatedRequestForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
+import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyUnauthenticatedRequestForm;
 import com.pasinski.sl.backend.meal.forms.MealResponseBody;
+import com.pasinski.sl.backend.user.bodyinfo.forms.BodyInfoForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -97,6 +99,7 @@ public class DietController {
     }
 
     @PutMapping()
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateDiet(@RequestParam Long idDiet, @RequestBody List<List<Long>> days) {
         try {
             this.dietService.updateDiet(idDiet, days);
@@ -108,6 +111,7 @@ public class DietController {
     }
 
     @PutMapping("/final")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> modifyFinalDiet(@RequestBody FinalDietModifyRequestForm modifiedDiet) {
         try {
             this.dietService.modifyFinalDiet(modifiedDiet);
@@ -119,6 +123,7 @@ public class DietController {
     }
 
     @PutMapping("/final/day/reset")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> resetDay(@RequestParam Long idDiet, @RequestParam Long idFinalDay) {
         try {
             this.dietService.resetDay(idDiet, idFinalDay);
@@ -166,5 +171,40 @@ public class DietController {
         }
 
         return new ResponseEntity<>(id, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/unauthenticated")
+    public ResponseEntity<?> updateDietForUnauthenticated(@RequestParam Long idDiet,
+                                                       @RequestBody DietUnauthenticatedRequestForm requestForm) {
+        try {
+            this.dietService.updateDietForUnauthenticated(idDiet, requestForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/final/unauthenticated")
+    public ResponseEntity<?> modifyFinalDietForUnauthenticated(@RequestBody FinalDietModifyUnauthenticatedRequestForm requestForm) {
+        try {
+            this.dietService.modifyFinalDietForUnauthenticated(requestForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/final/day/reset/unauthenticated")
+    public ResponseEntity<?> resetDayForUnauthenticated(@RequestParam Long idDiet, @RequestParam Long idFinalDay,
+                                                        @RequestBody BodyInfoForm bodyInfoForm) {
+        try {
+            this.dietService.resetDay(idDiet, idFinalDay, bodyInfoForm);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

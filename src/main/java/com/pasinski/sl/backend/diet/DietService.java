@@ -6,6 +6,7 @@ import com.pasinski.sl.backend.diet.forms.DietResponseForm;
 import com.pasinski.sl.backend.diet.forms.request.DietUnauthenticatedRequestForm;
 import com.pasinski.sl.backend.diet.forms.Grocery;
 import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyRequestForm;
+import com.pasinski.sl.backend.diet.forms.request.FinalDietModifyUnauthenticatedRequestForm;
 import com.pasinski.sl.backend.file.S3Service;
 import com.pasinski.sl.backend.meal.Meal;
 import com.pasinski.sl.backend.meal.MealRepository;
@@ -14,6 +15,7 @@ import com.pasinski.sl.backend.meal.ingredient.IngredientRepository;
 import com.pasinski.sl.backend.meal.review.Review;
 import com.pasinski.sl.backend.user.AppUser;
 import com.pasinski.sl.backend.user.bodyinfo.BodyInfo;
+import com.pasinski.sl.backend.user.bodyinfo.forms.BodyInfoForm;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,8 @@ public class DietService {
     public DietResponseForm getDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet)
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        validateOwner(diet);
 
+        validateOwner(diet);
         return new DietResponseForm(diet, s3Service);
     }
 
@@ -45,28 +47,40 @@ public class DietService {
         if (userSecurityService.getLoggedUser().getBodyInfo() == null)
             throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY, "You have to set your body info first");
 
-        return this.dietRepository.save(new Diet(getListOfListsOfMeals(daysForm), userSecurityService.getLoggedUser())).getIdDiet();
+        Diet diet = new Diet(getListOfListsOfMeals(daysForm), userSecurityService.getLoggedUser());
+
+        return this.dietRepository.save(diet).getIdDiet();
     }
     public Long addDietForUnauthenticated(DietUnauthenticatedRequestForm requestForm) {
-        BodyInfo bodyInfo = new BodyInfo(requestForm.bodyInfo(), null);
+        BodyInfo bodyInfo = new BodyInfo(requestForm.bodyInfoForm(), null);
 
         return this.dietRepository.save(new Diet(getListOfListsOfMeals(requestForm.days()), bodyInfo))
                 .getIdDiet();
     }
 
     public void updateDiet(Long idDiet, List<List<Long>> daysForm) {
-        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        Diet diet = this.dietRepository.findById(idDiet)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
         validateOwner(diet);
-
         diet.updateDiet(getListOfListsOfMeals(daysForm));
+        this.dietRepository.save(diet);
+    }
 
+    public void updateDietForUnauthenticated(Long idDiet, DietUnauthenticatedRequestForm requestForm) {
+        BodyInfo bodyInfo = new BodyInfo(requestForm.bodyInfoForm(), null);
+        Diet diet = this.dietRepository.findById(idDiet)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        validateOwner(diet);
+        diet.updateDiet(getListOfListsOfMeals(requestForm.days()), bodyInfo);
         this.dietRepository.save(diet);
     }
 
     public List<Grocery> getGroceries(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        validateOwner(diet);
 
+        validateOwner(diet);
         return diet.getGroceries().stream().toList();
     }
 
@@ -104,17 +118,27 @@ public class DietService {
 
     public void deleteDiet(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NO_CONTENT));
-        validateOwner(diet);
 
+        validateOwner(diet);
         this.dietRepository.delete(diet);
     }
 
     public void modifyFinalDiet(FinalDietModifyRequestForm modifiedDiet) {
         Diet diet = this.dietRepository.findById(modifiedDiet.idDiet())
                 .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        validateOwner(diet);
 
+        validateOwner(diet);
         diet.modifyDiet(modifiedDiet, ingredientRepository);
+        this.dietRepository.save(diet);
+    }
+
+    public void modifyFinalDietForUnauthenticated(FinalDietModifyUnauthenticatedRequestForm modifiedDiet) {
+        BodyInfo bodyInfo = new BodyInfo(modifiedDiet.bodyInfoForm(), null);
+        Diet diet = this.dietRepository.findById(modifiedDiet.dietModifyForm().idDiet())
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        validateOwner(diet);
+        diet.modifyDiet(modifiedDiet.dietModifyForm(), ingredientRepository, bodyInfo);
         this.dietRepository.save(diet);
     }
 
@@ -133,16 +157,25 @@ public class DietService {
 
     public void resetDay(Long idDiet, Long idDay) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        validateOwner(diet);
 
+        validateOwner(diet);
         diet.resetDay(idDay);
+        this.dietRepository.save(diet);
+    }
+
+    public void resetDay(Long idDiet, Long idDay, BodyInfoForm bodyInfoForm) {
+        BodyInfo bodyInfo = new BodyInfo(bodyInfoForm, null);
+        Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        validateOwner(diet);
+        diet.resetDay(idDay, bodyInfo);
         this.dietRepository.save(diet);
     }
 
     public void reCalculate(Long idDiet) {
         Diet diet = this.dietRepository.findById(idDiet).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-        validateOwner(diet);
 
+        validateOwner(diet);
         diet.reCalculate();
         this.dietRepository.save(diet);
     }

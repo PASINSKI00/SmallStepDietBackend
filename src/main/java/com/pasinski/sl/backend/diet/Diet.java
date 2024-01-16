@@ -61,10 +61,20 @@ public class Diet {
                 .findFirst().ifPresentOrElse(finalDay -> finalDay.resetDay(appUser.getBodyInfo().getCaloriesGoal()),
                         () -> { throw new HttpClientErrorException(HttpStatus.NOT_FOUND); });
     }
+    public void resetDay(Long idDay, BodyInfo bodyInfo) {
+        this.finalDays.stream().filter(finalDay -> Objects.equals(finalDay.getIdFinalDay(), idDay))
+                .findFirst().ifPresentOrElse(finalDay -> finalDay.resetDay(bodyInfo.getCaloriesGoal()),
+                        () -> { throw new HttpClientErrorException(HttpStatus.NOT_FOUND); });
+    }
 
     public void updateDiet(List<List<Meal>> days) {
         this.finalDays.clear();
         days.forEach(meals -> this.finalDays.add(new FinalDay(meals, appUser.getBodyInfo().getCaloriesGoal())));
+    }
+
+    public void updateDiet(List<List<Meal>> days, BodyInfo bodyInfo) {
+        this.finalDays.clear();
+        days.forEach(meals -> this.finalDays.add(new FinalDay(meals, bodyInfo.getCaloriesGoal())));
     }
 
     public void modifyDiet(FinalDietModifyRequestForm modifiedDiet, IngredientRepository ingredientRepository) {
@@ -72,6 +82,15 @@ public class Diet {
             finalDays.forEach(finalDay -> {
                 if (Objects.equals(modifiedDay.idFinalDay(), finalDay.getIdFinalDay()))
                     finalDay.modifyFinalDay(modifiedDay, ingredientRepository, appUser.getBodyInfo().getCaloriesGoal());
+            });
+        });
+    }
+
+    public void modifyDiet(FinalDietModifyRequestForm modifiedDiet, IngredientRepository ingredientRepository, BodyInfo bodyInfo) {
+        modifiedDiet.finalDays().forEach(modifiedDay -> {
+            finalDays.forEach(finalDay -> {
+                if (Objects.equals(modifiedDay.idFinalDay(), finalDay.getIdFinalDay()))
+                    finalDay.modifyFinalDay(modifiedDay, ingredientRepository, bodyInfo.getCaloriesGoal());
             });
         });
     }
