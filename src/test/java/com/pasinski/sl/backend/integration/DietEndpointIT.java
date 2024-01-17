@@ -337,6 +337,7 @@ public class DietEndpointIT extends BaseForIT {
     }
 
     @Test
+    @Order(11)
     public void notAuthenticatedUser_CanPostDiet() throws IOException, InterruptedException {
         //given
         List<List<Long>> days = new ArrayList<>(List.of(new ArrayList<>(Arrays.asList(1L, 2L))));
@@ -347,7 +348,6 @@ public class DietEndpointIT extends BaseForIT {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .header("Authorization", dietUserAuthHeader)
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(requestForm)))
                 .build();
 
@@ -356,8 +356,111 @@ public class DietEndpointIT extends BaseForIT {
 
         //then
         assertEquals(201, httpResponse.statusCode());
-        long dietId = Long.parseLong(httpResponse.body());
+        dietId = Long.parseLong(httpResponse.body());
         assertInstanceOf(DietResponseForm.class, retrieveDiet(dietId));
+    }
+
+    @Test
+    @Order(12)
+    public void notAuthenticatedUser_CanUpdateDiet() throws IOException, InterruptedException {
+        //given
+        List<List<Long>> days = new ArrayList<>(List.of(new ArrayList<>(Arrays.asList(3L, 4L, 5L))));
+        BodyInfoForm bodyInfoForm = new BodyInfoForm(Goals.MAINTAIN_WEIGHT,182,88,23,Gender.MALE,1.5F,0);
+        DietUnauthenticatedRequestForm requestForm = new DietUnauthenticatedRequestForm(days, bodyInfoForm);
+        String url = host + dietEndpoint + "/unauthenticated?idDiet=" + dietId;
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(requestForm)))
+                .build();
+
+        //when
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        //then
+        assertEquals(200, httpResponse.statusCode());
+        assertInstanceOf(DietResponseForm.class, retrieveDiet(dietId));
+        DietResponseForm actual = retrieveDiet(dietId);
+        assertEquals(1, actual.getFinalDays().size());
+        assertEquals(3, actual.getFinalDays().get(0).getFinalMeals().size());
+    }
+
+    @Test
+    @Order(13)
+    public void notAuthenticatedUser_CanModifyDiet() throws IOException, InterruptedException {
+        //given
+        BodyInfoForm bodyInfoForm = new BodyInfoForm(Goals.MAINTAIN_WEIGHT,182,88,23,Gender.MALE,1.5F,0);
+        DietResponseForm dietBefore = retrieveDiet(dietId);
+        List<FinalDayModifyRequestForm> dayForms = getFinalDayModifyRequestForm(dietBefore);
+
+        //Prep diet form
+        FinalDietModifyRequestForm dietForm = new FinalDietModifyRequestForm(dietId,dayForms);
+        FinalDietModifyUnauthenticatedRequestForm body = new FinalDietModifyUnauthenticatedRequestForm(dietForm, bodyInfoForm);
+
+        String url = host + dietEndpoint + "/final/unauthenticated";
+        postBodyInfo();
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(body)))
+                .build();
+
+        //when
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        //then
+        assertEquals(200, httpResponse.statusCode());
+
+        DietResponseForm dietAfter = retrieveDiet(dietId);
+        FinalMealResponseForm firstMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(0);
+        FinalMealResponseForm secondMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(1);
+        FinalMealResponseForm thirdMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(2);
+        assertEquals(20, firstMeal.getPercentOfDay());
+        assertEquals(50, secondMeal.getPercentOfDay());
+        assertEquals(30, thirdMeal.getPercentOfDay());
+
+        FinalIngredientResponseForm firstIngredient = firstMeal.getFinalIngredients().get(0);
+        FinalIngredientResponseForm secondIngredient = firstMeal.getFinalIngredients().get(1);
+        assertEquals(3000, firstIngredient.getWeight());
+        assertEquals(656, secondIngredient.getWeight());
+    }
+
+    @Test
+    @Order(14)
+    public void notAuthenticatedUser_CanResetDietDay() throws IOException, InterruptedException {
+        //given
+        BodyInfoForm bodyInfoForm = new BodyInfoForm(Goals.MAINTAIN_WEIGHT,182,88,23,Gender.MALE,1.5F,0);
+        DietResponseForm dietBefore = retrieveDiet(dietId);
+        Long idFinalDay = dietBefore.getFinalDays().get(0).getIdFinalDay();
+
+        String url = host + dietEndpoint + "/final/day/reset/unauthenticated?idDiet=" + dietId + "&idFinalDay=" + idFinalDay;
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(bodyInfoForm)))
+                .build();
+
+        //when
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        //then
+        assertEquals(200, httpResponse.statusCode());
+
+        DietResponseForm dietAfter = retrieveDiet(dietId);
+        FinalMealResponseForm firstMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(0);
+        FinalMealResponseForm secondMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(1);
+        FinalMealResponseForm thirdMeal = dietAfter.getFinalDays().get(0).getFinalMeals().get(2);
+        assertEquals(33, firstMeal.getPercentOfDay());
+        assertEquals(33, secondMeal.getPercentOfDay());
+        assertEquals(34, thirdMeal.getPercentOfDay());
+
+        FinalIngredientResponseForm firstIngredient = firstMeal.getFinalIngredients().get(0);
+        FinalIngredientResponseForm secondIngredient = firstMeal.getFinalIngredients().get(1);
+        assertEquals(262, firstIngredient.getWeight());
+        assertEquals(394, secondIngredient.getWeight());
     }
 
     @Test
