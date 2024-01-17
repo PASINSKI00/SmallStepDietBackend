@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -162,7 +163,7 @@ public class DietController {
 
     // ---------- UNAUTHENTICATED ----------
     @PostMapping("/unauthenticated")
-    public ResponseEntity<?> addDietForUnauthenticated(@RequestBody DietUnauthenticatedRequestForm requestForm) {
+    public ResponseEntity<?> addDietForUnauthenticated(@Valid @RequestBody DietUnauthenticatedRequestForm requestForm) {
         Long id;
         try {
             id = this.dietService.addDietForUnauthenticated(requestForm);
@@ -175,7 +176,7 @@ public class DietController {
 
     @PutMapping("/unauthenticated")
     public ResponseEntity<?> updateDietForUnauthenticated(@RequestParam Long idDiet,
-                                                       @RequestBody DietUnauthenticatedRequestForm requestForm) {
+                                                          @Valid @RequestBody DietUnauthenticatedRequestForm requestForm) {
         try {
             this.dietService.updateDietForUnauthenticated(idDiet, requestForm);
         } catch (HttpClientErrorException e) {
@@ -186,7 +187,7 @@ public class DietController {
     }
 
     @PutMapping("/final/unauthenticated")
-    public ResponseEntity<?> modifyFinalDietForUnauthenticated(@RequestBody FinalDietModifyUnauthenticatedRequestForm requestForm) {
+    public ResponseEntity<?> modifyFinalDietForUnauthenticated(@Valid @RequestBody FinalDietModifyUnauthenticatedRequestForm requestForm) {
         try {
             this.dietService.modifyFinalDietForUnauthenticated(requestForm);
         } catch (HttpClientErrorException e) {
@@ -198,7 +199,7 @@ public class DietController {
 
     @PutMapping("/final/day/reset/unauthenticated")
     public ResponseEntity<?> resetDayForUnauthenticated(@RequestParam Long idDiet, @RequestParam Long idFinalDay,
-                                                        @RequestBody BodyInfoForm bodyInfoForm) {
+                                                        @Valid @RequestBody BodyInfoForm bodyInfoForm) {
         try {
             this.dietService.resetDay(idDiet, idFinalDay, bodyInfoForm);
         } catch (HttpClientErrorException e) {
